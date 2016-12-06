@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Cook Together</string>
+    <string name="hello_world">hello world</string>
+    <string name="location"> </string>
+    <string name="button_go_to_map">Map</string>
+    <string name="button_go_to_localization">localization</string>
+    <string name="button_search_location">go To</string>
 </resources>
