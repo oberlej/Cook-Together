@@ -2,11 +2,15 @@ package com.cooktogether.mainscreens;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,19 +31,23 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.zip.Inflater;
 
 public class CreateActivity extends BaseActivity {
     private LinearLayout mListOfDays;
     private EditText mTitle;
     private EditText mDescription;
+    private EditText mLocationName;
     private Button mBtnNewDay;
     private Spinner mPopupSpinner;
     private List<String> days;
 
     private DatabaseReference mDatabase;
+
 
     private enum Day {
         MONDAY("Monday"), TUESDAY("Tuesday"), WEDNESDAY("Wednesday"), THURSDAY("Thursday"), FRIDAY("Friday"), SATURDAY("Saturday"), SUNDAY("Sunday");
@@ -74,7 +82,12 @@ public class CreateActivity extends BaseActivity {
         switch (item.getItemId()) {
             case R.id.action_save:
                 String mealId = mDatabase.child("meals").push().getKey();
-                Meal m = new Meal(mTitle.getText().toString(),mDescription.getText().toString(),getUid(),mealId);
+                String locationName = mLocationName.getText().toString();
+                Location location = getLocation(locationName);
+                if(location == null){
+                    //todo Alert box to change the location
+                }
+                Meal m = new Meal(mTitle.getText().toString(),mDescription.getText().toString(),getUid(),mealId, location);
                 mDatabase.child("meals").child(mealId).setValue(m);
                 return true;
             case R.id.action_logout:
@@ -91,6 +104,7 @@ public class CreateActivity extends BaseActivity {
         mListOfDays = (LinearLayout) findViewById(R.id.create_list_of_days);
         mTitle = (EditText) findViewById(R.id.create_title);
         mDescription = (EditText) findViewById(R.id.create_description);
+        mLocationName = (EditText) findViewById(R.id.create_location);
 
         days = new ArrayList<String>();
         for (Day d : Day.values()) {
@@ -154,5 +168,25 @@ public class CreateActivity extends BaseActivity {
         }
         Day day = Day.values()[origIndex];
         days.add(index, day.name);
+    }
+
+    /*
+    For now it returns only the first address found to make it simple
+     */
+    private Location getLocation(String locationName){
+        Geocoder geo = new Geocoder(this, Locale.getDefault());
+        Location location = new Location("");
+        try {
+            List<Address> addresses =  geo.getFromLocationName(locationName, 1);
+            if(addresses.size() > 0){
+                Address address = addresses.get(0);
+                location.setLatitude(address.getLatitude());
+                location.setLongitude(address.getLongitude());
+                return location;
+            }
+        }catch (IOException e){
+            Log.e("getLocation", e.getMessage());
+        }
+        return null;
     }
 }
