@@ -37,6 +37,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
+                <TextView
+                    style="@style/Header"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Free Days" />
 
                 <LinearLayout
                     android:id="@+id/create_list_of_days"
@@ -46,21 +51,6 @@
 
                 </LinearLayout>
 
-                <EditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textPersonName"
-                    android:text="Location"
-                    android:ems="10"
-                    android:id="@+id/create_location"
-                    android:maxLines="1"/>
-
-                <TextView
-                    style="@style/Header"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="Free Days" />
-
                 <Button
                     android:layout_marginTop="10dp"
                     android:id="@+id/create_new_day_btn"
@@ -69,7 +59,15 @@
                     android:onClick="addDay"
                     android:text="Add Day" />
             </LinearLayout>
-        </LinearLayout>
 
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textPersonName"
+                android:text="Location"
+                android:ems="10"
+                android:id="@+id/create_location"
+                android:maxLines="1"/>
+        </LinearLayout>
     </ScrollView>
 </LinearLayout>

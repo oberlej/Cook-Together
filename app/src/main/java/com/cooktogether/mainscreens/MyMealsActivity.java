@@ -11,6 +11,6 @@ public class MyMealsActivity extends AbstractMealListActivity {
     @Override
     public Query getQuery(DatabaseReference databaseReference) {
         // All my posts
-        return databaseReference.child("meals").orderByChild("userId").equalTo(getUid());
+        return databaseReference.child("meals").orderByChild("userKey").equalTo(getUid());
     }
 }
