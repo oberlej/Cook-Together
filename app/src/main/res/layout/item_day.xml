@@ -29,12 +29,16 @@
 
 
         <CheckBox
+            android:onClick="toggleMealTime"
+            android:id="@+id/day_lunch_cb"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Lunch" />
 
         <CheckBox
+            android:onClick="toggleMealTime"
+            android:id="@+id/day_dinner_cb"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"

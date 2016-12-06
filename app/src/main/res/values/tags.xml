@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <item name="TAG_ORIG_INDEX" type="id"/>
-    <item name="TAG_CHILD_INDEX" type="id"/>
+    <item name="TAG_ORIG_INDEX" type="id" />
+    <item name="TAG_CHILD_INDEX" type="id" />
+    <item name="TAG_DAY" type="id" />
 </resources>

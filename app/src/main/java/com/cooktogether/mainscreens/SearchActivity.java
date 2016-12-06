@@ -1,16 +1,16 @@
 package com.cooktogether.mainscreens;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-import com.cooktogether.BaseActivity;
+import com.cooktogether.helpers.AbstractBaseActivity;
 import com.cooktogether.R;
 
-public class SearchActivity extends BaseActivity {
+public class SearchActivity extends AbstractBaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        checkIsConnected();
         setContentView(R.layout.activity_search);
     }
 }

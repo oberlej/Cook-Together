@@ -32,15 +32,23 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/activity_vertical_margin"
             android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:onClick="newDate"
-            android:text="Propose a new cooking date" />
+            android:onClick="newMeal"
+            android:text="Propose a new meal" />
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/activity_vertical_margin"
             android:layout_marginTop="@dimen/activity_vertical_margin"
-            android:onClick="searchDate"
-            android:text="Search for a cooking date" />
+            android:onClick="myMeals"
+            android:text="My proposed meals" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:onClick="searchMeal"
+            android:text="Search for meals proposed by other users" />
     </LinearLayout>
 </LinearLayout>

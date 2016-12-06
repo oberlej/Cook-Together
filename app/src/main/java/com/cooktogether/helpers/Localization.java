@@ -1,4 +1,4 @@
-package com.cooktogether;
+package com.cooktogether.helpers;
 
 import android.Manifest;
 import android.content.Context;
@@ -22,6 +22,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.cooktogether.R;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;

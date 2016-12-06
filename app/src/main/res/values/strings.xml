@@ -20,6 +20,7 @@
     <string name="title_activity_authentication">AuthenticationActivity</string>
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
+    <string name="MEAL_KEY">meal_key</string>
 </resources>
 
 
