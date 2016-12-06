@@ -113,8 +113,8 @@ public class Localization extends AppCompatActivity implements OnMapReadyCallbac
             double longitude = location.getLongitude();
 
             Location exp = mLocation;
-            exp.setLatitude(mLocation.getLatitude()+5);
-            exp.setLongitude(mLocation.getLongitude()+2);
+            exp.setLatitude(mLocation.getLatitude()+0.1);
+            exp.setLongitude(mLocation.getLongitude()+0.1);
             nearBy.add(exp);
 
             CameraPosition cameraPos = new CameraPosition.Builder().target(new LatLng(latitude, longitude)).zoom(10).build();

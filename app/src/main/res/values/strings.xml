@@ -1,8 +1,25 @@
 <resources>
     <string name="app_name">Cook Together</string>
-    <string name="hello_world">hello world</string>
     <string name="location"> </string>
     <string name="button_go_to_map">Map</string>
     <string name="button_go_to_localization">localization</string>
     <string name="button_search_location">go To</string>
+    <string name="password_hint">Password</string>
+    <string name="email_hint">Email</string>
+    <string name="sign_up_button_label">Sign Up</string>
+    <string name="signup_error_message">Please make sure you enter an email address and password!</string>
+    <string name="signup_error_title">Error!</string>
+    <string name="signup_success">Account successfully created! You can now Login.</string>
+    <string name="login_error_message">Please make sure you enter an email address and password!</string>
+    <string name="login_error_title">Error!</string>
+    <string name="login_button_label">Login</string>
+    <string name="sign_up_text">Sign Up!</string>
+    <string name="title_activity_login">Sign in</string>
+    <string name="add_item">Add New Item</string>
+    <string name="action_logout">Logout</string>
+    <string name="title_activity_authentication">AuthenticationActivity</string>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
 </resources>
+
+
