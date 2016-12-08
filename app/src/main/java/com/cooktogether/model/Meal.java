@@ -32,7 +32,6 @@ public class Meal {
         this.mealKey = mealKey;
         this.freeDays = freeDays;
         this.location = location;
-        System.out.println("locaaaaatiooooon "+location);
     }
 
     public List<Day> getFreeDays() {
