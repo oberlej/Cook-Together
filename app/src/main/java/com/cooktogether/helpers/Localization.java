@@ -23,6 +23,7 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.cooktogether.R;
+import com.cooktogether.model.UserLocation;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -38,7 +39,7 @@ import java.util.Locale;
 
 public class Localization extends AppCompatActivity implements OnMapReadyCallback {
     private GoogleMap myGoogleMap;
-    private Location mLocation;
+    private UserLocation mLocation;
     private ArrayList<Location> nearBy ;
 
     @Override
@@ -47,7 +48,7 @@ public class Localization extends AppCompatActivity implements OnMapReadyCallbac
         setContentView(R.layout.activity_localization);
 
         ((MapFragment) getFragmentManager().findFragmentById(R.id.myMap)).getMapAsync(this);
-        mLocation = null;
+        mLocation = new UserLocation();
         nearBy = new ArrayList<Location>();
         /*
         LocationManager locationManager;
@@ -92,10 +93,10 @@ public class Localization extends AppCompatActivity implements OnMapReadyCallbac
             TextView myLocationText = (TextView) findViewById(R.id.myLocationText);
             myLocationText.setText("Locating using " + provider);
 
-
-            mLocation = locationManager.getLastKnownLocation(provider);
-            if (mLocation != null) {
-                updateWithNewLocation(mLocation);
+            Location location = new Location(provider);
+            location = locationManager.getLastKnownLocation(provider);
+            if (location != null) {
+                updateWithNewLocation(location);
             }
             locationManager.requestLocationUpdates(provider, 2000, 10, locationListener);
 
@@ -112,11 +113,11 @@ public class Localization extends AppCompatActivity implements OnMapReadyCallbac
         if(location != null){
             double latitude = location.getLatitude();
             double longitude = location.getLongitude();
-
-            Location exp = mLocation;
-            exp.setLatitude(mLocation.getLatitude()+0.1);
-            exp.setLongitude(mLocation.getLongitude()+0.1);
-            nearBy.add(exp);
+            //updating mLocation
+            latitudeLongitude = "lat: "+latitude +" long: "+ longitude;
+            mLocation.setLatitude(latitude);
+            mLocation.setLongitude(longitude);
+            mLocation.setName(latitudeLongitude);
 
             CameraPosition cameraPos = new CameraPosition.Builder().target(new LatLng(latitude, longitude)).zoom(10).build();
 
@@ -143,15 +144,17 @@ public class Localization extends AppCompatActivity implements OnMapReadyCallbac
                         stringBuilder.append("\n").append(address.getAddressLine(i));
                     }
                     addressString = stringBuilder.toString();
+                    mLocation.setName(address.getLocality());
                 }
             } catch (IOException e){
                 Log.e("update geocoder error:", e.getMessage());
             }
         } else {
             latitudeLongitude = "No location found";
+            mLocation.setName(latitudeLongitude);
         }
 
-        myLocationText.setText("Your current position is:" + addressString);
+        myLocationText.setText("Your position is:" + addressString);
 
     }
 
@@ -185,10 +188,10 @@ public class Localization extends AppCompatActivity implements OnMapReadyCallbac
 
         String addressString = "No address";
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        Location location = new Location("");
         try {
             List<Address> addresses = geocoder.getFromLocationName(locationName, 1);
             StringBuilder stringBuilder = new StringBuilder();
-            System.out.print("size"+ addresses.size());
             if(addresses.size() > 0) {
                 Address address = addresses.get(0);
 
@@ -196,9 +199,11 @@ public class Localization extends AppCompatActivity implements OnMapReadyCallbac
                     stringBuilder.append("\n").append(address.getAddressLine(i));
                 }
                 stringBuilder.append(address.getCountryName());
-                mLocation.setLongitude(address.getLongitude());
-                mLocation.setLatitude(address.getLatitude());
-                updateWithNewLocation(mLocation);
+
+                location.setLongitude(address.getLongitude());
+                location.setLatitude(address.getLatitude());
+                updateWithNewLocation(location);
+
                 addressString = stringBuilder.toString();
 
             }

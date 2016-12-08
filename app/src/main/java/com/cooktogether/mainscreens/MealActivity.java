@@ -24,6 +24,7 @@ import com.cooktogether.R;
 import com.cooktogether.model.Day;
 import com.cooktogether.model.DayEnum;
 import com.cooktogether.model.Meal;
+import com.cooktogether.model.UserLocation;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -114,11 +115,14 @@ public class MealActivity extends AbstractBaseActivity {
             mMealKey = getDB().child("meals").push().getKey();
         }
         String locationName = mLocationName.getText().toString();
-        Location location = getLocation(locationName);
-        if (location == null) {
+        UserLocation location = getLocation(locationName);
+
+        if (location.getAddress() == null) {
+            Toast.makeText(getApplicationContext(), "Unvalid location or no service available", Toast.LENGTH_LONG).show();
             //todo Alert box to change the location
         }
-        Meal m = new Meal(mTitle.getText().toString(), mDescription.getText().toString(), getUid(), mMealKey, mDaysFree, null);
+
+        Meal m = new Meal(mTitle.getText().toString(), mDescription.getText().toString(), getUid(), mMealKey, mDaysFree, location);
 
         getDB().child("meals").child(mMealKey).setValue(m);
 //        mDatabase.child("users").child(getUid()).child("meals").child()
@@ -162,6 +166,7 @@ public class MealActivity extends AbstractBaseActivity {
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     Meal meal = Meal.parseSnapshot(dataSnapshot);
 
+                    mLocationName.setText(meal.getLocation().toString());
                     mTitle.setText(meal.getTitle());
                     mDescription.setText(meal.getDescription());
                     initNotFreeDays();
@@ -250,24 +255,23 @@ public class MealActivity extends AbstractBaseActivity {
         }
     }
 
-
     /*
     For now it returns only the first address found to make it simple
      */
-    private Location getLocation(String locationName) {
+    private UserLocation getLocation(String locationName) {
         Geocoder geo = new Geocoder(this, Locale.getDefault());
-        Location location = new Location("");
+        UserLocation location = new UserLocation();
         try {
             List<Address> addresses = geo.getFromLocationName(locationName, 1);
             if (addresses.size() > 0) {
                 Address address = addresses.get(0);
                 location.setLatitude(address.getLatitude());
                 location.setLongitude(address.getLongitude());
-                return location;
+                location.setAddress(address);
             }
         } catch (IOException e) {
             Log.e("getLocation", e.getMessage());
         }
-        return null;
+        return location;
     }
 }

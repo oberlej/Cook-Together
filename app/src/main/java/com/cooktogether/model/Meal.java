@@ -16,7 +16,7 @@ public class Meal {
     private String description;
     private String userKey;
     private String mealKey;
-    private Location location;
+    private UserLocation location;
 
 
     private List<Day> freeDays;
@@ -25,13 +25,14 @@ public class Meal {
 
     }
 
-    public Meal(String title, String description, String userKey, String mealKey, List<Day> freeDays, Location location) {
+    public Meal(String title, String description, String userKey, String mealKey, List<Day> freeDays, UserLocation location) {
         this.title = title;
         this.description = description;
         this.userKey = userKey;
         this.mealKey = mealKey;
         this.freeDays = freeDays;
         this.location = location;
+        System.out.println("locaaaaatiooooon "+location);
     }
 
     public List<Day> getFreeDays() {
@@ -74,11 +75,11 @@ public class Meal {
         this.description = description;
     }
 
-    public Location getLocation() {
+    public UserLocation getLocation() {
         return this.location;
     }
 
-    public void setLocation(Location location) {
+    public void setLocation(UserLocation location) {
         if (location != null) {
             this.location = location;
         }
@@ -89,6 +90,23 @@ public class Meal {
         for(DataSnapshot day : snapshot.child("freeDays").getChildren()){
             freeDays.add(new Day((String)day.child("name").getValue(),(Boolean)day.child("lunch").getValue(),(Boolean)day.child("dinner").getValue()));
         }
-        return new Meal((String) snapshot.child("title").getValue(), (String) snapshot.child("description").getValue(), (String) snapshot.child("userKey").getValue(), (String) snapshot.child("mealKey").getValue(), freeDays,null);
+
+        double lat = 0.0;
+        double lon = 0.0;
+        String locationName = "";
+
+        if(snapshot.hasChild("location")) {
+            DataSnapshot loc = snapshot.child("location");
+            lat = (Double) loc.child("latitude").getValue();
+            lon = (Double) loc.child("longitude").getValue();
+            locationName = (String) loc.child("name").getValue();
+        }
+
+        UserLocation location = new UserLocation();
+        location.setLongitude(lon);
+        location.setLatitude(lat);
+        location.setName(locationName);
+
+        return new Meal((String) snapshot.child("title").getValue(), (String) snapshot.child("description").getValue(), (String) snapshot.child("userKey").getValue(), (String) snapshot.child("mealKey").getValue(), freeDays,location);
     }
 }
