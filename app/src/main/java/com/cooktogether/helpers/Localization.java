@@ -13,42 +13,77 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ListFragment;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.cooktogether.R;
+import com.cooktogether.mainscreens.MealActivity;
+import com.cooktogether.model.Meal;
+import com.cooktogether.model.UserLocation;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class Localization extends AppCompatActivity implements OnMapReadyCallback {
+public class Localization extends AbstractBaseActivity implements OnMapReadyCallback {
     private GoogleMap myGoogleMap;
-    private Location mLocation;
-    private ArrayList<Location> nearBy ;
+    private UserLocation mLocation;
+    private ArrayList<Meal> nearByMealsList;
+
+    // Set up Layout Manager, reverse layout
+   // LinearLayoutManager mManager = new LinearLayoutManager(getApplicationContext());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        checkIsConnected();
         setContentView(R.layout.activity_localization);
 
+        //getting the list of other meal propositions
+        nearByMealsList = new ArrayList<Meal>();
+        Query mealsQuery = getQuery(getDB());
+
+        mealsQuery.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot meals) {
+                nearByMealsList = findNearByMeals(meals);
+                Location location;
+                if(mLocation == null)
+                    location = null;
+                else
+                location = new Location("provider");
+                location.setLatitude(mLocation.getLatitude());
+                location.setLongitude(mLocation.getLongitude());
+                updateWithNewLocation(location);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The read failed: " + databaseError.getMessage());
+            }
+        });
+
         ((MapFragment) getFragmentManager().findFragmentById(R.id.myMap)).getMapAsync(this);
-        mLocation = null;
-        nearBy = new ArrayList<Location>();
+        mLocation = new UserLocation();
+
         /*
         LocationManager locationManager;
         String context = Context.LOCATION_SERVICE;
@@ -56,6 +91,17 @@ public class Localization extends AppCompatActivity implements OnMapReadyCallbac
         // using gps
         //String provider = LocationManager.GPS_PROVIDER;
         */
+
+    }
+
+    private ArrayList<Meal> findNearByMeals(DataSnapshot meals) {
+        ArrayList<Meal> nearByMeals = new ArrayList<Meal>();
+
+        for(DataSnapshot mealSnap : meals.getChildren() ){
+            Meal meal = Meal.parseSnapshot(mealSnap);
+            nearByMeals.add(meal);
+        }
+        return nearByMeals;
     }
 
     @Override
@@ -77,6 +123,31 @@ public class Localization extends AppCompatActivity implements OnMapReadyCallbac
             // Enable/disable zooming functionality
             myGoogleMap.getUiSettings().setZoomGesturesEnabled(true);
 
+            /*myGoogleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(Marker marker) {
+                    // Launch PostDetailActivity
+                    if(marker.getTag() != "mine") {
+                        Intent intent = new Intent(getApplicationContext(), MealActivity.class);
+                        intent.putExtra(getResources().getString(R.string.MEAL_KEY), (String)marker.getTag());
+                        startActivity(intent);
+                    }
+                    return true;
+                }
+            });*/
+
+            myGoogleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener(){
+
+                @Override
+                public void onInfoWindowClick(Marker marker) {
+                    if(marker.getTag() != "mine") {
+                        Intent intent = new Intent(getApplicationContext(), MealActivity.class);
+                        intent.putExtra(getResources().getString(R.string.MEAL_KEY), (String)marker.getTag());
+                        startActivity(intent);
+                    }
+                }
+            });
+
             LocationManager locationManager;
             String context = Context.LOCATION_SERVICE;
             locationManager = (LocationManager) getSystemService(context);
@@ -92,10 +163,10 @@ public class Localization extends AppCompatActivity implements OnMapReadyCallbac
             TextView myLocationText = (TextView) findViewById(R.id.myLocationText);
             myLocationText.setText("Locating using " + provider);
 
-
-            mLocation = locationManager.getLastKnownLocation(provider);
-            if (mLocation != null) {
-                updateWithNewLocation(mLocation);
+            Location location ;//= new Location(provider);
+            location = locationManager.getLastKnownLocation(provider);
+            if (location != null) {
+                updateWithNewLocation(location);
             }
             locationManager.requestLocationUpdates(provider, 2000, 10, locationListener);
 
@@ -112,11 +183,11 @@ public class Localization extends AppCompatActivity implements OnMapReadyCallbac
         if(location != null){
             double latitude = location.getLatitude();
             double longitude = location.getLongitude();
-
-            Location exp = mLocation;
-            exp.setLatitude(mLocation.getLatitude()+0.1);
-            exp.setLongitude(mLocation.getLongitude()+0.1);
-            nearBy.add(exp);
+            //updating mLocation
+            latitudeLongitude = "lat: "+latitude +" long: "+ longitude;
+            mLocation.setLatitude(latitude);
+            mLocation.setLongitude(longitude);
+            mLocation.setName(latitudeLongitude);
 
             CameraPosition cameraPos = new CameraPosition.Builder().target(new LatLng(latitude, longitude)).zoom(10).build();
 
@@ -125,9 +196,11 @@ public class Localization extends AppCompatActivity implements OnMapReadyCallbac
             //removes all the marker in the map
             myGoogleMap.clear();
             //add the markers
-            addMarkerTo(latitude, longitude, "My position");
-            for(int i =0; i< nearBy.size(); i++) {
-                addMarkerTo(nearBy.get(i).getLatitude(), nearBy.get(i).getLongitude(), "NEAR BY");
+            addMarkerTo("mine", mLocation, "My position");
+            if(!nearByMealsList.isEmpty()) {
+                for (Meal m : nearByMealsList) {
+                    addMarkerTo(m.getMealKey(), m.getLocation(), m.getTitle());
+                }
             }
 
             Geocoder geocoder = new Geocoder(this, Locale.getDefault());
@@ -143,15 +216,24 @@ public class Localization extends AppCompatActivity implements OnMapReadyCallbac
                         stringBuilder.append("\n").append(address.getAddressLine(i));
                     }
                     addressString = stringBuilder.toString();
+                    mLocation.setName(address.getLocality());
                 }
             } catch (IOException e){
                 Log.e("update geocoder error:", e.getMessage());
             }
         } else {
+            myGoogleMap.clear();
+            //add the markers
+            if(!nearByMealsList.isEmpty()) {
+                for (Meal m : nearByMealsList) {
+                    addMarkerTo(m.getMealKey(), m.getLocation(), m.getTitle());
+                }
+            }
             latitudeLongitude = "No location found";
+            mLocation.setName(latitudeLongitude);
         }
 
-        myLocationText.setText("Your current position is:" + addressString);
+        myLocationText.setText("Your position is:" + addressString);
 
     }
 
@@ -185,10 +267,10 @@ public class Localization extends AppCompatActivity implements OnMapReadyCallbac
 
         String addressString = "No address";
         Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        Location location = new Location("");
         try {
             List<Address> addresses = geocoder.getFromLocationName(locationName, 1);
             StringBuilder stringBuilder = new StringBuilder();
-            System.out.print("size"+ addresses.size());
             if(addresses.size() > 0) {
                 Address address = addresses.get(0);
 
@@ -196,9 +278,11 @@ public class Localization extends AppCompatActivity implements OnMapReadyCallbac
                     stringBuilder.append("\n").append(address.getAddressLine(i));
                 }
                 stringBuilder.append(address.getCountryName());
-                mLocation.setLongitude(address.getLongitude());
-                mLocation.setLatitude(address.getLatitude());
-                updateWithNewLocation(mLocation);
+
+                location.setLongitude(address.getLongitude());
+                location.setLatitude(address.getLatitude());
+                updateWithNewLocation(location);
+
                 addressString = stringBuilder.toString();
 
             }
@@ -209,12 +293,14 @@ public class Localization extends AppCompatActivity implements OnMapReadyCallbac
     }
 
     //adds marker at the position latitude, longitude to the map , entitled title
-    private void addMarkerTo(double latitude, double longitude, String title){
+    private void addMarkerTo(String id, UserLocation location, String title){
         MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(new LatLng(latitude, longitude));
+        markerOptions.position(new LatLng(location.getLatitude(), location.getLongitude()));
         markerOptions.title(title);
-        markerOptions.snippet("("+latitude+","+longitude+")");
-        myGoogleMap.addMarker(markerOptions).showInfoWindow();
+        markerOptions.snippet(location.toString());
+        Marker myMarker = myGoogleMap.addMarker(markerOptions);
+        myMarker.showInfoWindow();
+        myMarker.setTag(id);
     }
 
     /*private Address getAddress(double latitude, double longitude){
@@ -224,4 +310,9 @@ public class Localization extends AppCompatActivity implements OnMapReadyCallbac
     private Address getAddress(String locationName){
 
     }*/
+
+    public Query getQuery(DatabaseReference databaseReference){
+        Query allPosts = databaseReference.child("meals");
+        return  allPosts;
+    }
 }

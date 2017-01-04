@@ -26,8 +26,8 @@ import java.util.List;
 
 public abstract class AbstractMealListActivity extends AbstractBaseActivity {
     private FirebaseRecyclerAdapter<Meal, MealViewHolder> mAdapter;
-    private RecyclerView mRecycler;
-    private LinearLayoutManager mManager;
+    protected RecyclerView mRecycler;
+    protected LinearLayoutManager mManager;
 
     public AbstractMealListActivity() {
     }

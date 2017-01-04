@@ -4,14 +4,18 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
-import android.location.Location;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AlertDialog;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -21,15 +25,13 @@ import android.widget.Toast;
 
 import com.cooktogether.helpers.AbstractBaseActivity;
 import com.cooktogether.R;
+import com.cooktogether.listener.RecyclerItemClickListener;
 import com.cooktogether.model.Day;
 import com.cooktogether.model.DayEnum;
 import com.cooktogether.model.Meal;
-import com.google.firebase.database.ChildEventListener;
+import com.cooktogether.model.UserLocation;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
@@ -37,6 +39,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+
+import com.cooktogether.adapter.locationOptionsAdapter;
 
 public class MealActivity extends AbstractBaseActivity {
     private LinearLayout mListOfDays;
@@ -51,6 +55,12 @@ public class MealActivity extends AbstractBaseActivity {
     private boolean mAnswer;
     private EditText mLocationName;
 
+    // for the list of location options
+    private RecyclerView mRecyclerView;
+    private RecyclerView.Adapter mAdapter;
+    private RecyclerView.LayoutManager mLayoutManager;
+    private UserLocation selectedLocation;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +68,29 @@ public class MealActivity extends AbstractBaseActivity {
 
         setContentView(R.layout.activity_meal);
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar_main));
+
+        //for the list of location options
+        mRecyclerView = (RecyclerView) findViewById(R.id.location_options);
+
+        // use this setting to improve performance if you know that changes
+        // in content do not change the layout size of the RecyclerView
+        mRecyclerView.setHasFixedSize(true);
+
+        // use a linear layout manager
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.addOnItemTouchListener(
+                new RecyclerItemClickListener(this, new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override public void onItemClick(View view, int position) {
+                        selectedLocation = ((locationOptionsAdapter)mAdapter).getSelectedLocation(position);
+                        mLocationName.setText(selectedLocation.toString());
+                        ((locationOptionsAdapter)mAdapter).clear();
+                        mRecyclerView.clearFocus();
+                    }
+                })
+        );
+
+
 
         initFields();
     }
@@ -113,15 +146,16 @@ public class MealActivity extends AbstractBaseActivity {
         if (!mIsUpdate) {
             mMealKey = getDB().child("meals").push().getKey();
         }
-        String locationName = mLocationName.getText().toString();
-        Location location = getLocation(locationName);
-        if (location == null) {
+
+        if (selectedLocation == null) {
+            Toast.makeText(getApplicationContext(), "Unvalid location or no service available", Toast.LENGTH_LONG).show();
             //todo Alert box to change the location
         }
-        Meal m = new Meal(mTitle.getText().toString(), mDescription.getText().toString(), getUid(), mMealKey, mDaysFree, null);
+
+        Meal m = new Meal(mTitle.getText().toString(), mDescription.getText().toString(), getUid(), mMealKey, mDaysFree, selectedLocation);
 
         getDB().child("meals").child(mMealKey).setValue(m);
-//        mDatabase.child("users").child(getUid()).child("meals").child()
+
         if (!mIsUpdate) {
             Toast.makeText(getApplicationContext(), "Meal " + mTitle.getText().toString() + " created.", Toast.LENGTH_LONG).show();
         } else {
@@ -137,6 +171,27 @@ public class MealActivity extends AbstractBaseActivity {
         mDescription = (EditText) findViewById(R.id.create_description);
         mLocationName = (EditText) findViewById(R.id.create_location);
 
+        mLocationName.addTextChangedListener(new TextWatcher() {
+            ArrayList<UserLocation> locations = new ArrayList<UserLocation>();
+            public void afterTextChanged(Editable s) {
+
+                if(mLocationName.isFocused()) {
+                    locations = getLocation(mLocationName.getText().toString());
+                    if(locations.isEmpty()) {
+                        mLocationName.setError("Location is not found, please try again");
+                    }else {
+                        mAdapter = new locationOptionsAdapter();
+                        mRecyclerView.setAdapter(mAdapter);
+                        ((locationOptionsAdapter) mAdapter).setMOptions(locations);
+                    }
+                }
+            }
+
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            }
+        });
         initNotFreeDays();
         mDaysFree = new ArrayList<Day>();
 
@@ -162,6 +217,7 @@ public class MealActivity extends AbstractBaseActivity {
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     Meal meal = Meal.parseSnapshot(dataSnapshot);
 
+                    mLocationName.setText(meal.getLocation().toString());
                     mTitle.setText(meal.getTitle());
                     mDescription.setText(meal.getDescription());
                     initNotFreeDays();
@@ -250,24 +306,28 @@ public class MealActivity extends AbstractBaseActivity {
         }
     }
 
-
     /*
     For now it returns only the first address found to make it simple
      */
-    private Location getLocation(String locationName) {
+    private ArrayList<UserLocation> getLocation(String locationName) {
         Geocoder geo = new Geocoder(this, Locale.getDefault());
-        Location location = new Location("");
+
+        ArrayList<UserLocation> locations = new ArrayList<UserLocation>();
+
         try {
-            List<Address> addresses = geo.getFromLocationName(locationName, 1);
+            List<Address> addresses = geo.getFromLocationName(locationName, 5);
             if (addresses.size() > 0) {
-                Address address = addresses.get(0);
-                location.setLatitude(address.getLatitude());
-                location.setLongitude(address.getLongitude());
-                return location;
+                for(Address address : addresses) {
+                    UserLocation location = new UserLocation();
+                    location.setLatitude(address.getLatitude());
+                    location.setLongitude(address.getLongitude());
+                    location.setAddress(address);
+                    locations.add(location);
+                }
             }
         } catch (IOException e) {
             Log.e("getLocation", e.getMessage());
         }
-        return null;
+        return locations;
     }
 }
