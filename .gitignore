@@ -37,10 +37,12 @@ captures/
 .idea/workspace.xml
 .idea/*
 .idea/tasks.xml
-.idea/libraries
+.idea/libraries/*
 
 # Keystore files
 *.jks
 
 # External native build folder generated in Android Studio 2.2 and later
 .externalNativeBuild
+
+.idea/libraries/animated_vector_drawable_24_2_1.xml
