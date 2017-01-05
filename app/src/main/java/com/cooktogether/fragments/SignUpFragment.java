@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.cooktogether.R;
+import com.cooktogether.mainscreens.AuthenticationActivity;
 import com.cooktogether.mainscreens.HomeActivity;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -53,6 +54,7 @@ public class SignUpFragment extends Fragment {
 
         passwordEditText = (EditText) view.findViewById(R.id.signup_pw);
         emailEditText = (EditText) view.findViewById(R.id.signup_email);
+
         signUpButton = (Button) view.findViewById(R.id.signup_btn);
 
         signUpButton.setOnClickListener(new View.OnClickListener() {

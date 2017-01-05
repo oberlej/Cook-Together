@@ -61,16 +61,9 @@ public class LogInFragment extends Fragment {
 
     private void init(View view) {
         mFirebaseAuth = FirebaseAuth.getInstance();
-        signUpTextView = (TextView) view.findViewById(R.id.login_signup);
         emailEditText = (EditText) view.findViewById(R.id.login_email);
         passwordEditText = (EditText) view.findViewById(R.id.login_pw);
         logInButton = (Button) view.findViewById(R.id.login_btn);
-        signUpTextView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                ((AuthenticationActivity) getActivity()).showSignUp();
-            }
-        });
 
         logInButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -113,9 +106,9 @@ public class LogInFragment extends Fragment {
         });
 
         // Initialize Facebook Login button
-        LoginButton loginButton = (LoginButton) view.findViewById(R.id.login_fb_btn);
-        loginButton.setReadPermissions("email", "public_profile");
-        loginButton.registerCallback(((AuthenticationActivity) getActivity()).getCallbackManager(), new FacebookCallback<LoginResult>() {
+        LoginButton loginButtonFB = (LoginButton) view.findViewById(R.id.login_fb_btn);
+        loginButtonFB.setReadPermissions("email", "public_profile");
+        loginButtonFB.registerCallback(((AuthenticationActivity) getActivity()).getCallbackManager(), new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 handleFacebookAccessToken(loginResult.getAccessToken());

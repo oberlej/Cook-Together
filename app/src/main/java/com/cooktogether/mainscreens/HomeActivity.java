@@ -22,7 +22,7 @@ public class HomeActivity extends AbstractBaseActivity {
         setContentView(R.layout.activity_home);
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar_main));
         getSupportActionBar().setDisplayShowTitleEnabled(false);
-        ((TextView) findViewById(R.id.toolbar_title)).setText(R.string.app_name);
+//        ((TextView) findViewById(R.id.toolbar_title)).setText(R.string.app_name);
     }
 
     public boolean onCreateOptionsMenu(Menu menu) {

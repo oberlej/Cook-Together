@@ -1,5 +1,6 @@
 package com.cooktogether.mainscreens;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -8,18 +9,26 @@ import android.content.pm.Signature;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cooktogether.R;
 import com.cooktogether.fragments.LogInFragment;
 import com.cooktogether.fragments.SignUpFragment;
+import com.cooktogether.helpers.ViewPagerAdapter;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -37,6 +46,8 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AuthenticationActivity extends AppCompatActivity {
     protected FirebaseAuth mFirebaseAuth;
@@ -47,14 +58,22 @@ public class AuthenticationActivity extends AppCompatActivity {
     private Fragment mLogIn;
     private Fragment mSignUp;
 
+    private Toolbar toolbar;
+    private TabLayout tabLayout;
+    private ViewPager viewPager;
+    private ViewPagerAdapter adapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FacebookSdk.sdkInitialize(getApplicationContext());
+        mCallbackManager = CallbackManager.Factory.create();
+
         setContentView(R.layout.activity_authentication);
 
-        setSupportActionBar((Toolbar) findViewById(R.id.toolbar_main));
+        toolbar = (Toolbar) findViewById(R.id.toolbar_main);
+        setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
-        ((TextView) findViewById(R.id.toolbar_title)).setText(R.string.app_name);
 
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -64,10 +83,13 @@ public class AuthenticationActivity extends AppCompatActivity {
         mLogIn = new LogInFragment().newInstance();
         mSignUp = new SignUpFragment().newInstance();
 
-        getSupportFragmentManager().beginTransaction().add(R.id.activity_authentication, mLogIn).hide(mLogIn).add(R.id.activity_authentication, mSignUp).hide(mSignUp).commit();
+        viewPager = (ViewPager) findViewById(R.id.auth_viewpager);
+        setupViewPager(viewPager);
+        adapter = ((ViewPagerAdapter) viewPager.getAdapter());
 
-        FacebookSdk.sdkInitialize(getApplicationContext());
-        mCallbackManager = CallbackManager.Factory.create();
+        tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(viewPager);
+
         mAuthListener = new FirebaseAuth.AuthStateListener() {
             @Override
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
@@ -81,14 +103,14 @@ public class AuthenticationActivity extends AppCompatActivity {
                 }
             }
         };
+    }
 
-
-        if (mFirebaseUser == null) {
-            // Not logged in, launch the Log In activity
-            showLogIn();
-        } else {
-            loadHome();
-        }
+    private void setupViewPager(final ViewPager viewPager) {
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getSupportFragmentManager());
+        viewPager.setOffscreenPageLimit(1);
+        adapter.addFragment(mLogIn, "Login");
+        adapter.addFragment(mSignUp, "Sign Up");
+        viewPager.setAdapter(adapter);
     }
 
     private void loadHome() {
@@ -98,13 +120,12 @@ public class AuthenticationActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void showLogIn() {
-
-        getSupportFragmentManager().beginTransaction().hide(mSignUp).show(mLogIn).commit();
+    public void showLogIn() {
+        if (viewPager.getCurrentItem() != 0) viewPager.setCurrentItem(0);
     }
 
     public void showSignUp() {
-        getSupportFragmentManager().beginTransaction().hide(mLogIn).show(mSignUp).commit();
+        if (viewPager.getCurrentItem() != 1) viewPager.setCurrentItem(1);
     }
 
     @Override

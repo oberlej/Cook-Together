@@ -7,7 +7,7 @@
     android:theme="@style/ToolbarTheme"
     app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
-    <TextView
-        android:id="@+id/toolbar_title"
-        style="@style/ToolbarTitle" />
+    <!--<TextView-->
+        <!--android:id="@+id/toolbar_title"-->
+        <!--style="@style/ToolbarTitle" />-->
 </android.support.v7.widget.Toolbar>

@@ -14,7 +14,7 @@ import com.google.firebase.database.FirebaseDatabase;
 public abstract class AbstractBaseActivity extends AppCompatActivity {
 
     public DatabaseReference getDB() {
-        if(mDatabase == null){
+        if (mDatabase == null) {
             mDatabase = FirebaseDatabase.getInstance().getReference();
         }
         return mDatabase;
@@ -37,7 +37,9 @@ public abstract class AbstractBaseActivity extends AppCompatActivity {
     }
 
     public void logout() {
-        if (isConnected()) FirebaseAuth.getInstance().signOut();
+        if (isConnected()) {
+            FirebaseAuth.getInstance().signOut();
+        }
 
         Intent intent = new Intent(this, AuthenticationActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
