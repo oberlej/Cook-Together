@@ -21,6 +21,8 @@
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
     <string name="MEAL_KEY">meal_key</string>
+    <string name="facebook_app_id">794014440752386</string>
+    <string name="fb_login_protocol_scheme">fb794014440752386</string>
 </resources>
 
 

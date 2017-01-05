@@ -6,20 +6,31 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.cooktogether.R;
 import com.cooktogether.mainscreens.AuthenticationActivity;
 import com.cooktogether.mainscreens.HomeActivity;
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class LogInFragment extends Fragment {
     protected EditText emailEditText;
@@ -28,7 +39,7 @@ public class LogInFragment extends Fragment {
     protected TextView signUpTextView;
     private FirebaseAuth mFirebaseAuth;
 
-    public static LogInFragment newInstance(){
+    public static LogInFragment newInstance() {
         return new LogInFragment();
     }
 
@@ -50,14 +61,14 @@ public class LogInFragment extends Fragment {
 
     private void init(View view) {
         mFirebaseAuth = FirebaseAuth.getInstance();
-        signUpTextView = (TextView) view.findViewById(R.id.signUpText);
-        emailEditText = (EditText) view.findViewById(R.id.emailField);
-        passwordEditText = (EditText) view.findViewById(R.id.passwordField);
-        logInButton = (Button) view.findViewById(R.id.loginButton);
+        signUpTextView = (TextView) view.findViewById(R.id.login_signup);
+        emailEditText = (EditText) view.findViewById(R.id.login_email);
+        passwordEditText = (EditText) view.findViewById(R.id.login_pw);
+        logInButton = (Button) view.findViewById(R.id.login_btn);
         signUpTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((AuthenticationActivity)getActivity()).showSignUp();
+                ((AuthenticationActivity) getActivity()).showSignUp();
             }
         });
 
@@ -100,5 +111,39 @@ public class LogInFragment extends Fragment {
                 }
             }
         });
+
+        // Initialize Facebook Login button
+        LoginButton loginButton = (LoginButton) view.findViewById(R.id.login_fb_btn);
+        loginButton.setReadPermissions("email", "public_profile");
+        loginButton.registerCallback(((AuthenticationActivity) getActivity()).getCallbackManager(), new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                handleFacebookAccessToken(loginResult.getAccessToken());
+            }
+
+            @Override
+            public void onCancel() {
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+            }
+        });
+    }
+
+    private void handleFacebookAccessToken(AccessToken token) {
+        AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
+        mFirebaseAuth.signInWithCredential(credential)
+                .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        // If sign in fails, display a message to the user. If sign in succeeds
+                        // the auth state listener will be notified and logic to handle the
+                        // signed in user can be handled in the listener.
+                        if (!task.isSuccessful()) {
+                            Toast.makeText(getContext(), "Authentication failed.", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
     }
 }
