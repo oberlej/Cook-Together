@@ -34,7 +34,7 @@ public class ConversationActivity extends AbstractBaseActivity {
     protected LinearLayoutManager mManager;
 
     private String mConversationKey = null;
-    private String mTitle;
+    private TextView mTitle;
     private int nbrMessages;
     private EditText newMessage;
     private List<String> usersKeys;
@@ -63,19 +63,17 @@ public class ConversationActivity extends AbstractBaseActivity {
     }
 
     private void loadConversation() {
-        TextView title = (TextView) findViewById(R.id.conversation_title);
-        title.setText(mTitle);
 
         getDB().child("user-conversations").child(getUid()).child(mConversationKey).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Conversation conversation = Conversation.parseSnapshot(dataSnapshot);
-                //mTitle.setText(conversation.getTitle());
+                mTitle.setText(conversation.getTitle());
                 usersKeys = conversation.getUsersKeys();
 
                 //to make sure the current user Id is always the first in the list
                 usersKeys.remove(getUid());
-                usersKeys.add(0,getUid());
+                usersKeys.add(0, getUid());
 
                 nbrMessages = conversation.getMessages().size();
                 // Set up FirebaseRecyclerAdapter with the Query
@@ -129,7 +127,7 @@ public class ConversationActivity extends AbstractBaseActivity {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(getApplicationContext(), "Failed to load meal.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Failed to load Conversation.", Toast.LENGTH_SHORT).show();
             }
 
         });
@@ -140,9 +138,7 @@ public class ConversationActivity extends AbstractBaseActivity {
         if (intent.hasExtra("key")) {
             mConversationKey = intent.getStringExtra("key");
         }
-        if (intent.hasExtra("title")) {
-            mTitle = intent.getStringExtra("title");
-        }
+        mTitle = (TextView) findViewById(R.id.conversation_title);
     }
 
     @Override
@@ -153,18 +149,13 @@ public class ConversationActivity extends AbstractBaseActivity {
         }
     }
 
-    public Query getQuery(DatabaseReference databaseReference) {
-        return databaseReference.child("user-conversations").child(getUid()).child(mConversationKey).child("messages");
-
-    }
-    public void sendMessage(View view){
+    public void sendMessage(View view) {
         newMessage = (EditText) findViewById(R.id.text_message);
-        Message m = new Message(getUid(),newMessage.getText().toString());
+        Message m = new Message(getUid(), newMessage.getText().toString());
 
-        //getDB().child("conversations").child(mConversationKey).child("messages").push().setValue(m);
 
-        if(nbrMessages == 0) {
-            Conversation newConv = new Conversation(mTitle, mConversationKey, usersKeys);
+        if (nbrMessages == 0) {
+            Conversation newConv = new Conversation(mTitle.getText().toString(), mConversationKey, usersKeys);
             getDB().child("user-conversations").child(usersKeys.get(1)).child(mConversationKey).setValue(newConv);
         }
         getDB().child("user-conversations").child(usersKeys.get(1)).child(mConversationKey).child("messages").push().setValue(m);

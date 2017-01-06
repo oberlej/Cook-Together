@@ -64,7 +64,6 @@ public class ConversationListActivity extends AbstractBaseActivity {
                         // Launch PostDetailActivity
                         Intent intent = new Intent(getApplicationContext(), ConversationActivity.class);
                         intent.putExtra("key", conversationKey);
-                        intent.putExtra("title", model.getTitle());
                         startActivity(intent);
                     }
                 });

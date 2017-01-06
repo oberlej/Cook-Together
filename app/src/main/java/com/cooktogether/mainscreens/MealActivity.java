@@ -346,24 +346,14 @@ public class MealActivity extends AbstractBaseActivity {
         usersKeys.add(mUserKey);
         Conversation newConv = new Conversation(mTitle.getText().toString(), conversationKey, usersKeys);
 
-        //getDB().child("conversations").child(conversationKey).setValue(newConv);
-
-        //add conversation to user conversations
-        //Map<String, Object> conversationVal = newConv.toMap();
-
-        //Map<String, Object> childUpdates = new HashMap<>();
         getDB().child("user-conversations").child(getUid()).child(conversationKey).setValue(newConv);
-        //getDB().child("user-conversations").child(usersKeys.get(0)).child(conversationKey).setValue(newConv);
-        //childUpdates.put("/user-conversations/" + usersKeys.get(1) + "/" + conversationKey, conversationVal);
-        //childUpdates.put("/user-conversations/" + usersKeys.get(0) + "/" + conversationKey, conversationVal);
-        //getDB().updateChildren(childUpdates);
+
         Intent intent = new Intent(this, ConversationActivity.class);
         Bundle extras = new Bundle();
         extras.putString("key", conversationKey);
-        extras.putString("title", newConv.getTitle());
+        //extras.putString("title", newConv.getTitle());
         intent.putExtras(extras);
-        //intent.putExtra(getResources().getString(R.string.CONVERSATION_KEY), conversationKey);
-        //intent.putExtra(getResources().getString(R.string.CONVERSATION_TITLE), newConv.getTitle());
+
         startActivity(intent);
     }
 }
