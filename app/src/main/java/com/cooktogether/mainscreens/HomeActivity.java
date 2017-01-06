@@ -8,6 +8,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.cooktogether.helpers.ConversationListActivity;
 import com.cooktogether.helpers.Localization;
 import com.cooktogether.helpers.AbstractBaseActivity;
 import com.cooktogether.R;
@@ -55,6 +56,11 @@ public class HomeActivity extends AbstractBaseActivity {
 
     public void myMeals(View view) {
         Intent intent = new Intent(this, MyMealsActivity.class);
+        startActivity(intent);
+    }
+
+    public void goToConversations(View view){
+        Intent intent = new Intent(this, ConversationListActivity.class);
         startActivity(intent);
     }
 }

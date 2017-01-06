@@ -47,5 +47,13 @@
             android:layout_marginTop="@dimen/activity_vertical_margin"
             android:onClick="searchMeal"
             android:text="Search for meals proposed by other users" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/activity_vertical_margin"
+            android:layout_marginTop="@dimen/activity_vertical_margin"
+            android:onClick="goToConversations"
+            android:text="Messages" />
     </LinearLayout>
 </LinearLayout>

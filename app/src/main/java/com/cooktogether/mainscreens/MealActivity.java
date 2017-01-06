@@ -25,7 +25,9 @@ import android.widget.Toast;
 
 import com.cooktogether.helpers.AbstractBaseActivity;
 import com.cooktogether.R;
+import com.cooktogether.helpers.ConversationActivity;
 import com.cooktogether.listener.RecyclerItemClickListener;
+import com.cooktogether.model.Conversation;
 import com.cooktogether.model.Day;
 import com.cooktogether.model.DayEnum;
 import com.cooktogether.model.Meal;
@@ -329,5 +331,14 @@ public class MealActivity extends AbstractBaseActivity {
             Log.e("getLocation", e.getMessage());
         }
         return locations;
+    }
+
+    public void contact(View view){
+        String conversationKey = getDB().child("conversations").push().getKey();
+        Conversation newConv = new Conversation(mTitle.getText().toString(), conversationKey, getUid());
+        getDB().child("conversations").child(conversationKey).setValue(newConv);
+        Intent intent = new Intent(this, ConversationActivity.class);
+        intent.putExtra(getResources().getString(R.string.CONVERSATION_KEY), conversationKey);
+        startActivity(intent);
     }
 }
