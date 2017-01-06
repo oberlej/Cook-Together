@@ -26,21 +26,7 @@
             android:name=".mainscreens.HomeActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden" />
-        <activity
-            android:name=".mainscreens.MealActivity"
-            android:parentActivityName=".mainscreens.HomeActivity"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden" />
-        <activity
-            android:name=".mainscreens.SearchActivity"
-            android:parentActivityName=".mainscreens.HomeActivity"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden" />
-        <activity
-            android:name=".mainscreens.MyMealsActivity"
-            android:parentActivityName=".mainscreens.HomeActivity"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden" />
+
         <activity android:name=".helpers.Localization"></activity>
         <activity android:name=".helpers.ConversationActivity"></activity>
         <activity android:name=".helpers.ConversationListActivity"></activity>

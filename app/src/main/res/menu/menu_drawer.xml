@@ -1,0 +1,30 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group
+        android:id="@+id/group1"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_my_meals"
+            android:checked="true"
+            android:icon="@drawable/ic_list_black_48dp"
+            android:orderInCategory="@integer/MY_MEALS_ORDER"
+            android:title="My Meals" />
+        <item
+            android:id="@+id/nav_meal_detail"
+            android:icon="@drawable/ic_add_circle_outline_black_48dp"
+            android:orderInCategory="@integer/MEAL_DETAIL_ORDER"
+            android:title="New Meal" />
+        <item
+            android:id="@+id/nav_search_meal"
+            android:icon="@drawable/ic_search_black_48dp"
+            android:orderInCategory="@integer/SEARCH_MEAL_ORDER"
+            android:title="Search Meal" />
+    </group>
+    <group
+        android:id="@+id/group2"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_logout"
+            android:orderInCategory="100"
+            android:title="@string/action_logout" />
+    </group>
+</menu>

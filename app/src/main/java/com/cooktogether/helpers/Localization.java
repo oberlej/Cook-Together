@@ -21,7 +21,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.cooktogether.R;
-import com.cooktogether.mainscreens.MealActivity;
 import com.cooktogether.model.Meal;
 import com.cooktogether.model.UserLocation;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -141,9 +140,9 @@ public class Localization extends AbstractBaseActivity implements OnMapReadyCall
                 @Override
                 public void onInfoWindowClick(Marker marker) {
                     if(marker.getTag() != "mine") {
-                        Intent intent = new Intent(getApplicationContext(), MealActivity.class);
-                        intent.putExtra(getResources().getString(R.string.MEAL_KEY), (String)marker.getTag());
-                        startActivity(intent);
+//                        Intent intent = new Intent(getApplicationContext(), MealActivity.class);
+//                        intent.putExtra(getResources().getString(R.string.MEAL_KEY), (String)marker.getTag());
+//                        startActivity(intent);
                     }
                 }
             });

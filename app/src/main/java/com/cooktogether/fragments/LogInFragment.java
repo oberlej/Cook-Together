@@ -54,11 +54,6 @@ public class LogInFragment extends Fragment {
         return view;
     }
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
     private void init(View view) {
         mFirebaseAuth = FirebaseAuth.getInstance();
         emailEditText = (EditText) view.findViewById(R.id.login_email);
