@@ -14,7 +14,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import com.cooktogether.helpers.ConversationListActivity;
+import com.cooktogether.helpers.ConversationFragment;
 
 import com.cooktogether.fragments.MealFragment;
 import com.cooktogether.fragments.MyMealsFragment;
@@ -23,6 +23,7 @@ import com.cooktogether.fragments.SearchFragment;
 
 import com.cooktogether.helpers.AbstractBaseActivity;
 import com.cooktogether.R;
+import com.cooktogether.helpers.ConversationsListFragment;
 
 public class HomeActivity extends AbstractBaseActivity {
 
@@ -34,6 +35,7 @@ public class HomeActivity extends AbstractBaseActivity {
     private ActionBarDrawerToggle drawerToggle;
 
     private String mMealKey = "";
+    private String conversationKey;
 
     private MenuItem itemChecked = null;
 
@@ -96,6 +98,9 @@ public class HomeActivity extends AbstractBaseActivity {
                 break;
             case R.id.nav_search_meal:
                 fragmentClass = SearchFragment.class;
+                break;
+            case R.id.nav_my_messages:
+                fragmentClass = ConversationsListFragment.class;
                 break;
             case R.id.nav_logout:
                 logout();
@@ -198,8 +203,26 @@ public class HomeActivity extends AbstractBaseActivity {
     }
 
     public void goToConversations(){
-        Intent intent = new Intent(this, ConversationListActivity.class);
-        startActivity(intent);
+        selectDrawerItem(getNvDrawer().getMenu().findItem(R.id.nav_my_messages),getString(R.string.CONVERSATION_TITLE));
+    }
+
+    public void setConversationKey(String conversationKey) {
+        this.conversationKey = conversationKey;
+    }
+
+    public String getConversationKey() {
+        return conversationKey;
+    }
+
+    public void goToConversation(String conversationKey) {
+        setConversationKey(conversationKey);
+        Fragment f = ConversationFragment.newInstance();
+        showFragment(f);
+        itemChecked.setChecked(false);
+        itemChecked = null;
+        setTitle("Conversation");
+        mDrawer.closeDrawers();
+
     }
 }
 

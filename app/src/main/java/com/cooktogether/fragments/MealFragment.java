@@ -28,7 +28,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cooktogether.R;
-import com.cooktogether.helpers.ConversationActivity;
+
+import com.cooktogether.helpers.ConversationFragment;
 import com.cooktogether.listener.RecyclerItemClickListener;
 import com.cooktogether.adapter.locationOptionsAdapter;
 
@@ -329,6 +330,9 @@ public class MealFragment extends Fragment implements View.OnClickListener {
             case R.id.day_dinner_cb:
                 toggleMealTime(v);
                 break;
+            case R.id.contact_button:
+                contact(v);
+                break;
         }
     }
 
@@ -367,9 +371,7 @@ public class MealFragment extends Fragment implements View.OnClickListener {
 
         mParent.getDB().child("user-conversations").child(mParent.getUid()).child(conversationKey).setValue(newConv);
 
-        Intent intent = new Intent(mParent.getApplicationContext(), ConversationActivity.class);
-        intent.putExtra("key",conversationKey);
+        mParent.goToConversation(conversationKey);
 
-        startActivity(intent);
     }
 }

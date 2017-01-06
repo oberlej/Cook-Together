@@ -1,10 +1,5 @@
 package com.cooktogether.model;
 
-import android.content.Intent;
-import android.location.Location;
-
-import com.cooktogether.R;
-import com.cooktogether.helpers.ConversationActivity;
 import com.google.firebase.database.DataSnapshot;
 
 import java.util.ArrayList;

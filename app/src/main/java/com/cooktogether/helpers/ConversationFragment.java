@@ -1,15 +1,18 @@
 package com.cooktogether.helpers;
 
-import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cooktogether.R;
+import com.cooktogether.mainscreens.HomeActivity;
 import com.cooktogether.model.Conversation;
 import com.cooktogether.model.Message;
 import com.cooktogether.viewholder.MessageViewHolder;
@@ -27,11 +30,13 @@ import java.util.List;
  * Created by hela on 06/01/17.
  */
 
-public class ConversationActivity extends AbstractBaseActivity {
+public class ConversationFragment extends Fragment implements View.OnClickListener {
 
     private FirebaseRecyclerAdapter<Message, MessageViewHolder> mAdapter;
     protected RecyclerView mRecycler;
     protected LinearLayoutManager mManager;
+
+    protected HomeActivity mParent;
 
     private String mConversationKey = null;
     private TextView mTitle;
@@ -39,32 +44,41 @@ public class ConversationActivity extends AbstractBaseActivity {
     private EditText newMessage;
     private List<String> usersKeys;
 
-    public ConversationActivity() {
+    public static ConversationFragment newInstance() {
+        return new ConversationFragment();
+    }
+
+    public ConversationFragment() {
     }
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        checkIsConnected();
-        setContentView(R.layout.activity_conversation);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_conversation, container, false);
 
-        mRecycler = (RecyclerView) findViewById(R.id.conversation_messages_list_rcv);
+        mParent = (HomeActivity) getActivity();
+
+        mParent.checkIsConnected();
+
+
+        mRecycler = (RecyclerView) view.findViewById(R.id.conversation_messages_list_rcv);
         mRecycler.setHasFixedSize(true);
 
         // Set up Layout Manager, reverse layout
-        mManager = new LinearLayoutManager(getApplicationContext());
+        mManager = new LinearLayoutManager(getContext());
         mManager.setReverseLayout(true);
         mManager.setStackFromEnd(true);
         mRecycler.setLayoutManager(mManager);
-        initFields();
+        initFields(view);
 
         loadConversation();
+        return view;
     }
 
     private void loadConversation() {
 
-        getDB().child("user-conversations").child(getUid()).child(mConversationKey).addValueEventListener(new ValueEventListener() {
+        mParent.getDB().child("user-conversations").child(mParent.getUid())
+                .child(mConversationKey).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Conversation conversation = Conversation.parseSnapshot(dataSnapshot);
@@ -72,10 +86,11 @@ public class ConversationActivity extends AbstractBaseActivity {
                 usersKeys = conversation.getUsersKeys();
 
                 //to make sure the current user Id is always the first in the list
-                usersKeys.remove(getUid());
-                usersKeys.add(0, getUid());
+                usersKeys.remove(mParent.getUid());
+                usersKeys.add(0, mParent.getUid());
 
                 nbrMessages = conversation.getMessages().size();
+
                 // Set up FirebaseRecyclerAdapter with the Query
                 mAdapter = new FirebaseRecyclerAdapter<Message, MessageViewHolder>(Message.class, R.layout.item_message, MessageViewHolder.class, dataSnapshot.child("messages").getRef()) {
 
@@ -94,12 +109,12 @@ public class ConversationActivity extends AbstractBaseActivity {
                             @Override
                             public void onClick(View v) {
                                 // Launch PostDetailActivity
-                                Toast.makeText(getApplicationContext(), "Message clicked", Toast.LENGTH_LONG).show();
+                                Toast.makeText(getContext(), "Message clicked", Toast.LENGTH_LONG).show();
                             }
                         });
 
                         // Bind Post to ViewHolder, setting OnClickListener for the star button
-                        viewHolder.bindToPost(model, getUid());
+                        viewHolder.bindToPost(model, mParent.getUid());
                     }
                 };
                 mAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
@@ -127,18 +142,15 @@ public class ConversationActivity extends AbstractBaseActivity {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(getApplicationContext(), "Failed to load Conversation.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Failed to load Conversation.", Toast.LENGTH_SHORT).show();
             }
 
         });
     }
 
-    private void initFields() {
-        Intent intent = getIntent();
-        if (intent.hasExtra("key")) {
-            mConversationKey = intent.getStringExtra("key");
-        }
-        mTitle = (TextView) findViewById(R.id.conversation_title);
+    private void initFields(View view) {
+        mConversationKey = mParent.getConversationKey();
+        mTitle = (TextView) view.findViewById(R.id.conversation_title);
     }
 
     @Override
@@ -150,21 +162,33 @@ public class ConversationActivity extends AbstractBaseActivity {
     }
 
     public void sendMessage(View view) {
-        newMessage = (EditText) findViewById(R.id.text_message);
-        Message m = new Message(getUid(), newMessage.getText().toString());
+        newMessage = (EditText) view.findViewById(R.id.text_message);
+        Message m = new Message(mParent.getUid(), newMessage.getText().toString());
 
 
         if (nbrMessages == 0) {
             Conversation newConv = new Conversation(mTitle.getText().toString(), mConversationKey, usersKeys);
-            getDB().child("user-conversations").child(usersKeys.get(1)).child(mConversationKey).setValue(newConv);
+            mParent.getDB().child("user-conversations").child(usersKeys.get(1)).child(mConversationKey).setValue(newConv);
         }
-        getDB().child("user-conversations").child(usersKeys.get(1)).child(mConversationKey).child("messages").push().setValue(m);
+        mParent.getDB().child("user-conversations").child(usersKeys.get(1)).child(mConversationKey).child("messages").push().setValue(m);
 
-        getDB().child("user-conversations").child(usersKeys.get(0)).child(mConversationKey).child("messages").push().setValue(m);
+        mParent.getDB().child("user-conversations").child(usersKeys.get(0)).child(mConversationKey).child("messages").push().setValue(m);
 
         newMessage.setText("");
 
-        Toast.makeText(getApplicationContext(), "Message sent", Toast.LENGTH_LONG).show();
+        Toast.makeText(getContext(), "Message sent", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.send_button:
+                sendMessage(v);
+                break;
+            default:
+                break;
+
+        }
     }
 }
 

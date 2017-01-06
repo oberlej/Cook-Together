@@ -3,4 +3,5 @@
     <integer name="MEAL_DETAIL_ORDER">1</integer>
     <integer name="MY_MEALS_ORDER">0</integer>
     <integer name="SEARCH_MEAL_ORDER">2</integer>
+    <integer name="MY_MESSAGES_ORDER">3</integer>
 </resources>
