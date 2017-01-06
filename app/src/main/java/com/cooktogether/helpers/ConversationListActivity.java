@@ -93,7 +93,7 @@ public class ConversationListActivity extends AbstractBaseActivity {
     }
 
     public Query getQuery(DatabaseReference databaseReference){
-        return databaseReference.child("conversations");
+        return databaseReference.child("user-conversations").child(getUid());
     }
 }
 

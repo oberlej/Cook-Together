@@ -80,7 +80,6 @@ public class Conversation {
         List<String> usersKeys = new ArrayList<>();
         for(DataSnapshot userKey : snapshot.child("usersKeys").getChildren()){
             usersKeys.add((String)userKey.getValue());
-            usersKeys.add((String)userKey.getValue());
         }
 
         return new Conversation((String)snapshot.child("title").getValue(), messages,(String) snapshot.child("conversationKey").getValue(),usersKeys );

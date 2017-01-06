@@ -40,8 +40,10 @@ import com.google.firebase.database.ValueEventListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import com.cooktogether.adapter.locationOptionsAdapter;
 
@@ -344,10 +346,17 @@ public class MealActivity extends AbstractBaseActivity {
         usersKeys.add(mUserKey);
         Conversation newConv = new Conversation(mTitle.getText().toString(), conversationKey, usersKeys);
 
-        getDB().child("conversations").child(conversationKey).setValue(newConv);
+        //getDB().child("conversations").child(conversationKey).setValue(newConv);
 
-        Button send = (Button)findViewById(R.id.send_button);
-        send.setText("Connected ");
+        //add conversation to user conversations
+        //Map<String, Object> conversationVal = newConv.toMap();
+
+        //Map<String, Object> childUpdates = new HashMap<>();
+        getDB().child("user-conversations").child(getUid()).child(conversationKey).setValue(newConv);
+        //getDB().child("user-conversations").child(usersKeys.get(0)).child(conversationKey).setValue(newConv);
+        //childUpdates.put("/user-conversations/" + usersKeys.get(1) + "/" + conversationKey, conversationVal);
+        //childUpdates.put("/user-conversations/" + usersKeys.get(0) + "/" + conversationKey, conversationVal);
+        //getDB().updateChildren(childUpdates);
         Intent intent = new Intent(this, ConversationActivity.class);
         Bundle extras = new Bundle();
         extras.putString("key", conversationKey);

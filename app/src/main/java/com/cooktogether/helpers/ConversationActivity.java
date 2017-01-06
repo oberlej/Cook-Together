@@ -15,10 +15,13 @@ import com.cooktogether.model.Message;
 import com.cooktogether.viewholder.MessageViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by hela on 06/01/17.
@@ -32,7 +35,9 @@ public class ConversationActivity extends AbstractBaseActivity {
 
     private String mConversationKey = null;
     private String mTitle;
+    private int nbrMessages;
     private EditText newMessage;
+    private List<String> usersKeys;
 
     public ConversationActivity() {
     }
@@ -61,53 +66,73 @@ public class ConversationActivity extends AbstractBaseActivity {
         TextView title = (TextView) findViewById(R.id.conversation_title);
         title.setText(mTitle);
 
-        // Set up FirebaseRecyclerAdapter with the Query
-        Query conversationQuery = getQuery(getDB());
-
-        mAdapter = new FirebaseRecyclerAdapter<Message, MessageViewHolder>(Message.class, R.layout.item_message, MessageViewHolder.class, conversationQuery) {
-
+        getDB().child("user-conversations").child(getUid()).child(mConversationKey).addValueEventListener(new ValueEventListener() {
             @Override
-            protected Message parseSnapshot(DataSnapshot snapshot) {
-                return Message.parseSnapshot(snapshot);
-            }
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Conversation conversation = Conversation.parseSnapshot(dataSnapshot);
+                //mTitle.setText(conversation.getTitle());
+                usersKeys = conversation.getUsersKeys();
 
-            @Override
-            protected void populateViewHolder(final MessageViewHolder viewHolder, final Message model, final int position) {
-                final DatabaseReference messageRef = getRef(position);
+                //to make sure the current user Id is always the first in the list
+                usersKeys.remove(getUid());
+                usersKeys.add(0,getUid());
 
-                // Set click listener for the whole meal view
-                final String messageKey = messageRef.getKey();
-                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                nbrMessages = conversation.getMessages().size();
+                // Set up FirebaseRecyclerAdapter with the Query
+                mAdapter = new FirebaseRecyclerAdapter<Message, MessageViewHolder>(Message.class, R.layout.item_message, MessageViewHolder.class, dataSnapshot.child("messages").getRef()) {
+
                     @Override
-                    public void onClick(View v) {
-                        // Launch PostDetailActivity
-                        Toast.makeText(getApplicationContext(), "Message clicked", Toast.LENGTH_LONG).show();
+                    protected Message parseSnapshot(DataSnapshot snapshot) {
+                        return Message.parseSnapshot(snapshot);
+                    }
+
+                    @Override
+                    protected void populateViewHolder(final MessageViewHolder viewHolder, final Message model, final int position) {
+                        final DatabaseReference messageRef = getRef(position);
+
+                        // Set click listener for the whole meal view
+                        final String messageKey = messageRef.getKey();
+                        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                // Launch PostDetailActivity
+                                Toast.makeText(getApplicationContext(), "Message clicked", Toast.LENGTH_LONG).show();
+                            }
+                        });
+
+                        // Bind Post to ViewHolder, setting OnClickListener for the star button
+                        viewHolder.bindToPost(model, getUid());
+                    }
+                };
+                mAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+                    @Override
+                    public void onItemRangeInserted(int positionStart, int itemCount) {
+                        super.onItemRangeInserted(positionStart, itemCount);
+                        int messageCount = mAdapter.getItemCount();
+                        int lastVisiblePosition = mManager.findLastCompletelyVisibleItemPosition();
+                        // If the recycler view is initially being loaded or the
+                        // user is at the bottom of the list, scroll to the bottom
+                        // of the list to show the newly added message.
+                        if (lastVisiblePosition == -1 ||
+                                (positionStart >= (messageCount - 1) &&
+                                        lastVisiblePosition == (positionStart - 1))) {
+                            mRecycler.scrollToPosition(positionStart);
+                        }
                     }
                 });
 
-                // Bind Post to ViewHolder, setting OnClickListener for the star button
-                viewHolder.bindToPost(model, getUid());
-            }
-        };
-        mAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
-            @Override
-            public void onItemRangeInserted(int positionStart, int itemCount) {
-                super.onItemRangeInserted(positionStart, itemCount);
-                int messageCount = mAdapter.getItemCount();
-                int lastVisiblePosition = mManager.findLastCompletelyVisibleItemPosition();
-                // If the recycler view is initially being loaded or the
-                // user is at the bottom of the list, scroll to the bottom
-                // of the list to show the newly added message.
-                if (lastVisiblePosition == -1 ||
-                        (positionStart >= (messageCount - 1) &&
-                                lastVisiblePosition == (positionStart - 1))) {
-                    mRecycler.scrollToPosition(positionStart);
-                }
-            }
-        });
+                mRecycler.setLayoutManager(mManager);
+                mRecycler.setAdapter(mAdapter);
 
-        mRecycler.setLayoutManager(mManager);
-        mRecycler.setAdapter(mAdapter);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Toast.makeText(getApplicationContext(), "Failed to load meal.", Toast.LENGTH_SHORT).show();
+            }
+
+        });
     }
 
     private void initFields() {
@@ -129,14 +154,22 @@ public class ConversationActivity extends AbstractBaseActivity {
     }
 
     public Query getQuery(DatabaseReference databaseReference) {
-        return databaseReference.child("conversations").child(mConversationKey).child("messages");
+        return databaseReference.child("user-conversations").child(getUid()).child(mConversationKey).child("messages");
 
     }
     public void sendMessage(View view){
         newMessage = (EditText) findViewById(R.id.text_message);
         Message m = new Message(getUid(),newMessage.getText().toString());
 
-        getDB().child("conversations").child(mConversationKey).child("messages").push().setValue(m);
+        //getDB().child("conversations").child(mConversationKey).child("messages").push().setValue(m);
+
+        if(nbrMessages == 0) {
+            Conversation newConv = new Conversation(mTitle, mConversationKey, usersKeys);
+            getDB().child("user-conversations").child(usersKeys.get(1)).child(mConversationKey).setValue(newConv);
+        }
+        getDB().child("user-conversations").child(usersKeys.get(1)).child(mConversationKey).child("messages").push().setValue(m);
+
+        getDB().child("user-conversations").child(usersKeys.get(0)).child(mConversationKey).child("messages").push().setValue(m);
 
         newMessage.setText("");
 
