@@ -52,6 +52,7 @@ public class MealActivity extends AbstractBaseActivity {
     private List<Day> mDaysFree;
 
     private String mMealKey = null;
+    private String mUserKey;
     private boolean mIsUpdate = false;
 
     private boolean mAnswer;
@@ -219,6 +220,7 @@ public class MealActivity extends AbstractBaseActivity {
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     Meal meal = Meal.parseSnapshot(dataSnapshot);
 
+                    mUserKey = meal.getUserKey();
                     mLocationName.setText(meal.getLocation().toString());
                     mTitle.setText(meal.getTitle());
                     mDescription.setText(meal.getDescription());
@@ -335,10 +337,18 @@ public class MealActivity extends AbstractBaseActivity {
 
     public void contact(View view){
         String conversationKey = getDB().child("conversations").push().getKey();
-        Conversation newConv = new Conversation(mTitle.getText().toString(), conversationKey, getUid());
+        List<String> usersKeys = new ArrayList<String>();
+        usersKeys.add(getUid());
+        usersKeys.add(mUserKey);
+        Conversation newConv = new Conversation(mTitle.getText().toString(), conversationKey, usersKeys);
         getDB().child("conversations").child(conversationKey).setValue(newConv);
         Intent intent = new Intent(this, ConversationActivity.class);
-        intent.putExtra(getResources().getString(R.string.CONVERSATION_KEY), conversationKey);
+        Bundle extras = new Bundle();
+        extras.putString("key", conversationKey);
+        extras.putString("title", newConv.getTitle());
+        intent.putExtras(extras);
+        //intent.putExtra(getResources().getString(R.string.CONVERSATION_KEY), conversationKey);
+        //intent.putExtra(getResources().getString(R.string.CONVERSATION_TITLE), newConv.getTitle());
         startActivity(intent);
     }
 }

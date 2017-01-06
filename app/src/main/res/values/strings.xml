@@ -25,6 +25,7 @@
     <string name="facebook_app_id">794014440752386</string>
     <string name="fb_login_protocol_scheme">fb794014440752386</string>
     <string name="CONVERSATION_KEY" />
+    <string name="CONVERSATION_TITLE" />
 </resources>
 
 

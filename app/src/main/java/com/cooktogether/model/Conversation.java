@@ -3,6 +3,7 @@ package com.cooktogether.model;
 import com.google.firebase.database.DataSnapshot;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by hela on 06/01/17.
@@ -12,28 +13,29 @@ public class Conversation {
     private String Title;
     private ArrayList<Message> messages;
     private String conversationKey;
-    private String userKey; //to change later to users
+    private List<String> usersKeys; //to change later to users
+    //private String userKey2; //to change later to users
 
-    public Conversation(String title, String conversationKey, String userKey) {
+    public Conversation(String title, String conversationKey, List<String> usersKeys) {
         Title = title;
         this.messages = new ArrayList<Message>();
         this.conversationKey = conversationKey;
-        this.userKey = userKey;
+        this.usersKeys = usersKeys;
     }
 
-    public Conversation(String title, ArrayList<Message> messages, String conversationKey, String userKey) {
+    public Conversation(String title, ArrayList<Message> messages, String conversationKey, List<String> usersKeys) {
         Title = title;
         this.messages = messages;
         this.conversationKey = conversationKey;
-        this.userKey = userKey;
+        this.usersKeys = usersKeys;
     }
 
-    public String getUserKey() {
-        return userKey;
+    public List<String> getUsersKeys() {
+        return this.usersKeys;
     }
 
-    public void setUserKey(String userKey) {
-        this.userKey = userKey;
+    public void setUsersKeys(List usersKeys) {
+        this.usersKeys = usersKeys;
     }
 
     public void setMessages(ArrayList<Message> messages) {
@@ -75,6 +77,12 @@ public class Conversation {
                 messages.add(message);
             }
         }
-        return new Conversation((String)snapshot.child("title").getValue(), messages,(String) snapshot.child("conversationKey").getValue(), (String) snapshot.child("userKey").getValue());
+        List<String> usersKeys = new ArrayList<>();
+        for(DataSnapshot userKey : snapshot.child("usersKeys").getChildren()){
+            usersKeys.add((String)userKey.getValue());
+            usersKeys.add((String)userKey.getValue());
+        }
+
+        return new Conversation((String)snapshot.child("title").getValue(), messages,(String) snapshot.child("conversationKey").getValue(),usersKeys );
     }
 }

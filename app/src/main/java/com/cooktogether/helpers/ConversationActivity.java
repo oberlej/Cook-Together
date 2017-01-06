@@ -6,6 +6,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cooktogether.R;
@@ -30,11 +31,8 @@ public class ConversationActivity extends AbstractBaseActivity {
     protected LinearLayoutManager mManager;
 
     private String mConversationKey = null;
-    private String mtitle;
-    private ArrayList<Message> mMessages;
+    private String mTitle;
     private EditText newMessage;
-
-    private boolean mIsUpdate = false;
 
     public ConversationActivity() {
     }
@@ -55,6 +53,14 @@ public class ConversationActivity extends AbstractBaseActivity {
         mManager.setStackFromEnd(true);
         mRecycler.setLayoutManager(mManager);
         initFields();
+
+        loadConversation();
+    }
+
+    private void loadConversation() {
+        TextView title = (TextView) findViewById(R.id.conversation_title);
+        title.setText(mTitle);
+
         // Set up FirebaseRecyclerAdapter with the Query
         Query conversationQuery = getQuery(getDB());
 
@@ -80,7 +86,7 @@ public class ConversationActivity extends AbstractBaseActivity {
                 });
 
                 // Bind Post to ViewHolder, setting OnClickListener for the star button
-                viewHolder.bindToPost(model);
+                viewHolder.bindToPost(model, getUid());
             }
         };
         mAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
@@ -106,10 +112,11 @@ public class ConversationActivity extends AbstractBaseActivity {
 
     private void initFields() {
         Intent intent = getIntent();
-        if (intent.hasExtra(getResources().getString(R.string.CONVERSATION_KEY))) {
-            mConversationKey = intent.getStringExtra(getResources().getString(R.string.CONVERSATION_KEY));
-            mIsUpdate = mConversationKey != null && !mConversationKey.isEmpty();
-            //loadConversation();
+        if (intent.hasExtra("key")) {
+            mConversationKey = intent.getStringExtra("key");
+        }
+        if (intent.hasExtra("title")) {
+            mTitle = intent.getStringExtra("title");
         }
     }
 

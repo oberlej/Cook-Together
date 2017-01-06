@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.widget.Toast;
 
 import com.cooktogether.R;
 import com.cooktogether.model.Conversation;
@@ -62,11 +63,20 @@ public class ConversationListActivity extends AbstractBaseActivity {
                     public void onClick(View v) {
                         // Launch PostDetailActivity
                         Intent intent = new Intent(getApplicationContext(), ConversationActivity.class);
-                        intent.putExtra(getResources().getString(R.string.CONVERSATION_KEY), conversationKey);
+                        intent.putExtra("key", conversationKey);
+                        intent.putExtra("title", model.getTitle());
                         startActivity(intent);
                     }
                 });
 
+                viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener(){
+                    @Override
+                    public boolean onLongClick(View v){
+                        Toast.makeText(getApplicationContext(), "Are you sure you want to delete the conversation ?", Toast.LENGTH_LONG).show();
+
+                        return false;
+                    }
+                });
                 // Bind Post to ViewHolder, setting OnClickListener for the star button
                 viewHolder.bindToPost(model);
             }
@@ -83,7 +93,7 @@ public class ConversationListActivity extends AbstractBaseActivity {
     }
 
     public Query getQuery(DatabaseReference databaseReference){
-        return databaseReference.child("conversations").orderByChild("userKey").equalTo(getUid());
+        return databaseReference.child("conversations");
     }
 }
 
