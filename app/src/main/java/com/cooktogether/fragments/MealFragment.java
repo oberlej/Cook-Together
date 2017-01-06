@@ -1,31 +1,39 @@
-package com.cooktogether.mainscreens;
+package com.cooktogether.fragments;
 
+import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
+import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AlertDialog;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.cooktogether.helpers.AbstractBaseActivity;
 import com.cooktogether.R;
+import com.cooktogether.adapter.locationOptionsAdapter;
+import com.cooktogether.helpers.AbstractBaseActivity;
 import com.cooktogether.listener.RecyclerItemClickListener;
+import com.cooktogether.mainscreens.HomeActivity;
 import com.cooktogether.model.Day;
 import com.cooktogether.model.DayEnum;
 import com.cooktogether.model.Meal;
@@ -40,13 +48,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import com.cooktogether.adapter.locationOptionsAdapter;
-
-public class MealActivity extends AbstractBaseActivity {
+public class MealFragment extends Fragment implements View.OnClickListener {
     private LinearLayout mListOfDays;
     private EditText mTitle;
     private EditText mDescription;
     private List<Day> mDaysNotFree;
+
     private List<Day> mDaysFree;
 
     private String mMealKey = null;
@@ -55,6 +62,8 @@ public class MealActivity extends AbstractBaseActivity {
     private boolean mAnswer;
     private EditText mLocationName;
 
+    private HomeActivity mParent;
+
     // for the list of location options
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -62,44 +71,23 @@ public class MealActivity extends AbstractBaseActivity {
     private UserLocation selectedLocation;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        checkIsConnected();
-
-        setContentView(R.layout.activity_meal);
-        setSupportActionBar((Toolbar) findViewById(R.id.toolbar_main));
-
-        //for the list of location options
-        mRecyclerView = (RecyclerView) findViewById(R.id.location_options);
-
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
-        mRecyclerView.setHasFixedSize(true);
-
-        // use a linear layout manager
-        mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.addOnItemTouchListener(
-                new RecyclerItemClickListener(this, new RecyclerItemClickListener.OnItemClickListener() {
-                    @Override public void onItemClick(View view, int position) {
-                        selectedLocation = ((locationOptionsAdapter)mAdapter).getSelectedLocation(position);
-                        mLocationName.setText(selectedLocation.toString());
-                        ((locationOptionsAdapter)mAdapter).clear();
-                        mRecyclerView.clearFocus();
-                    }
-                })
-        );
-
-
-
-        initFields();
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_meal, container, false);
+        initFields(view);
+        return view;
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_save, menu);
-        return true;
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        menu.clear();
+        inflater.inflate(R.menu.menu_save, menu);
     }
 
     @Override
@@ -108,10 +96,6 @@ public class MealActivity extends AbstractBaseActivity {
         switch (item.getItemId()) {
             case R.id.action_save:
                 saveMeal();
-                NavUtils.navigateUpFromSameTask(this);
-                return true;
-            case R.id.action_logout:
-                logout();
                 return true;
             case R.id.action_cancel:
                 DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
@@ -128,14 +112,14 @@ public class MealActivity extends AbstractBaseActivity {
                     }
                 };
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setMessage("Discard meal ?")
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                String message = mIsUpdate ? "Discard meal ?" : "Dsigard changes ?";
+                builder.setMessage(message)
                         .setPositiveButton("Yes", dialogClickListener)
                         .setNegativeButton("No", dialogClickListener).show();
 
                 if (mAnswer) {
-                    Toast.makeText(getApplicationContext(), "Meal " + mTitle.getText().toString() + " discarded.", Toast.LENGTH_LONG).show();
-                    NavUtils.navigateUpFromSameTask(this);
+                    Toast.makeText(getContext(), "Meal " + mTitle.getText().toString() + " discarded.", Toast.LENGTH_LONG).show();
                 }
                 return true;
         }
@@ -144,42 +128,66 @@ public class MealActivity extends AbstractBaseActivity {
 
     private boolean saveMeal() {
         if (!mIsUpdate) {
-            mMealKey = getDB().child("meals").push().getKey();
+            mMealKey = mParent.getDB().child("meals").push().getKey();
         }
 
         if (selectedLocation == null) {
-            Toast.makeText(getApplicationContext(), "Unvalid location or no service available", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Unvalid location or no service available", Toast.LENGTH_LONG).show();
             //todo Alert box to change the location
         }
 
-        Meal m = new Meal(mTitle.getText().toString(), mDescription.getText().toString(), getUid(), mMealKey, mDaysFree, selectedLocation);
+        Meal m = new Meal(mTitle.getText().toString(), mDescription.getText().toString(), mParent.getUid(), mMealKey, mDaysFree, selectedLocation);
 
-        getDB().child("meals").child(mMealKey).setValue(m);
+        mParent.getDB().child("meals").child(mMealKey).setValue(m);
 
         if (!mIsUpdate) {
-            Toast.makeText(getApplicationContext(), "Meal " + mTitle.getText().toString() + " created.", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Meal " + mTitle.getText().toString() + " created.", Toast.LENGTH_LONG).show();
         } else {
-            Toast.makeText(getApplicationContext(), "Meal " + mTitle.getText().toString() + " updated.", Toast.LENGTH_LONG).show();
-
+            Toast.makeText(getContext(), "Meal " + mTitle.getText().toString() + " updated.", Toast.LENGTH_LONG).show();
         }
         return true;
     }
 
-    private void initFields() {
-        mListOfDays = (LinearLayout) findViewById(R.id.create_list_of_days);
-        mTitle = (EditText) findViewById(R.id.create_title);
-        mDescription = (EditText) findViewById(R.id.create_description);
-        mLocationName = (EditText) findViewById(R.id.create_location);
+    private void initFields(View view) {
+        mParent = (HomeActivity) getActivity();
+        view.findViewById(R.id.create_new_day_btn).setOnClickListener(this);
+        //for the list of location options
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.location_options);
+
+        // use this setting to improve performance if you know that changes
+        // in content do not change the layout size of the RecyclerView
+        mRecyclerView.setHasFixedSize(true);
+
+        // use a linear layout manager
+        mLayoutManager = new LinearLayoutManager(getContext());
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.addOnItemTouchListener(
+                new RecyclerItemClickListener(getContext(), new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        selectedLocation = ((locationOptionsAdapter) mAdapter).getSelectedLocation(position);
+                        mLocationName.setText(selectedLocation.toString());
+                        ((locationOptionsAdapter) mAdapter).clear();
+                        mRecyclerView.clearFocus();
+                    }
+                })
+        );
+
+        mListOfDays = (LinearLayout) view.findViewById(R.id.create_list_of_days);
+        mTitle = (EditText) view.findViewById(R.id.create_title);
+        mDescription = (EditText) view.findViewById(R.id.create_description);
+        mLocationName = (EditText) view.findViewById(R.id.create_location);
 
         mLocationName.addTextChangedListener(new TextWatcher() {
             ArrayList<UserLocation> locations = new ArrayList<UserLocation>();
+
             public void afterTextChanged(Editable s) {
 
-                if(mLocationName.isFocused()) {
+                if (mLocationName.isFocused()) {
                     locations = getLocation(mLocationName.getText().toString());
-                    if(locations.isEmpty()) {
+                    if (locations.isEmpty()) {
                         mLocationName.setError("Location is not found, please try again");
-                    }else {
+                    } else {
                         mAdapter = new locationOptionsAdapter();
                         mRecyclerView.setAdapter(mAdapter);
                         ((locationOptionsAdapter) mAdapter).setMOptions(locations);
@@ -187,7 +195,8 @@ public class MealActivity extends AbstractBaseActivity {
                 }
             }
 
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
 
             public void onTextChanged(CharSequence s, int start, int before, int count) {
             }
@@ -195,10 +204,9 @@ public class MealActivity extends AbstractBaseActivity {
         initNotFreeDays();
         mDaysFree = new ArrayList<Day>();
 
-        Intent intent = getIntent();
-        if (intent.hasExtra(getResources().getString(R.string.MEAL_KEY))) {
-            mMealKey = intent.getStringExtra(getResources().getString(R.string.MEAL_KEY));
-            mIsUpdate = mMealKey != null && !mMealKey.isEmpty();
+        mMealKey = mParent.getMealKey();
+        mIsUpdate = mMealKey != null && !mMealKey.isEmpty();
+        if (mIsUpdate) {
             loadMeal();
         }
     }
@@ -212,7 +220,7 @@ public class MealActivity extends AbstractBaseActivity {
 
     private void loadMeal() {
         if (mIsUpdate) {
-            getDB().child("meals").child(mMealKey).addValueEventListener(new ValueEventListener() {
+            mParent.getDB().child("meals").child(mMealKey).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     Meal meal = Meal.parseSnapshot(dataSnapshot);
@@ -230,7 +238,7 @@ public class MealActivity extends AbstractBaseActivity {
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
-                    Toast.makeText(getApplicationContext(), "Failed to load meal.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Failed to load meal.", Toast.LENGTH_SHORT).show();
                 }
             });
         }
@@ -245,14 +253,23 @@ public class MealActivity extends AbstractBaseActivity {
         return names;
     }
 
-    /**
-     * onClick handler for the add a freee day button.
-     * Will open alertdialog and propose all days that are not aded to the freeDays list.
-     *
-     * @param view
-     */
-    public void addDay(View view) {
-        AlertDialog.Builder b = new AlertDialog.Builder(this);
+    private void updateFreeDaysLayout() {
+        mListOfDays.removeAllViews();
+        for (Day d : mDaysFree) {
+            View dayWrapper = mParent.getLayoutInflater().inflate(R.layout.item_day, mListOfDays, false);
+            dayWrapper.setTag(R.id.TAG_DAY, d);
+            ((TextView) dayWrapper.findViewById(R.id.day_name)).setText(d.getName());
+            ((CheckBox) dayWrapper.findViewById(R.id.day_lunch_cb)).setChecked(d.isLunch());
+            ((CheckBox) dayWrapper.findViewById(R.id.day_dinner_cb)).setChecked(d.isDinner());
+            dayWrapper.findViewById(R.id.day_dinner_cb).setOnClickListener(this);
+            dayWrapper.findViewById(R.id.day_lunch_cb).setOnClickListener(this);
+            dayWrapper.findViewById(R.id.day_remove_btn).setOnClickListener(this);
+            mListOfDays.addView(dayWrapper);
+        }
+    }
+
+    private void addDay() {
+        AlertDialog.Builder b = new AlertDialog.Builder(getContext());
         b.setTitle("Add a new day");
         b.setItems(getNames(mDaysNotFree), new DialogInterface.OnClickListener() {
             @Override
@@ -272,19 +289,7 @@ public class MealActivity extends AbstractBaseActivity {
         b.show();
     }
 
-    private void updateFreeDaysLayout() {
-        mListOfDays.removeAllViews();
-        for (Day d : mDaysFree) {
-            View dayWrapper = getLayoutInflater().inflate(R.layout.item_day, mListOfDays, false);
-            dayWrapper.setTag(R.id.TAG_DAY, d);
-            ((TextView) dayWrapper.findViewById(R.id.day_name)).setText(d.getName());
-            ((CheckBox) dayWrapper.findViewById(R.id.day_lunch_cb)).setChecked(d.isLunch());
-            ((CheckBox) dayWrapper.findViewById(R.id.day_dinner_cb)).setChecked(d.isDinner());
-            mListOfDays.addView(dayWrapper);
-        }
-    }
-
-    public void removeDay(View view) {
+    private void removeDay(View view) {
         //remove dayWrapper from list
         View parent = (View) ((View) view.getParent()).getParent();
         Day day = (Day) parent.getTag(R.id.TAG_DAY);
@@ -294,7 +299,7 @@ public class MealActivity extends AbstractBaseActivity {
         Collections.sort(mDaysNotFree);
     }
 
-    public void toggleMealTime(View view) {
+    private void toggleMealTime(View view) {
         int id = view.getId();
         CheckBox cb = (CheckBox) view;
         LinearLayout dayWrapper = (LinearLayout) (((View) view.getParent()).getParent());
@@ -306,18 +311,34 @@ public class MealActivity extends AbstractBaseActivity {
         }
     }
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.create_new_day_btn:
+                addDay();
+                break;
+            case R.id.day_remove_btn:
+                removeDay(v);
+                break;
+            case R.id.day_lunch_cb:
+            case R.id.day_dinner_cb:
+                toggleMealTime(v);
+                break;
+        }
+    }
+
     /*
     For now it returns only the first address found to make it simple
      */
     private ArrayList<UserLocation> getLocation(String locationName) {
-        Geocoder geo = new Geocoder(this, Locale.getDefault());
+        Geocoder geo = new Geocoder(getContext(), Locale.getDefault());
 
         ArrayList<UserLocation> locations = new ArrayList<UserLocation>();
 
         try {
             List<Address> addresses = geo.getFromLocationName(locationName, 5);
             if (addresses.size() > 0) {
-                for(Address address : addresses) {
+                for (Address address : addresses) {
                     UserLocation location = new UserLocation();
                     location.setLatitude(address.getLatitude());
                     location.setLongitude(address.getLongitude());

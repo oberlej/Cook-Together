@@ -15,10 +15,13 @@ import android.widget.EditText;
 import com.cooktogether.R;
 import com.cooktogether.mainscreens.AuthenticationActivity;
 import com.cooktogether.mainscreens.HomeActivity;
+import com.cooktogether.model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class SignUpFragment extends Fragment {
 
@@ -79,6 +82,10 @@ public class SignUpFragment extends Fragment {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if (task.isSuccessful()) {
+                                        //create user in db
+//                                        DatabaseReference mDB = FirebaseDatabase.getInstance().getReference();
+//                                        mDB.child("users").child(mFirebaseAuth.getCurrentUser().getUid()).setValue(new User("User Name",mFirebaseAuth.getCurrentUser().,""));
+
                                         Intent intent = new Intent(getContext(), HomeActivity.class);
                                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);

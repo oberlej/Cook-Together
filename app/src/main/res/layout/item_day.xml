@@ -10,7 +10,6 @@
         android:orientation="horizontal">
 
         <ImageView
-            android:onClick="removeDay"
             android:id="@+id/day_remove_btn"
             android:layout_width="24dp"
             android:layout_height="24dp"
@@ -29,7 +28,6 @@
 
 
         <CheckBox
-            android:onClick="toggleMealTime"
             android:id="@+id/day_lunch_cb"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -37,7 +35,6 @@
             android:text="Lunch" />
 
         <CheckBox
-            android:onClick="toggleMealTime"
             android:id="@+id/day_dinner_cb"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
