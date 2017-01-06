@@ -17,6 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -337,11 +338,16 @@ public class MealActivity extends AbstractBaseActivity {
 
     public void contact(View view){
         String conversationKey = getDB().child("conversations").push().getKey();
+
         List<String> usersKeys = new ArrayList<String>();
         usersKeys.add(getUid());
         usersKeys.add(mUserKey);
         Conversation newConv = new Conversation(mTitle.getText().toString(), conversationKey, usersKeys);
+
         getDB().child("conversations").child(conversationKey).setValue(newConv);
+
+        Button send = (Button)findViewById(R.id.send_button);
+        send.setText("Connected ");
         Intent intent = new Intent(this, ConversationActivity.class);
         Bundle extras = new Bundle();
         extras.putString("key", conversationKey);
