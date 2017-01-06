@@ -5,9 +5,9 @@
     android:layout_height="wrap_content"
     android:background="?attr/colorPrimary"
     android:theme="@style/ToolbarTheme"
-    app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
-
+    app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+    android:fitsSystemWindows="true">
     <!--<TextView-->
-        <!--android:id="@+id/toolbar_title"-->
-        <!--style="@style/ToolbarTitle" />-->
+    <!--android:id="@+id/toolbar_title"-->
+    <!--style="@style/ToolbarTitle" />-->
 </android.support.v7.widget.Toolbar>
