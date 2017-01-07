@@ -12,14 +12,13 @@
         android:layout_alignParentBottom="true"
         android:layout_height="wrap_content"
         android:inputType="textMultiLine|textLongMessage"
-        android:hint="type your message here ..." />
+        android:hint="@string/hint_messaging" />
 
     <Button
         android:id="@+id/send_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Send"
-        android:onClick="sendMessage"
+        android:text="@string/send_message_btn"
         android:layout_alignTop="@+id/text_message"
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />

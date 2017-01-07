@@ -21,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -66,6 +67,7 @@ public class MealFragment extends Fragment implements View.OnClickListener {
 
     private boolean mAnswer;
     private EditText mLocationName;
+    private Button mContact_btn;
 
     private HomeActivity mParent;
 
@@ -181,7 +183,15 @@ public class MealFragment extends Fragment implements View.OnClickListener {
         mListOfDays = (LinearLayout) view.findViewById(R.id.create_list_of_days);
         mTitle = (EditText) view.findViewById(R.id.create_title);
         mDescription = (EditText) view.findViewById(R.id.create_description);
+        mContact_btn = (Button) view.findViewById(R.id.contact_button);
+        mContact_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                contact(v);
+            }
+        });
         mLocationName = (EditText) view.findViewById(R.id.create_location);
+
 
         mLocationName.addTextChangedListener(new TextWatcher() {
             ArrayList<UserLocation> locations = new ArrayList<UserLocation>();
@@ -329,9 +339,6 @@ public class MealFragment extends Fragment implements View.OnClickListener {
             case R.id.day_lunch_cb:
             case R.id.day_dinner_cb:
                 toggleMealTime(v);
-                break;
-            case R.id.contact_button:
-                contact(v);
                 break;
         }
     }

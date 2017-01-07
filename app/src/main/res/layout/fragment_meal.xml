@@ -21,7 +21,7 @@
                 android:id="@+id/create_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Title"
+                android:hint="@string/meal_title"
                 android:maxLines="1" />
 
             <EditText
@@ -29,7 +29,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="top|start"
-                android:hint="Please enter a short description of what type of food you would like to cook and how you imagined the meal together."
+                android:hint="@string/description"
                 android:maxLines="5" />
 
             <LinearLayout
@@ -40,7 +40,7 @@
                     style="@style/Header"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Free Days" />
+                    android:text="@string/free_days" />
 
                 <LinearLayout
                     android:id="@+id/create_list_of_days"
@@ -55,14 +55,14 @@
                     android:id="@+id/create_new_day_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Add Day" />
+                    android:text="@string/add_day" />
             </LinearLayout>
 
             <EditText
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textPersonName"
-                android:hint="Location"
+                android:hint="@string/type_location"
                 android:ems="10"
                 android:id="@+id/create_location"
                 android:maxLines="1"/>
@@ -76,8 +76,7 @@
                 android:id="@+id/contact_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Contact"
-                android:onClick="contact"/>
+                android:text="@string/contact"/>
         </LinearLayout>
 
     </ScrollView>

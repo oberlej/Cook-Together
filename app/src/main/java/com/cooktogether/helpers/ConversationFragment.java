@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,6 +44,7 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
     private int nbrMessages;
     private EditText newMessage;
     private List<String> usersKeys;
+    private Button mSendButton;
 
     public static ConversationFragment newInstance() {
         return new ConversationFragment();
@@ -151,6 +153,14 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
     private void initFields(View view) {
         mConversationKey = mParent.getConversationKey();
         mTitle = (TextView) view.findViewById(R.id.conversation_title);
+        newMessage = (EditText) view.findViewById(R.id.text_message);
+        mSendButton = (Button) view.findViewById(R.id.send_button);
+        mSendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendMessage(v);
+            }
+        });
     }
 
     @Override
@@ -162,9 +172,7 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
     }
 
     public void sendMessage(View view) {
-        newMessage = (EditText) view.findViewById(R.id.text_message);
         Message m = new Message(mParent.getUid(), newMessage.getText().toString());
-
 
         if (nbrMessages == 0) {
             Conversation newConv = new Conversation(mTitle.getText().toString(), mConversationKey, usersKeys);

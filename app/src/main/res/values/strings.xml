@@ -35,6 +35,14 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="facebook_provider_id">facebook.com</string>
+    <string name="contact">Contact</string>
+    <string name="add_day">Add Day</string>
+    <string name="free_days">Free Days</string>
+    <string name="type_location">Location</string>
+    <string name="description">Please enter a short description of what type of food you would like to cook and how you imagined the meal together.</string>
+    <string name="meal_title">Title</string>
+    <string name="send_message_btn">Send</string>
+    <string name="hint_messaging">type your message here ...</string>
 </resources>
 
 
