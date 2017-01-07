@@ -44,6 +44,8 @@
     <string name="send_message_btn">Send</string>
     <string name="hint_messaging">type your message here ...</string>
     <string name="no_description">The user did not give any description. You can contact them to get more information .. :)</string>
+    <string name="selected_place">Location</string>
+    <string name="place_details">place details</string>
 </resources>
 
 

@@ -29,8 +29,7 @@
             android:windowSoftInputMode="stateHidden" />
 
         <activity android:name=".helpers.Localization"></activity>
-        <activity android:name=".helpers.ConversationActivity"></activity>
-        <activity android:name=".helpers.ConversationListActivity"></activity>
+        <activity android:name=".mainscreens.AutoCompleteActivity"></activity>
 
         <activity
             android:name="com.facebook.CustomTabActivity"
@@ -57,6 +56,7 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
