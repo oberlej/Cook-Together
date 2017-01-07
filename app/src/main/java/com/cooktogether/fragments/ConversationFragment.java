@@ -1,4 +1,4 @@
-package com.cooktogether.helpers;
+package com.cooktogether.fragments;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -21,10 +21,8 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -40,6 +38,7 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
     protected HomeActivity mParent;
 
     private String mConversationKey = null;
+    private String mMealKey;
     private TextView mTitle;
     private int nbrMessages;
     private EditText newMessage;
@@ -85,6 +84,7 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Conversation conversation = Conversation.parseSnapshot(dataSnapshot);
                 mTitle.setText(conversation.getTitle());
+                mMealKey = conversation.getMealKey();
                 usersKeys = conversation.getUsersKeys();
 
                 //to make sure the current user Id is always the first in the list
@@ -175,7 +175,7 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
         Message m = new Message(mParent.getUid(), newMessage.getText().toString());
 
         if (nbrMessages == 0) {
-            Conversation newConv = new Conversation(mTitle.getText().toString(), mConversationKey, usersKeys);
+            Conversation newConv = new Conversation(mTitle.getText().toString(), mConversationKey, mMealKey,usersKeys);
             mParent.getDB().child("user-conversations").child(usersKeys.get(1)).child(mConversationKey).setValue(newConv);
         }
         mParent.getDB().child("user-conversations").child(usersKeys.get(1)).child(mConversationKey).child("messages").push().setValue(m);

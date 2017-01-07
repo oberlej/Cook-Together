@@ -15,7 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 
 import com.cooktogether.fragments.MealNotEditableFragment;
-import com.cooktogether.helpers.ConversationFragment;
+import com.cooktogether.fragments.ConversationFragment;
 
 import com.cooktogether.fragments.MyMealFragment;
 import com.cooktogether.fragments.MyMealsFragment;
@@ -24,7 +24,7 @@ import com.cooktogether.fragments.SearchFragment;
 
 import com.cooktogether.helpers.AbstractBaseActivity;
 import com.cooktogether.R;
-import com.cooktogether.helpers.ConversationsListFragment;
+import com.cooktogether.fragments.ConversationsListFragment;
 
 public class HomeActivity extends AbstractBaseActivity {
 

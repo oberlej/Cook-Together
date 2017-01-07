@@ -2,11 +2,9 @@ package com.cooktogether.fragments;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,7 +19,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -31,20 +28,15 @@ import android.widget.Toast;
 import com.cooktogether.R;
 
 import com.cooktogether.adapter.locationOptionsAdapter;
-import com.cooktogether.helpers.AbstractBaseActivity;
 import com.cooktogether.helpers.AbstractBaseFragment;
 
-import com.cooktogether.helpers.ConversationFragment;
-
 import com.cooktogether.listener.RecyclerItemClickListener;
-import com.cooktogether.adapter.locationOptionsAdapter;
 
 import com.cooktogether.mainscreens.HomeActivity;
 import com.cooktogether.model.Day;
 import com.cooktogether.model.DayEnum;
 import com.cooktogether.model.Meal;
 import com.cooktogether.model.UserLocation;
-import com.cooktogether.model.Conversation;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -53,10 +45,8 @@ import com.google.firebase.database.ValueEventListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 public class MyMealFragment extends AbstractBaseFragment implements View.OnClickListener {
     private LinearLayout mListOfDays;

@@ -23,8 +23,11 @@ import com.cooktogether.model.Day;
 import com.cooktogether.model.DayEnum;
 import com.cooktogether.model.Meal;
 import com.cooktogether.model.UserLocation;
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
@@ -149,16 +152,17 @@ public class MealNotEditableFragment extends Fragment {
         }
     }
 
-
     public void contact(View view) {
-        String conversationKey = mParent.getDB().child("user-conversations").child(mParent.getUid()).push().getKey();
+
+        String conversationKey =  mParent.getDB().child("user-conversations").child(mParent.getUid()).push().getKey();
 
         List<String> usersKeys = new ArrayList<String>();
         usersKeys.add(mParent.getUid());
         usersKeys.add(mealUserKey);
-        Conversation newConv = new Conversation(title.getText().toString(), conversationKey, usersKeys);
+        Conversation newConv = new Conversation(title.getText().toString(), conversationKey, mealKey, usersKeys);
 
         mParent.getDB().child("user-conversations").child(mParent.getUid()).child(conversationKey).setValue(newConv);
+
 
         mParent.goToConversation(conversationKey);
 

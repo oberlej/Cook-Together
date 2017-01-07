@@ -1,4 +1,4 @@
-package com.cooktogether.helpers;
+package com.cooktogether.fragments;
 
 import android.content.Intent;
 import android.os.Bundle;

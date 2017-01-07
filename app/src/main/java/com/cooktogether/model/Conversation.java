@@ -13,20 +13,22 @@ public class Conversation {
     private String Title;
     private ArrayList<Message> messages;
     private String conversationKey;
+    private String mealKey;
     private List<String> usersKeys; //to change later to users
-    //private String userKey2; //to change later to users
 
-    public Conversation(String title, String conversationKey, List<String> usersKeys) {
+    public Conversation(String title, String conversationKey, String mealKey, List<String> usersKeys) {
         Title = title;
         this.messages = new ArrayList<Message>();
         this.conversationKey = conversationKey;
+        this.mealKey = mealKey;
         this.usersKeys = usersKeys;
     }
 
-    public Conversation(String title, ArrayList<Message> messages, String conversationKey, List<String> usersKeys) {
+    public Conversation(String title, ArrayList<Message> messages, String conversationKey, String mealKey ,List<String> usersKeys) {
         Title = title;
         this.messages = messages;
         this.conversationKey = conversationKey;
+        this.mealKey = mealKey;
         this.usersKeys = usersKeys;
     }
 
@@ -42,10 +44,6 @@ public class Conversation {
         this.messages = messages;
     }
 
-    public void addMessage(Message message){
-        this.messages.add(message);
-    }
-
     public String getTitle() {
         return Title;
     }
@@ -55,18 +53,26 @@ public class Conversation {
     }
 
 
-    public String getLastMessage() {
+    /*public String getLastMessage() {
         if(this.messages.isEmpty())
             return "no messages";
         return this.messages.get(this.messages.size()-1).getContent();
-    }
+    }*/
 
     public String getConversationKey() {
-        return conversationKey;
+        return this.conversationKey;
     }
 
     public void setConversationKey(String conversationKey) {
         this.conversationKey = conversationKey;
+    }
+
+    public String getMealKey() {
+        return mealKey;
+    }
+
+    public void setMealKey(String mealKey) {
+        this.mealKey = mealKey;
     }
 
     public static Conversation parseSnapshot(DataSnapshot snapshot) {
@@ -82,6 +88,6 @@ public class Conversation {
             usersKeys.add((String)userKey.getValue());
         }
 
-        return new Conversation((String)snapshot.child("title").getValue(), messages,(String) snapshot.child("conversationKey").getValue(),usersKeys );
+        return new Conversation((String)snapshot.child("title").getValue(), messages,(String) snapshot.child("conversationKey").getValue(),(String) snapshot.child("mealKey").getValue(),usersKeys );
     }
 }
