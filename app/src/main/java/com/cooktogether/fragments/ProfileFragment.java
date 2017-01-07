@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.TextViewCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,6 +21,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cooktogether.R;
@@ -46,6 +48,7 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
     private User mUser = null;
     private boolean mAnswer;
     private EditText mUserName;
+    private TextView mUseFBImage;
 
     public static ProfileFragment newInstance() {
         return new ProfileFragment();
@@ -68,6 +71,8 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
         mImage = (CircleImageView) view.findViewById(R.id.profile_image);
         mImage.setOnClickListener(this);
         mUserName = (EditText) view.findViewById(R.id.profile_user_name);
+        mUseFBImage = (TextView) view.findViewById(R.id.profile_use_fb_image);
+        mUseFBImage.setOnClickListener(this);
         loadUser();
     }
 
@@ -89,12 +94,20 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
                     if (mUser.isFacebookConnected()) {
                         setFacebookImageUri();
                         new DownloadImage(mImage).execute(mUser.getImageURI());
+                        mUseFBImage.setVisibility(View.GONE);
                     }
                 } else {
                     if (mUser.isFacebookImage()) {
                         new DownloadImage(mImage).execute(mUser.getImageURI());
+                        mUseFBImage.setVisibility(View.GONE);
                     } else {
-                        mImage.setImageBitmap(getPath(Uri.parse(mUser.getImageURI())));
+                        Bitmap b = getPath(Uri.parse(mUser.getImageURI()));
+                        if (b != null) {
+                            mImage.setImageBitmap(b);
+                        } else {
+                            mImage.setBackgroundResource(R.drawable.ic_photo_camera_black_48dp);
+                        }
+                        mUseFBImage.setVisibility(View.VISIBLE);
                     }
                 }
             }
@@ -185,6 +198,9 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
             mUser.setFacebookImage(false);
             Bitmap bitmap = getPath(data.getData());
             mImage.setImageBitmap(bitmap);
+            mUseFBImage.setVisibility(View.VISIBLE);
+        } else {
+            mImage.setBackgroundResource(R.drawable.ic_photo_camera_black_48dp);
         }
     }
 
@@ -232,6 +248,11 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
         switch (v.getId()) {
             case R.id.profile_image:
                 selectImage();
+                break;
+            case R.id.profile_use_fb_image:
+                setFacebookImageUri();
+                new DownloadImage(mImage).execute(mUser.getImageURI());
+                mUseFBImage.setVisibility(View.GONE);
                 break;
         }
     }
