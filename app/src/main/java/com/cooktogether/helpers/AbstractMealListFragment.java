@@ -19,12 +19,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 
 
-public abstract class AbstractMealListFragment extends Fragment {
+public abstract class AbstractMealListFragment extends AbstractBaseFragment {
     private FirebaseRecyclerAdapter<Meal, MealViewHolder> mAdapter;
     protected RecyclerView mRecycler;
     protected LinearLayoutManager mManager;
-
-    protected HomeActivity mParent;
 
     public AbstractMealListFragment() {
     }
@@ -32,7 +30,12 @@ public abstract class AbstractMealListFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_meal_list, container, false);
+        init(view);
+        return view;
+    }
 
+    @Override
+    protected void init(View view) {
         mParent = (HomeActivity) getActivity();
 
         mRecycler = (RecyclerView) view.findViewById(R.id.meals_list_rcv);
@@ -45,7 +48,7 @@ public abstract class AbstractMealListFragment extends Fragment {
         mRecycler.setLayoutManager(mManager);
 
         // Set up FirebaseRecyclerAdapter with the Query
-        Query mealsQuery = getQuery(mParent.getDB());
+        Query mealsQuery = getQuery(getDB());
 
         mAdapter = new FirebaseRecyclerAdapter<Meal, MealViewHolder>(Meal.class, R.layout.item_meal, MealViewHolder.class, mealsQuery) {
 
@@ -64,8 +67,8 @@ public abstract class AbstractMealListFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         // Launch PostDetailActivity
-                        mParent.setMealKey(mealKey);
-                        mParent.selectDrawerItem(mParent.getNvDrawer().getMenu().findItem(R.id.nav_meal_detail),getString(R.string.update_meal));
+                        ((HomeActivity)mParent).setMealKey(mealKey);
+                        ((HomeActivity)mParent).selectDrawerItem(((HomeActivity)mParent).getNvDrawer().getMenu().findItem(R.id.nav_meal_detail),getString(R.string.update_meal));
                     }
                 });
 
@@ -74,7 +77,6 @@ public abstract class AbstractMealListFragment extends Fragment {
             }
         };
         mRecycler.setAdapter(mAdapter);
-        return view;
     }
 
     @Override

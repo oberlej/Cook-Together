@@ -13,6 +13,8 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import com.cooktogether.R;
+import com.cooktogether.helpers.AbstractBaseActivity;
+import com.cooktogether.helpers.AbstractBaseFragment;
 import com.cooktogether.mainscreens.AuthenticationActivity;
 import com.cooktogether.mainscreens.HomeActivity;
 import com.cooktogether.model.User;
@@ -20,17 +22,17 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
-public class SignUpFragment extends Fragment {
+public class SignUpFragment extends AbstractBaseFragment {
 
     protected EditText passwordEditText;
     protected EditText emailEditText;
     protected Button signUpButton;
-    private FirebaseAuth mFirebaseAuth;
 
-    public static SignUpFragment newInstance(){
+    public static SignUpFragment newInstance() {
         return new SignUpFragment();
     }
 
@@ -50,10 +52,10 @@ public class SignUpFragment extends Fragment {
         super.onCreate(savedInstanceState);
     }
 
-    private void init(View view) {
+    @Override
+    protected void init(View view) {
 
-        // Initialize FirebaseAuth
-        mFirebaseAuth = FirebaseAuth.getInstance();
+        mParent = (AbstractBaseActivity) getActivity();
 
         passwordEditText = (EditText) view.findViewById(R.id.signup_pw);
         emailEditText = (EditText) view.findViewById(R.id.signup_email);
@@ -77,14 +79,15 @@ public class SignUpFragment extends Fragment {
                     AlertDialog dialog = builder.create();
                     dialog.show();
                 } else {
-                    mFirebaseAuth.createUserWithEmailAndPassword(email, password)
+                    getAuth().createUserWithEmailAndPassword(email, password)
                             .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if (task.isSuccessful()) {
                                         //create user in db
-//                                        DatabaseReference mDB = FirebaseDatabase.getInstance().getReference();
-//                                        mDB.child("users").child(mFirebaseAuth.getCurrentUser().getUid()).setValue(new User("User Name",mFirebaseAuth.getCurrentUser().,""));
+                                        FirebaseUser cu = getCurrentUser();
+                                        User newUser = new User(cu.getUid(), cu.getDisplayName(), cu.getEmail(), "",false, "", false);
+                                        getDB().child("users").child(cu.getUid()).setValue(newUser);
 
                                         Intent intent = new Intent(getContext(), HomeActivity.class);
                                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

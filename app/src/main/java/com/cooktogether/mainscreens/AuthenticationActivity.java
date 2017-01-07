@@ -28,6 +28,7 @@ import android.widget.Toast;
 import com.cooktogether.R;
 import com.cooktogether.fragments.LogInFragment;
 import com.cooktogether.fragments.SignUpFragment;
+import com.cooktogether.helpers.AbstractBaseActivity;
 import com.cooktogether.helpers.ViewPagerAdapter;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -49,9 +50,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AuthenticationActivity extends AppCompatActivity {
-    protected FirebaseAuth mFirebaseAuth;
-    protected FirebaseUser mFirebaseUser;
+public class AuthenticationActivity extends AbstractBaseActivity {
     private FirebaseAuth.AuthStateListener mAuthListener;
     private CallbackManager mCallbackManager;
 
@@ -74,10 +73,6 @@ public class AuthenticationActivity extends AppCompatActivity {
         toolbar = (Toolbar) findViewById(R.id.toolbar_main);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
-
-        // Initialize Firebase Auth
-        mFirebaseAuth = FirebaseAuth.getInstance();
-        mFirebaseUser = mFirebaseAuth.getCurrentUser();
 
         //init fragments
         mLogIn = new LogInFragment().newInstance();
@@ -139,14 +134,14 @@ public class AuthenticationActivity extends AppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
-        mFirebaseAuth.addAuthStateListener(mAuthListener);
+        getAuth().addAuthStateListener(mAuthListener);
     }
 
     @Override
     public void onStop() {
         super.onStop();
         if (mAuthListener != null) {
-            mFirebaseAuth.removeAuthStateListener(mAuthListener);
+            getAuth().removeAuthStateListener(mAuthListener);
         }
     }
 

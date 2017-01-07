@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -26,21 +27,7 @@
             android:name=".mainscreens.HomeActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden" />
-        <activity
-            android:name=".mainscreens.MealActivity"
-            android:parentActivityName=".mainscreens.HomeActivity"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden" />
-        <activity
-            android:name=".mainscreens.SearchActivity"
-            android:parentActivityName=".mainscreens.HomeActivity"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden" />
-        <activity
-            android:name=".mainscreens.MyMealsActivity"
-            android:parentActivityName=".mainscreens.HomeActivity"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden" />
+
         <activity android:name=".helpers.Localization"></activity>
 
         <activity

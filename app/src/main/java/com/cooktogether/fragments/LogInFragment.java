@@ -16,12 +16,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cooktogether.R;
+import com.cooktogether.helpers.AbstractBaseFragment;
 import com.cooktogether.mainscreens.AuthenticationActivity;
 import com.cooktogether.mainscreens.HomeActivity;
+import com.cooktogether.model.User;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.Profile;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -31,13 +34,16 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserInfo;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.ValueEventListener;
 
-public class LogInFragment extends Fragment {
+public class LogInFragment extends AbstractBaseFragment {
     protected EditText emailEditText;
     protected EditText passwordEditText;
     protected Button logInButton;
     protected TextView signUpTextView;
-    private FirebaseAuth mFirebaseAuth;
 
     public static LogInFragment newInstance() {
         return new LogInFragment();
@@ -54,8 +60,9 @@ public class LogInFragment extends Fragment {
         return view;
     }
 
-    private void init(View view) {
-        mFirebaseAuth = FirebaseAuth.getInstance();
+    @Override
+    protected void init(View view) {
+        mParent = (AuthenticationActivity) getActivity();
         emailEditText = (EditText) view.findViewById(R.id.login_email);
         passwordEditText = (EditText) view.findViewById(R.id.login_pw);
         logInButton = (Button) view.findViewById(R.id.login_btn);
@@ -77,7 +84,7 @@ public class LogInFragment extends Fragment {
                     AlertDialog dialog = builder.create();
                     dialog.show();
                 } else {
-                    mFirebaseAuth.signInWithEmailAndPassword(email, password)
+                    getAuth().signInWithEmailAndPassword(email, password)
                             .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
@@ -111,17 +118,19 @@ public class LogInFragment extends Fragment {
 
             @Override
             public void onCancel() {
+                Toast.makeText(getContext(), "Connection canceled.", Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void onError(FacebookException error) {
+                Toast.makeText(getContext(), "Authentication failed. " + error.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
 
     private void handleFacebookAccessToken(AccessToken token) {
         AuthCredential credential = FacebookAuthProvider.getCredential(token.getToken());
-        mFirebaseAuth.signInWithCredential(credential)
+        getAuth().signInWithCredential(credential)
                 .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
@@ -129,7 +138,27 @@ public class LogInFragment extends Fragment {
                         // the auth state listener will be notified and logic to handle the
                         // signed in user can be handled in the listener.
                         if (!task.isSuccessful()) {
-                            Toast.makeText(getContext(), "Authentication failed.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getContext(), "Authentication failed.", Toast.LENGTH_LONG).show();
+                        } else {
+                            //check if it is the first time the user connects to our app
+                            getDB().child("users").child(getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    if (dataSnapshot.exists()) {
+                                        //user has already connected once
+                                    } else {
+                                        //first time => create user entry
+                                        FirebaseUser cu = getCurrentUser();
+                                        User newUser = new User(cu.getUid(), cu.getDisplayName(), cu.getEmail(), "",true, "", true);
+                                        getDB().child("users").child(cu.getUid()).setValue(newUser);
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+                                    Toast.makeText(getContext(), "Something went wrong. Please logout and try logging in again.", Toast.LENGTH_LONG).show();
+                                }
+                            });
                         }
                     }
                 });

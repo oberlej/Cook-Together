@@ -60,6 +60,10 @@ public class HomeActivity extends AbstractBaseActivity {
         // We can now look up items within the header if needed
 //        ImageView ivHeaderPhoto = headerLayout.findViewById(R.id.imageView);
         //set default item
+        loadDefaultScreen();
+    }
+
+    public void loadDefaultScreen() {
         MenuItem defaultItem = nvDrawer.getMenu().findItem(R.id.nav_my_meals);
         selectDrawerItem(defaultItem, defaultItem.getTitle().toString());
     }

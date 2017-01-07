@@ -15,16 +15,16 @@ import com.google.firebase.database.FirebaseDatabase;
 public abstract class AbstractBaseActivity extends AppCompatActivity {
 
     public DatabaseReference getDB() {
-        if (mDatabase == null) {
-            mDatabase = FirebaseDatabase.getInstance().getReference();
-        }
-        return mDatabase;
+        return FirebaseDatabase.getInstance().getReference();
     }
 
-    private DatabaseReference mDatabase = null;
+    public FirebaseAuth getAuth(){
+        return FirebaseAuth.getInstance();
+    }
+
 
     public boolean isConnected() {
-        return FirebaseAuth.getInstance().getCurrentUser() != null;
+        return getAuth().getCurrentUser() != null;
     }
 
     public void checkIsConnected() {
@@ -33,15 +33,20 @@ public abstract class AbstractBaseActivity extends AppCompatActivity {
         }
     }
 
-    public FirebaseUser getCurrentUser(){return FirebaseAuth.getInstance().getCurrentUser();}
+    public FirebaseUser getCurrentUser() {
+        return getAuth().getCurrentUser();
+    }
 
     public String getUid() {
-        return FirebaseAuth.getInstance().getCurrentUser().getUid();
+        if(isConnected()) {
+            return getCurrentUser().getUid();
+        }
+        return null;
     }
 
     public void logout() {
         if (isConnected()) {
-            FirebaseAuth.getInstance().signOut();
+            getAuth().signOut();
         }
 
         Intent intent = new Intent(this, AuthenticationActivity.class);
