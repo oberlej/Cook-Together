@@ -19,7 +19,6 @@
 
             <de.hdodenhof.circleimageview.CircleImageView xmlns:app="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/profile_image"
-
                 android:layout_width="96dp"
                 android:layout_height="96dp"
                 android:src="@drawable/ic_photo_camera_black_48dp"
@@ -27,7 +26,16 @@
                 app:civ_border_width="2dp" />
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/profile_use_fb_image"
+            android:visibility="visible"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Use facebook picture"
+            android:textAlignment="center" />
+
         <EditText
+            style="@style/Header"
             android:id="@+id/profile_user_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
