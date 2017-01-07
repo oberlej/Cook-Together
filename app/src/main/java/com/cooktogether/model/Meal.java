@@ -1,7 +1,5 @@
 package com.cooktogether.model;
 
-import android.location.Location;
-
 import com.google.firebase.database.DataSnapshot;
 
 import java.util.ArrayList;
@@ -108,4 +106,5 @@ public class Meal {
 
         return new Meal((String) snapshot.child("title").getValue(), (String) snapshot.child("description").getValue(), (String) snapshot.child("userKey").getValue(), (String) snapshot.child("mealKey").getValue(), freeDays,location);
     }
+
 }

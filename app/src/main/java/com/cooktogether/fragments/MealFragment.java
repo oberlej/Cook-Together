@@ -1,19 +1,16 @@
 package com.cooktogether.fragments;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
+
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -23,6 +20,8 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -30,15 +29,23 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cooktogether.R;
+
 import com.cooktogether.adapter.locationOptionsAdapter;
 import com.cooktogether.helpers.AbstractBaseActivity;
 import com.cooktogether.helpers.AbstractBaseFragment;
+
+import com.cooktogether.helpers.ConversationFragment;
+
 import com.cooktogether.listener.RecyclerItemClickListener;
+import com.cooktogether.adapter.locationOptionsAdapter;
+
 import com.cooktogether.mainscreens.HomeActivity;
 import com.cooktogether.model.Day;
 import com.cooktogether.model.DayEnum;
 import com.cooktogether.model.Meal;
 import com.cooktogether.model.UserLocation;
+import com.cooktogether.model.Conversation;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
@@ -46,8 +53,10 @@ import com.google.firebase.database.ValueEventListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 public class MealFragment extends AbstractBaseFragment implements View.OnClickListener {
     private LinearLayout mListOfDays;
@@ -58,10 +67,12 @@ public class MealFragment extends AbstractBaseFragment implements View.OnClickLi
     private List<Day> mDaysFree;
 
     private String mMealKey = null;
+    private String mUserKey;
     private boolean mIsUpdate = false;
 
     private boolean mAnswer;
     private EditText mLocationName;
+    private Button mContact_btn;
 
     // for the list of location options
     private RecyclerView mRecyclerView;
@@ -177,7 +188,15 @@ public class MealFragment extends AbstractBaseFragment implements View.OnClickLi
         mListOfDays = (LinearLayout) view.findViewById(R.id.create_list_of_days);
         mTitle = (EditText) view.findViewById(R.id.create_title);
         mDescription = (EditText) view.findViewById(R.id.create_description);
+        mContact_btn = (Button) view.findViewById(R.id.contact_button);
+        mContact_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                contact(v);
+            }
+        });
         mLocationName = (EditText) view.findViewById(R.id.create_location);
+
 
         mLocationName.addTextChangedListener(new TextWatcher() {
             ArrayList<UserLocation> locations = new ArrayList<UserLocation>();
@@ -227,6 +246,7 @@ public class MealFragment extends AbstractBaseFragment implements View.OnClickLi
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     Meal meal = Meal.parseSnapshot(dataSnapshot);
 
+                    mUserKey = meal.getUserKey();
                     mLocationName.setText(meal.getLocation().toString());
                     mTitle.setText(meal.getTitle());
                     mDescription.setText(meal.getDescription());
@@ -354,5 +374,18 @@ public class MealFragment extends AbstractBaseFragment implements View.OnClickLi
         return locations;
     }
 
+    public void contact(View view){
+        String conversationKey = getDB().child("user-conversations").child(mParent.getUid()).push().getKey();
+
+        List<String> usersKeys = new ArrayList<String>();
+        usersKeys.add(getUid());
+        usersKeys.add(mUserKey);
+        Conversation newConv = new Conversation(mTitle.getText().toString(), conversationKey, usersKeys);
+
+        getDB().child("user-conversations").child(getUid()).child(conversationKey).setValue(newConv);
+
+        ((HomeActivity)mParent).goToConversation(conversationKey);
+
+    }
 
 }

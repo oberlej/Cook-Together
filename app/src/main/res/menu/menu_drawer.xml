@@ -18,6 +18,11 @@
             android:icon="@drawable/ic_search_black_48dp"
             android:orderInCategory="@integer/SEARCH_MEAL_ORDER"
             android:title="Search Meal" />
+        <item
+            android:id="@+id/nav_my_messages"
+            android:icon="@drawable/ic_message_white_48dp"
+            android:orderInCategory="@integer/MY_MESSAGES_ORDER"
+            android:title="My Messages" />
     </group>
     <group
         android:id="@+id/group2"

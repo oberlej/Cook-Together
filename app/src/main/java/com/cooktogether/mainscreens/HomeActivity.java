@@ -13,15 +13,17 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
+
+import com.cooktogether.helpers.ConversationFragment;
 
 import com.cooktogether.fragments.MealFragment;
 import com.cooktogether.fragments.MyMealsFragment;
 import com.cooktogether.fragments.ProfileFragment;
 import com.cooktogether.fragments.SearchFragment;
-import com.cooktogether.helpers.Localization;
+
 import com.cooktogether.helpers.AbstractBaseActivity;
 import com.cooktogether.R;
+import com.cooktogether.helpers.ConversationsListFragment;
 
 public class HomeActivity extends AbstractBaseActivity {
 
@@ -33,6 +35,7 @@ public class HomeActivity extends AbstractBaseActivity {
     private ActionBarDrawerToggle drawerToggle;
 
     private String mMealKey = "";
+    private String conversationKey;
 
     private MenuItem itemChecked = null;
 
@@ -100,6 +103,9 @@ public class HomeActivity extends AbstractBaseActivity {
             case R.id.nav_search_meal:
                 fragmentClass = SearchFragment.class;
                 break;
+            case R.id.nav_my_messages:
+                fragmentClass = ConversationsListFragment.class;
+                break;
             case R.id.nav_logout:
                 logout();
                 return;
@@ -157,6 +163,9 @@ public class HomeActivity extends AbstractBaseActivity {
             case R.id.action_profile:
                 showProfile();
                 return true;
+            case R.id.action_message:
+                goToConversations();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -195,6 +204,29 @@ public class HomeActivity extends AbstractBaseActivity {
         super.onConfigurationChanged(newConfig);
         // Pass any configuration change to the drawer toggles
         drawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    public void goToConversations(){
+        selectDrawerItem(getNvDrawer().getMenu().findItem(R.id.nav_my_messages),getString(R.string.CONVERSATION_TITLE));
+    }
+
+    public void setConversationKey(String conversationKey) {
+        this.conversationKey = conversationKey;
+    }
+
+    public String getConversationKey() {
+        return conversationKey;
+    }
+
+    public void goToConversation(String conversationKey) {
+        setConversationKey(conversationKey);
+        Fragment f = ConversationFragment.newInstance();
+        showFragment(f);
+        itemChecked.setChecked(false);
+        itemChecked = null;
+        setTitle("Conversation");
+        mDrawer.closeDrawers();
+
     }
 }
 
