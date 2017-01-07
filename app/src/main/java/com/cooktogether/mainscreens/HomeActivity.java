@@ -14,9 +14,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.cooktogether.fragments.MealNotEditableFragment;
 import com.cooktogether.helpers.ConversationFragment;
 
-import com.cooktogether.fragments.MealFragment;
+import com.cooktogether.fragments.MyMealFragment;
 import com.cooktogether.fragments.MyMealsFragment;
 import com.cooktogether.fragments.ProfileFragment;
 import com.cooktogether.fragments.SearchFragment;
@@ -94,7 +95,7 @@ public class HomeActivity extends AbstractBaseActivity {
                 fragmentClass = MyMealsFragment.class;
                 break;
             case R.id.nav_meal_detail:
-                fragmentClass = MealFragment.class;
+                fragmentClass = MyMealFragment.class;
                 break;
             case R.id.nav_search_meal:
                 fragmentClass = SearchFragment.class;
@@ -218,11 +219,21 @@ public class HomeActivity extends AbstractBaseActivity {
         setConversationKey(conversationKey);
         Fragment f = ConversationFragment.newInstance();
         showFragment(f);
-        itemChecked.setChecked(false);
-        itemChecked = null;
+        //itemChecked.setChecked(false);
+        //itemChecked = null;
         setTitle("Conversation");
         mDrawer.closeDrawers();
 
+    }
+
+    public void goToMeal(String mealKey) {
+        setMealKey(mealKey);
+        Fragment f = MealNotEditableFragment.newInstance();
+        showFragment(f);
+        //itemChecked.setChecked(false);
+        //itemChecked = null;
+        setTitle("Proposed Meal");
+        mDrawer.closeDrawers();
     }
 }
 

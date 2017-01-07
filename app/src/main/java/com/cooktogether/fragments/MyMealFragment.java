@@ -53,7 +53,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class MealFragment extends Fragment implements View.OnClickListener {
+public class MyMealFragment extends Fragment implements View.OnClickListener {
     private LinearLayout mListOfDays;
     private EditText mTitle;
     private EditText mDescription;
@@ -67,7 +67,7 @@ public class MealFragment extends Fragment implements View.OnClickListener {
 
     private boolean mAnswer;
     private EditText mLocationName;
-    private Button mContact_btn;
+    //private Button mContact_btn;
 
     private HomeActivity mParent;
 
@@ -183,13 +183,13 @@ public class MealFragment extends Fragment implements View.OnClickListener {
         mListOfDays = (LinearLayout) view.findViewById(R.id.create_list_of_days);
         mTitle = (EditText) view.findViewById(R.id.create_title);
         mDescription = (EditText) view.findViewById(R.id.create_description);
-        mContact_btn = (Button) view.findViewById(R.id.contact_button);
+        /*mContact_btn = (Button) view.findViewById(R.id.contact_button);
         mContact_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 contact(v);
             }
-        });
+        });*/
         mLocationName = (EditText) view.findViewById(R.id.create_location);
 
 

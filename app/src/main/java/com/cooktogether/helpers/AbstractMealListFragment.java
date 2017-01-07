@@ -63,9 +63,16 @@ public abstract class AbstractMealListFragment extends Fragment {
                 viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        // Launch PostDetailActivity
+                        // Launch Meal Details Fragment
                         mParent.setMealKey(mealKey);
-                        mParent.selectDrawerItem(mParent.getNvDrawer().getMenu().findItem(R.id.nav_meal_detail),getString(R.string.update_meal));
+                        //if the user is the one who proposed the meal, they can edit it
+                        if(model.getUserKey().equals(mParent.getUid())){
+                            mParent.selectDrawerItem(mParent.getNvDrawer().getMenu().findItem(R.id.nav_meal_detail),getString(R.string.update_meal));
+                        }
+                        else{
+                            mParent.goToMeal(mealKey);
+                        }
+
                     }
                 });
 
