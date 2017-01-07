@@ -1,8 +1,11 @@
 package com.cooktogether.fragments;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -16,6 +19,7 @@ import com.cooktogether.mainscreens.HomeActivity;
 import com.cooktogether.model.Conversation;
 import com.cooktogether.viewholder.ConversationViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
@@ -94,13 +98,31 @@ public class ConversationsListFragment extends Fragment {
                 });
 
                 viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener(){
+                    DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int choice) {
+                            switch (choice) {
+                                case DialogInterface.BUTTON_POSITIVE:
+                                    conversationRef.removeValue().addOnFailureListener(failureListener);
+                                    Toast.makeText(getContext(), "Conversation "+ model.getTitle() +" has been deleted", Toast.LENGTH_LONG).show();
+                                    break;
+                                case DialogInterface.BUTTON_NEGATIVE:
+                                    break;
+                            }
+                        }
+                    };
                     @Override
                     public boolean onLongClick(View v){
-                        Toast.makeText(getApplicationContext(), "Are you sure you want to delete the conversation ?", Toast.LENGTH_LONG).show();
 
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                        String message =  "Are you sure you want to delete your version of the conversation ?";
+                        builder.setMessage(message)
+                                .setPositiveButton("Yes", dialogClickListener)
+                                .setNegativeButton("No", dialogClickListener).show();
                         return false;
                     }
                 });
+
                 // Bind Post to ViewHolder, setting OnClickListener for the star button
                 viewHolder.bindToPost(model);
             }
@@ -110,5 +132,12 @@ public class ConversationsListFragment extends Fragment {
     public Query getQuery(DatabaseReference databaseReference){
         return databaseReference.child("user-conversations").child(mParent.getUid());
     }
+
+    private OnFailureListener failureListener = new OnFailureListener() {
+        @Override
+        public void onFailure(@NonNull Exception e) {
+            Toast.makeText(getContext(), e.getMessage().toString(), Toast.LENGTH_LONG).show();
+        }
+    };
 }
 

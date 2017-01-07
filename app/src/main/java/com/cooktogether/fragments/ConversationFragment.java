@@ -1,7 +1,10 @@
 package com.cooktogether.fragments;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -18,6 +21,7 @@ import com.cooktogether.model.Conversation;
 import com.cooktogether.model.Message;
 import com.cooktogether.viewholder.MessageViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -115,6 +119,31 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
                             }
                         });
 
+                        viewHolder.itemView.setOnLongClickListener(new View.OnLongClickListener(){
+                            DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int choice) {
+                                    switch (choice) {
+                                        case DialogInterface.BUTTON_POSITIVE:
+                                            messageRef.removeValue().addOnFailureListener(failureListener);
+                                            Toast.makeText(getContext(), "Message has been deleted", Toast.LENGTH_LONG).show();
+                                            break;
+                                        case DialogInterface.BUTTON_NEGATIVE:
+                                            break;
+                                    }
+                                }
+                            };
+                            @Override
+                            public boolean onLongClick(View v){
+
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                                String message =  "Are you sure you want to delete your version of the conversation ?";
+                                builder.setMessage(message)
+                                        .setPositiveButton("Yes", dialogClickListener)
+                                        .setNegativeButton("No", dialogClickListener).show();
+                                return false;
+                            }
+                        });
                         // Bind Post to ViewHolder, setting OnClickListener for the star button
                         viewHolder.bindToPost(model, mParent.getUid());
                     }
@@ -174,10 +203,10 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
     public void sendMessage(View view) {
         Message m = new Message(mParent.getUid(), newMessage.getText().toString());
 
-        if (nbrMessages == 0) {
-            Conversation newConv = new Conversation(mTitle.getText().toString(), mConversationKey, mMealKey,usersKeys);
-            mParent.getDB().child("user-conversations").child(usersKeys.get(1)).child(mConversationKey).setValue(newConv);
-        }
+        //if (nbrMessages == 0) {
+        Conversation newConv = new Conversation(mTitle.getText().toString(), mConversationKey, mMealKey,usersKeys);
+        mParent.getDB().child("user-conversations").child(usersKeys.get(1)).child(mConversationKey).setValue(newConv);
+        //}
         mParent.getDB().child("user-conversations").child(usersKeys.get(1)).child(mConversationKey).child("messages").push().setValue(m);
 
         mParent.getDB().child("user-conversations").child(usersKeys.get(0)).child(mConversationKey).child("messages").push().setValue(m);
@@ -198,6 +227,13 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
 
         }
     }
+
+    private OnFailureListener failureListener = new OnFailureListener() {
+        @Override
+        public void onFailure(@NonNull Exception e) {
+            Toast.makeText(getContext(), e.getMessage().toString(), Toast.LENGTH_LONG).show();
+        }
+    };
 }
 
 
