@@ -30,7 +30,12 @@ import android.widget.Toast;
 
 import com.cooktogether.R;
 
+import com.cooktogether.adapter.locationOptionsAdapter;
+import com.cooktogether.helpers.AbstractBaseActivity;
+import com.cooktogether.helpers.AbstractBaseFragment;
+
 import com.cooktogether.helpers.ConversationFragment;
+
 import com.cooktogether.listener.RecyclerItemClickListener;
 import com.cooktogether.adapter.locationOptionsAdapter;
 
@@ -53,7 +58,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class MyMealFragment extends Fragment implements View.OnClickListener {
+public class MyMealFragment extends AbstractBaseFragment implements View.OnClickListener {
     private LinearLayout mListOfDays;
     private EditText mTitle;
     private EditText mDescription;
@@ -69,8 +74,6 @@ public class MyMealFragment extends Fragment implements View.OnClickListener {
     private EditText mLocationName;
     //private Button mContact_btn;
 
-    private HomeActivity mParent;
-
     // for the list of location options
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -80,7 +83,7 @@ public class MyMealFragment extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_meal, container, false);
-        initFields(view);
+        init(view);
         return view;
     }
 
@@ -135,7 +138,7 @@ public class MyMealFragment extends Fragment implements View.OnClickListener {
 
     private boolean saveMeal() {
         if (!mIsUpdate) {
-            mMealKey = mParent.getDB().child("meals").push().getKey();
+            mMealKey = getDB().child("meals").push().getKey();
         }
 
         if (selectedLocation == null) {
@@ -145,7 +148,7 @@ public class MyMealFragment extends Fragment implements View.OnClickListener {
 
         Meal m = new Meal(mTitle.getText().toString(), mDescription.getText().toString(), mParent.getUid(), mMealKey, mDaysFree, selectedLocation);
 
-        mParent.getDB().child("meals").child(mMealKey).setValue(m);
+        getDB().child("meals").child(mMealKey).setValue(m);
 
         if (!mIsUpdate) {
             Toast.makeText(getContext(), "Meal " + mTitle.getText().toString() + " created.", Toast.LENGTH_LONG).show();
@@ -155,8 +158,10 @@ public class MyMealFragment extends Fragment implements View.OnClickListener {
         return true;
     }
 
-    private void initFields(View view) {
+    @Override
+    protected void init(View view) {
         mParent = (HomeActivity) getActivity();
+
         view.findViewById(R.id.create_new_day_btn).setOnClickListener(this);
         //for the list of location options
         mRecyclerView = (RecyclerView) view.findViewById(R.id.location_options);
@@ -219,7 +224,7 @@ public class MyMealFragment extends Fragment implements View.OnClickListener {
         initNotFreeDays();
         mDaysFree = new ArrayList<Day>();
 
-        mMealKey = mParent.getMealKey();
+        mMealKey = ((HomeActivity)mParent).getMealKey();
         mIsUpdate = mMealKey != null && !mMealKey.isEmpty();
         if (mIsUpdate) {
             loadMeal();
@@ -235,7 +240,8 @@ public class MyMealFragment extends Fragment implements View.OnClickListener {
 
     private void loadMeal() {
         if (mIsUpdate) {
-            mParent.getDB().child("meals").child(mMealKey).addValueEventListener(new ValueEventListener() {
+            //// TODO: 1/7/17 change to single valueeventlistenenr ?? 
+            getDB().child("meals").child(mMealKey).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     Meal meal = Meal.parseSnapshot(dataSnapshot);
@@ -368,17 +374,4 @@ public class MyMealFragment extends Fragment implements View.OnClickListener {
         return locations;
     }
 
-    public void contact(View view){
-        String conversationKey = mParent.getDB().child("user-conversations").child(mParent.getUid()).push().getKey();
-
-        List<String> usersKeys = new ArrayList<String>();
-        usersKeys.add(mParent.getUid());
-        usersKeys.add(mUserKey);
-        Conversation newConv = new Conversation(mTitle.getText().toString(), conversationKey, usersKeys);
-
-        mParent.getDB().child("user-conversations").child(mParent.getUid()).child(conversationKey).setValue(newConv);
-
-        mParent.goToConversation(conversationKey);
-
-    }
 }
