@@ -103,7 +103,7 @@ public class HomeActivity extends AbstractBaseActivity {
                 fragmentClass = MyMealFragment.class;
                 break;
             case R.id.nav_search_meal:
-                fragmentClass = LocalizationFragment.class;
+                fragmentClass = com.cooktogether.helpers.SearchFragment.class;
                 break;
             case R.id.nav_my_messages:
                 fragmentClass = ConversationsListFragment.class;

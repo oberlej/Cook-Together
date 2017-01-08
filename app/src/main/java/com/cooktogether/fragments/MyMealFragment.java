@@ -179,13 +179,7 @@ public class MyMealFragment extends AbstractBaseFragment implements View.OnClick
         mListOfDays = (LinearLayout) view.findViewById(R.id.create_list_of_days);
         mTitle = (EditText) view.findViewById(R.id.create_title);
         mDescription = (EditText) view.findViewById(R.id.create_description);
-        /*mContact_btn = (Button) view.findViewById(R.id.contact_button);
-        mContact_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                contact(v);
-            }
-        });*/
+
         mLocationName = (EditText) view.findViewById(R.id.create_location);
 
 

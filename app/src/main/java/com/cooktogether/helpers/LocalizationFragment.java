@@ -284,6 +284,18 @@ public class LocalizationFragment extends AbstractBaseFragment implements OnMapR
     @Override
     protected void init(final View view) {
         mParent = (HomeActivity) getActivity();
+        /*view.findViewById(R.id.searchLocation).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToLocation(v);
+            }
+        });*/
+        view.findViewById(R.id.searchButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToLocation(v);
+            }
+        });
         //getting the list of other meal propositions
         nearByMealsList = new ArrayList<Meal>();
         Query mealsQuery = getQuery(getDB());

@@ -44,6 +44,8 @@
     <string name="send_message_btn">Send</string>
     <string name="hint_messaging">type your message here ...</string>
     <string name="no_description">The user did not give any description. You can contact them to get more information .. :)</string>
+    <string name="action_list_search">view in a list</string>
+    <string name="action_map_search">view in a map</string>
 </resources>
 
 
