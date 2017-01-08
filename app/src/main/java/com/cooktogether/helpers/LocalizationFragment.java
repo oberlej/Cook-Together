@@ -16,11 +16,14 @@ import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.cooktogether.R;
+import com.cooktogether.mainscreens.HomeActivity;
 import com.cooktogether.model.Meal;
 import com.cooktogether.model.UserLocation;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -42,7 +45,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class Localization extends AbstractBaseActivity implements OnMapReadyCallback {
+public class LocalizationFragment extends AbstractBaseFragment implements OnMapReadyCallback {
     private GoogleMap myGoogleMap;
     private UserLocation mLocation;
     private ArrayList<Meal> nearByMealsList;
@@ -50,39 +53,14 @@ public class Localization extends AbstractBaseActivity implements OnMapReadyCall
     // Set up Layout Manager, reverse layout
    // LinearLayoutManager mManager = new LinearLayoutManager(getApplicationContext());
 
+    public LocalizationFragment(){
+
+    }
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        checkIsConnected();
-        setContentView(R.layout.activity_localization);
-
-        //getting the list of other meal propositions
-        nearByMealsList = new ArrayList<Meal>();
-        Query mealsQuery = getQuery(getDB());
-
-        mealsQuery.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot meals) {
-                nearByMealsList = findNearByMeals(meals);
-                Location location;
-                if(mLocation == null)
-                    location = null;
-                else
-                location = new Location("provider");
-                location.setLatitude(mLocation.getLatitude());
-                location.setLongitude(mLocation.getLongitude());
-                updateWithNewLocation(location);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                System.out.println("The read failed: " + databaseError.getMessage());
-            }
-        });
-
-        ((MapFragment) getFragmentManager().findFragmentById(R.id.myMap)).getMapAsync(this);
-        mLocation = new UserLocation();
-
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_map_search, container, false);
+        init(view);
+        return view;
         /*
         LocationManager locationManager;
         String context = Context.LOCATION_SERVICE;
@@ -106,8 +84,8 @@ public class Localization extends AbstractBaseActivity implements OnMapReadyCall
     @Override
     public void onMapReady(GoogleMap googleMap) {
         myGoogleMap = googleMap;
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ((TextView) findViewById(R.id.myLocationText)).setText("Permission denied");
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ((TextView) this.getView().findViewById(R.id.myLocationText)).setText("Permission denied");
         } else {
             //Changing map type
             myGoogleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
@@ -121,19 +99,6 @@ public class Localization extends AbstractBaseActivity implements OnMapReadyCall
             myGoogleMap.getUiSettings().setCompassEnabled(true);
             // Enable/disable zooming functionality
             myGoogleMap.getUiSettings().setZoomGesturesEnabled(true);
-
-            /*myGoogleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
-                @Override
-                public boolean onMarkerClick(Marker marker) {
-                    // Launch PostDetailActivity
-                    if(marker.getTag() != "mine") {
-                        Intent intent = new Intent(getApplicationContext(), MealActivity.class);
-                        intent.putExtra(getResources().getString(R.string.MEAL_KEY), (String)marker.getTag());
-                        startActivity(intent);
-                    }
-                    return true;
-                }
-            });*/
 
             myGoogleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener(){
 
@@ -149,7 +114,8 @@ public class Localization extends AbstractBaseActivity implements OnMapReadyCall
 
             LocationManager locationManager;
             String context = Context.LOCATION_SERVICE;
-            locationManager = (LocationManager) getSystemService(context);
+
+            locationManager = (LocationManager) mParent.getSystemService(context);
 
             Criteria criteria = new Criteria();
             criteria.setAccuracy(Criteria.ACCURACY_FINE);
@@ -159,13 +125,13 @@ public class Localization extends AbstractBaseActivity implements OnMapReadyCall
             criteria.setPowerRequirement(Criteria.POWER_LOW);
 
             String provider = locationManager.getBestProvider(criteria, true);
-            TextView myLocationText = (TextView) findViewById(R.id.myLocationText);
+            TextView myLocationText = (TextView) this.getView().findViewById(R.id.myLocationText);
             myLocationText.setText("Locating using " + provider);
 
             Location location ;//= new Location(provider);
             location = locationManager.getLastKnownLocation(provider);
             if (location != null) {
-                updateWithNewLocation(location);
+                updateWithNewLocation(location, getView());
             }
             locationManager.requestLocationUpdates(provider, 2000, 10, locationListener);
 
@@ -173,9 +139,9 @@ public class Localization extends AbstractBaseActivity implements OnMapReadyCall
     }
 
 
-    private void updateWithNewLocation(android.location.Location location) {
+    private void updateWithNewLocation(android.location.Location location, View view) {
         String latitudeLongitude;
-        TextView myLocationText = (TextView) findViewById(R.id.myLocationText);
+        TextView myLocationText = (TextView) view.findViewById(R.id.myLocationText);
 
         String addressString = "No address found";
 
@@ -202,7 +168,7 @@ public class Localization extends AbstractBaseActivity implements OnMapReadyCall
                 }
             }
 
-            Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+            Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
 
             try {
                 List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
@@ -239,7 +205,7 @@ public class Localization extends AbstractBaseActivity implements OnMapReadyCall
     private final LocationListener locationListener = new LocationListener() {
         @Override
         public void onLocationChanged(Location location) {
-            updateWithNewLocation(location);
+            updateWithNewLocation(location, getView());
         }
 
         @Override
@@ -254,18 +220,18 @@ public class Localization extends AbstractBaseActivity implements OnMapReadyCall
 
         @Override
         public void onProviderDisabled(String s) {
-            updateWithNewLocation(null);
+            updateWithNewLocation(null, getView());
         }
     };
 
     public void goToLocation(View view){
         //get the input of the user
-        EditText query = (EditText) findViewById(R.id.searchLocation);
+        EditText query = (EditText) view.findViewById(R.id.searchLocation);
         //convert it to string
         String locationName = query.getText().toString();
 
         String addressString = "No address";
-        Geocoder geocoder = new Geocoder(this, Locale.getDefault());
+        Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
         Location location = new Location("");
         try {
             List<Address> addresses = geocoder.getFromLocationName(locationName, 1);
@@ -280,7 +246,7 @@ public class Localization extends AbstractBaseActivity implements OnMapReadyCall
 
                 location.setLongitude(address.getLongitude());
                 location.setLatitude(address.getLatitude());
-                updateWithNewLocation(location);
+                updateWithNewLocation(location, getView());
 
                 addressString = stringBuilder.toString();
 
@@ -313,5 +279,37 @@ public class Localization extends AbstractBaseActivity implements OnMapReadyCall
     public Query getQuery(DatabaseReference databaseReference){
         Query allPosts = databaseReference.child("meals");
         return  allPosts;
+    }
+
+    @Override
+    protected void init(final View view) {
+        mParent = (HomeActivity) getActivity();
+        //getting the list of other meal propositions
+        nearByMealsList = new ArrayList<Meal>();
+        Query mealsQuery = getQuery(getDB());
+
+        mealsQuery.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot meals) {
+                nearByMealsList = findNearByMeals(meals);
+                Location location;
+                if(mLocation == null)
+                    location = null;
+                else
+                    location = new Location("provider");
+                location.setLatitude(mLocation.getLatitude());
+                location.setLongitude(mLocation.getLongitude());
+                updateWithNewLocation(location, view);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The read failed: " + databaseError.getMessage());
+            }
+        });
+
+        ((MapFragment) mParent.getFragmentManager().findFragmentById(R.id.myMap)).getMapAsync(this);
+        mLocation = new UserLocation();
+
     }
 }

@@ -127,13 +127,14 @@ public class MyMealFragment extends AbstractBaseFragment implements View.OnClick
     }
 
     private boolean saveMeal() {
-        if (!mIsUpdate) {
-            mMealKey = getDB().child("meals").push().getKey();
-        }
-
         if (selectedLocation == null) {
             Toast.makeText(getContext(), "Unvalid location or no service available", Toast.LENGTH_LONG).show();
+            return false;
             //todo Alert box to change the location
+        }
+
+        if (!mIsUpdate) {
+            mMealKey = getDB().child("meals").push().getKey();
         }
 
         Meal m = new Meal(mTitle.getText().toString(), mDescription.getText().toString(), mParent.getUid(), mMealKey, mDaysFree, selectedLocation);

@@ -25,6 +25,7 @@ import com.cooktogether.fragments.SearchFragment;
 import com.cooktogether.helpers.AbstractBaseActivity;
 import com.cooktogether.R;
 import com.cooktogether.fragments.ConversationsListFragment;
+import com.cooktogether.helpers.LocalizationFragment;
 
 public class HomeActivity extends AbstractBaseActivity {
 
@@ -102,7 +103,7 @@ public class HomeActivity extends AbstractBaseActivity {
                 fragmentClass = MyMealFragment.class;
                 break;
             case R.id.nav_search_meal:
-                fragmentClass = SearchFragment.class;
+                fragmentClass = LocalizationFragment.class;
                 break;
             case R.id.nav_my_messages:
                 fragmentClass = ConversationsListFragment.class;
