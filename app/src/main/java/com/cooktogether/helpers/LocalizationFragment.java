@@ -61,13 +61,49 @@ public class LocalizationFragment extends AbstractBaseFragment implements OnMapR
         View view = inflater.inflate(R.layout.fragment_map_search, container, false);
         init(view);
         return view;
-        /*
-        LocationManager locationManager;
-        String context = Context.LOCATION_SERVICE;
-        locationManager = (LocationManager) getSystemService(context);
-        // using gps
-        //String provider = LocationManager.GPS_PROVIDER;
-        */
+}
+
+    @Override
+    protected void init(final View view) {
+        mParent = (HomeActivity) getActivity();
+        /*view.findViewById(R.id.searchLocation).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToLocation(v);
+            }
+        });*/
+        view.findViewById(R.id.searchButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToLocation(v);
+            }
+        });
+        //getting the list of other meal propositions
+        nearByMealsList = new ArrayList<Meal>();
+        Query mealsQuery = getQuery(getDB());
+
+        mealsQuery.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot meals) {
+                nearByMealsList = findNearByMeals(meals);
+                Location location;
+                if(mLocation == null)
+                    location = null;
+                else
+                    location = new Location("provider");
+                location.setLatitude(mLocation.getLatitude());
+                location.setLongitude(mLocation.getLongitude());
+                updateWithNewLocation(location, view);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                System.out.println("The read failed: " + databaseError.getMessage());
+            }
+        });
+
+        ((MapFragment) mParent.getFragmentManager().findFragmentById(R.id.myMap)).getMapAsync(this);
+        mLocation = new UserLocation();
 
     }
 
@@ -279,49 +315,5 @@ public class LocalizationFragment extends AbstractBaseFragment implements OnMapR
     public Query getQuery(DatabaseReference databaseReference){
         Query allPosts = databaseReference.child("meals");
         return  allPosts;
-    }
-
-    @Override
-    protected void init(final View view) {
-        mParent = (HomeActivity) getActivity();
-        /*view.findViewById(R.id.searchLocation).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goToLocation(v);
-            }
-        });*/
-        view.findViewById(R.id.searchButton).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goToLocation(v);
-            }
-        });
-        //getting the list of other meal propositions
-        nearByMealsList = new ArrayList<Meal>();
-        Query mealsQuery = getQuery(getDB());
-
-        mealsQuery.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot meals) {
-                nearByMealsList = findNearByMeals(meals);
-                Location location;
-                if(mLocation == null)
-                    location = null;
-                else
-                    location = new Location("provider");
-                location.setLatitude(mLocation.getLatitude());
-                location.setLongitude(mLocation.getLongitude());
-                updateWithNewLocation(location, view);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                System.out.println("The read failed: " + databaseError.getMessage());
-            }
-        });
-
-        ((MapFragment) mParent.getFragmentManager().findFragmentById(R.id.myMap)).getMapAsync(this);
-        mLocation = new UserLocation();
-
     }
 }

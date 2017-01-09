@@ -1,5 +1,6 @@
 package com.cooktogether.mainscreens;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 
 import com.cooktogether.fragments.MealNotEditableFragment;
 import com.cooktogether.fragments.ConversationFragment;
@@ -47,7 +49,15 @@ public class HomeActivity extends AbstractBaseActivity {
         checkIsConnected();
 
         setContentView(R.layout.drawer_main);
+        init();
 
+
+        //set default item
+        loadDefaultScreen();
+    }
+
+    @Override
+    protected void init() {
         // Set a Toolbar to replace the ActionBar.
         mToolbar = (Toolbar) findViewById(R.id.toolbar_main);
         setSupportActionBar(mToolbar);
@@ -64,8 +74,6 @@ public class HomeActivity extends AbstractBaseActivity {
         View headerLayout = nvDrawer.inflateHeaderView(R.layout.nav_header);
         // We can now look up items within the header if needed
 //        ImageView ivHeaderPhoto = headerLayout.findViewById(R.id.imageView);
-        //set default item
-        loadDefaultScreen();
     }
 
     public void loadDefaultScreen() {
@@ -76,7 +84,28 @@ public class HomeActivity extends AbstractBaseActivity {
     private ActionBarDrawerToggle setupDrawerToggle() {
         // NOTE: Make sure you pass in a valid toolbar reference.  ActionBarDrawToggle() does not require it
         // and will not render the hamburger icon without it.
-        return new ActionBarDrawerToggle(this, mDrawer, mToolbar, R.string.drawer_open, R.string.drawer_close);
+        return new ActionBarDrawerToggle(this, mDrawer, mToolbar, R.string.drawer_open, R.string.drawer_close) {
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                super.onDrawerClosed(drawerView);
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                super.onDrawerOpened(drawerView);
+                InputMethodManager inputMethodManager = (InputMethodManager)
+                        getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+            }
+
+            @Override
+            public void onDrawerSlide(View drawerView, float slideOffset) {
+                super.onDrawerSlide(drawerView, slideOffset);
+                InputMethodManager inputMethodManager = (InputMethodManager)
+                        getSystemService(Context.INPUT_METHOD_SERVICE);
+                inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+            }
+        };
     }
 
     private void setupDrawerContent(NavigationView navigationView) {
@@ -208,8 +237,8 @@ public class HomeActivity extends AbstractBaseActivity {
         drawerToggle.onConfigurationChanged(newConfig);
     }
 
-    public void goToConversations(){
-        selectDrawerItem(getNvDrawer().getMenu().findItem(R.id.nav_my_messages),getString(R.string.CONVERSATION_TITLE));
+    public void goToConversations() {
+        selectDrawerItem(getNvDrawer().getMenu().findItem(R.id.nav_my_messages), getString(R.string.CONVERSATION_TITLE));
     }
 
     public void setConversationKey(String conversationKey) {

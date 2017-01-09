@@ -14,25 +14,25 @@ public class User {
     private String userName;
     private String email;
     private String birthDate;
-    private boolean facebookImage;
-    private String imageURI;
+    private boolean facebookPicture;
+    private String pictureURI;
     private boolean facebookConnected;
 
     public User() {
     }
 
-    public User(String userKey, String userName, String email, String birthDate, boolean facebookImage, String imageURI, boolean facebookConnected) {
+    public User(String userKey, String userName, String email, String birthDate, boolean facebookPicture, String pictureURI, boolean facebookConnected) {
         this.userKey = userKey;
         this.userName = userName;
         this.email = email;
         this.birthDate = birthDate;
-        this.facebookImage = facebookImage;
-        this.imageURI = imageURI;
+        this.facebookPicture = facebookPicture;
+        this.pictureURI = pictureURI;
         this.facebookConnected = facebookConnected;
     }
 
     public static User parseSnapshot(DataSnapshot snapshot) {
-        return new User((String) snapshot.child("userKey").getValue(), (String) snapshot.child("userName").getValue(), (String) snapshot.child("email").getValue(), (String) snapshot.child("birthDate").getValue(), (boolean) snapshot.child("facebookImage").getValue(), (String) snapshot.child("imageURI").getValue(), (boolean) snapshot.child("facebookConnected").getValue());
+        return new User((String) snapshot.child("userKey").getValue(), (String) snapshot.child("userName").getValue(), (String) snapshot.child("email").getValue(), (String) snapshot.child("birthDate").getValue(), (boolean) snapshot.child("facebookPicture").getValue(), (String) snapshot.child("pictureURI").getValue(), (boolean) snapshot.child("facebookConnected").getValue());
     }
 
     public String getUserKey() {
@@ -67,12 +67,12 @@ public class User {
         this.birthDate = birthDate;
     }
 
-    public String getImageURI() {
-        return imageURI;
+    public String getPictureURI() {
+        return pictureURI;
     }
 
-    public void setImageURI(String imageURI) {
-        this.imageURI = imageURI;
+    public void setPictureURI(String pictureURI) {
+        this.pictureURI = pictureURI;
     }
 
     public boolean isFacebookConnected() {
@@ -83,11 +83,11 @@ public class User {
         this.facebookConnected = facebookConnected;
     }
 
-    public boolean isFacebookImage() {
-        return facebookImage;
+    public boolean isFacebookPicture() {
+        return facebookPicture;
     }
 
-    public void setFacebookImage(boolean facebookImage) {
-        this.facebookImage = facebookImage;
+    public void setFacebookPicture(boolean facebookPicture) {
+        this.facebookPicture = facebookPicture;
     }
 }

@@ -70,6 +70,11 @@ public class AuthenticationActivity extends AbstractBaseActivity {
 
         setContentView(R.layout.activity_authentication);
 
+        init();
+    }
+
+    @Override
+    protected void init() {
         toolbar = (Toolbar) findViewById(R.id.toolbar_main);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
