@@ -20,12 +20,10 @@ import com.cooktogether.fragments.ConversationFragment;
 import com.cooktogether.fragments.MyMealFragment;
 import com.cooktogether.fragments.MyMealsFragment;
 import com.cooktogether.fragments.ProfileFragment;
-import com.cooktogether.fragments.SearchFragment;
 
 import com.cooktogether.helpers.AbstractBaseActivity;
 import com.cooktogether.R;
 import com.cooktogether.fragments.ConversationsListFragment;
-import com.cooktogether.helpers.LocalizationFragment;
 
 public class HomeActivity extends AbstractBaseActivity {
 
