@@ -96,6 +96,7 @@ public class MyMealFragment extends AbstractBaseFragment implements View.OnClick
         switch (item.getItemId()) {
             case R.id.action_save:
                 saveMeal();
+                ((HomeActivity) mParent).loadDefaultScreen();
                 return true;
             case R.id.action_cancel:
                 DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
@@ -103,24 +104,20 @@ public class MyMealFragment extends AbstractBaseFragment implements View.OnClick
                     public void onClick(DialogInterface dialog, int choice) {
                         switch (choice) {
                             case DialogInterface.BUTTON_POSITIVE:
-                                mAnswer = true;
-                                break;
-                            case DialogInterface.BUTTON_NEGATIVE:
-                                mAnswer = false;
+                                String message = mIsUpdate ? "Changes discarded." : "Meal " + mTitle.getText().toString() + " discarded.";
+                                Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
+                                ((HomeActivity) mParent).loadDefaultScreen();
                                 break;
                         }
                     }
                 };
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                String message = mIsUpdate ? "Discard meal ?" : "Dsigard changes ?";
+                String message = mIsUpdate ? "Discard changes ?" : "Discard meal ?";
                 builder.setMessage(message)
                         .setPositiveButton("Yes", dialogClickListener)
                         .setNegativeButton("No", dialogClickListener).show();
 
-                if (mAnswer) {
-                    Toast.makeText(getContext(), "Meal " + mTitle.getText().toString() + " discarded.", Toast.LENGTH_LONG).show();
-                }
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -209,7 +206,7 @@ public class MyMealFragment extends AbstractBaseFragment implements View.OnClick
         initNotFreeDays();
         mDaysFree = new ArrayList<Day>();
 
-        mMealKey = ((HomeActivity)mParent).getMealKey();
+        mMealKey = ((HomeActivity) mParent).getMealKey();
         mIsUpdate = mMealKey != null && !mMealKey.isEmpty();
         if (mIsUpdate) {
             loadMeal();
@@ -245,7 +242,8 @@ public class MyMealFragment extends AbstractBaseFragment implements View.OnClick
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
-                    Toast.makeText(getContext(), "Failed to load meal.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Failed to load meal.", Toast.LENGTH_LONG).show();
+                    ((HomeActivity) mParent).loadDefaultScreen();
                 }
             });
         }
