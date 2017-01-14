@@ -170,11 +170,8 @@ public class MapSearchFragment extends AbstractLocationFragment implements OnMap
         // Gets to GoogleMap from the MapView and does initialization stuff
         mapView.getMapAsync(this);
 
-        //init location bar fragment
-        setmButton(view);
-        setmLocationName(view);
-        initSelectedLocation();
-        initLocationName(view);
+        //init location bar
+        initLocationBar(view);
 
         //getting the list of other meal propositions
         initMealsList();

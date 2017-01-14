@@ -54,14 +54,10 @@
                     android:text="@string/add_day" />
             </LinearLayout>
 
-            <EditText
+            <include
+                layout="@layout/search_location_bar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="textPersonName"
-                android:hint="@string/type_location"
-                android:ems="10"
-                android:id="@+id/create_location"
-                android:maxLines="1"/>
+                android:layout_height="93dp"/>
 
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/location_options"

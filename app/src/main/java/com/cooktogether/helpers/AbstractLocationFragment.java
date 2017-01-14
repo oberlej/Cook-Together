@@ -240,4 +240,11 @@ public abstract class AbstractLocationFragment extends AbstractBaseFragment {
 
     public abstract void setmLocationName(View v);
 
+    protected void initLocationBar(View view){
+        setmButton(view);
+        setmLocationName(view);
+        initSelectedLocation();
+        initLocationName(view);
+    }
+
 }
