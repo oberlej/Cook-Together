@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 
 import com.cooktogether.fragments.MealNotEditableFragment;
 import com.cooktogether.fragments.ConversationFragment;
@@ -266,6 +267,10 @@ public class HomeActivity extends AbstractBaseActivity {
         //itemChecked = null;
         setTitle("Proposed Meal");
         mDrawer.closeDrawers();
+    }
+
+    public View getLocationSearchButton(Fragment f){
+      return getSupportFragmentManager().findFragmentById(f.getId()).getView().findViewById(R.id.enter_location_btn);
     }
 }
 

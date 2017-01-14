@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.cooktogether.R;
+import com.cooktogether.fragments.MyMealsFragment;
 import com.cooktogether.mainscreens.HomeActivity;
 import com.cooktogether.model.Meal;
 import com.cooktogether.viewholder.MealViewHolder;
@@ -35,9 +36,8 @@ public abstract class AbstractMealListFragment extends AbstractBaseFragment {
     }
 
     @Override
-    protected void init(View view) {
+    protected void init(final View view) {
         mParent = (HomeActivity) getActivity();
-
         mRecycler = (RecyclerView) view.findViewById(R.id.meals_list_rcv);
         mRecycler.setHasFixedSize(true);
 
@@ -79,6 +79,7 @@ public abstract class AbstractMealListFragment extends AbstractBaseFragment {
 
                 // Bind Post to ViewHolder, setting OnClickListener for the star button
                 viewHolder.bindToPost(model);
+
             }
         };
         mRecycler.setAdapter(mAdapter);

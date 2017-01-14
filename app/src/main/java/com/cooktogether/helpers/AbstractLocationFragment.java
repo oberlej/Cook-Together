@@ -9,26 +9,21 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
-import android.support.v4.app.ActivityCompat;
 import android.os.Bundle;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cooktogether.R;
 import com.cooktogether.adapter.locationOptionsAdapter;
 import com.cooktogether.listener.RecyclerItemClickListener;
-import com.cooktogether.mainscreens.HomeActivity;
-import com.cooktogether.model.User;
 import com.cooktogether.model.UserLocation;
 
 import java.io.IOException;
@@ -36,10 +31,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class LocationBarFragment extends AbstractBaseFragment implements View.OnClickListener{
+/**
+ * Created by hela on 14/01/17.
+ */
 
-    private EditText mLocationName;
-    public Button mEnterButton;
+public abstract class AbstractLocationFragment extends AbstractBaseFragment {
+    protected EditText mLocationName;
+    protected Button mEnterButton;
+
     // for the list of location options
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -47,25 +46,6 @@ public class LocationBarFragment extends AbstractBaseFragment implements View.On
 
     private UserLocation selectedLocation;
 
-    public LocationBarFragment() {
-
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.search_location_bar, container, false);
-        init(view);
-        ArrayList<View> touchables = new ArrayList<View>();
-        touchables.add(mEnterButton);
-        container.addTouchables(touchables);
-        return view;
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-
-    }
 
    /* public void goToLocation(View view){
         //get the input of the user
@@ -102,15 +82,6 @@ public class LocationBarFragment extends AbstractBaseFragment implements View.On
 */
 
 
-    @Override
-    protected void init(final View view) {
-        mParent = (HomeActivity) getActivity();
-        initSelectedLocation();
-        initLocationName(view);
-        mEnterButton = (Button)view.findViewById(R.id.enter_location_btn);
-        mEnterButton.setOnClickListener(this);
-    }
-
     /*
     For now it returns only the first address found to make it simple
      */
@@ -144,10 +115,6 @@ public class LocationBarFragment extends AbstractBaseFragment implements View.On
         this.selectedLocation = location;
     }
 
-    public static LocationBarFragment newInstance() {
-        return new LocationBarFragment();
-    }
-
     public void initLocationName(View view) {
         //for the list of location options
         mRecyclerView = (RecyclerView) view.findViewById(R.id.location_options);
@@ -171,7 +138,6 @@ public class LocationBarFragment extends AbstractBaseFragment implements View.On
                 })
         );
 
-        mLocationName = (EditText) view.findViewById(R.id.create_location);
         mLocationName.setText(selectedLocation.getName());
 
         mLocationName.addTextChangedListener(new TextWatcher() {
@@ -224,9 +190,8 @@ public class LocationBarFragment extends AbstractBaseFragment implements View.On
             double lat = location.getLatitude();
             double lon = location.getLongitude();
             setSelectedLocation(new UserLocation(lat, lon, getAddress(lat, lon)));
-        }
-        else{
-            setSelectedLocation(new UserLocation(0,0));
+        } else {
+            setSelectedLocation(new UserLocation(0, 0));
         }
         locationManager.requestLocationUpdates(provider, 2000, 10, locationListener);
     }
@@ -255,29 +220,24 @@ public class LocationBarFragment extends AbstractBaseFragment implements View.On
         }
     };
 
-    private Address getAddress(double latitude, double longitude){
+    protected Address getAddress(double latitude, double longitude) {
         Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
 
         try {
             List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
 
-            StringBuilder stringBuilder = new StringBuilder();
-            if(addresses.size() > 0) {
+            if (addresses.size() > 0) {
                 return addresses.get(0);
             }
-        } catch (IOException e){
+        } catch (IOException e) {
             Log.e("update geocoder error:", e.getMessage());
         }
         return null;
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.enter_location_btn :
-                setSelectedLocation(getLocation(mLocationName.getText().toString()).get(0));
-                break;
-        }
-    }
+
+    public abstract void setmButton(View v);
+
+    public abstract void setmLocationName(View v);
 
 }

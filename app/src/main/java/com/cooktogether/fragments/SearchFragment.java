@@ -16,8 +16,7 @@ public class SearchFragment extends AbstractMealListFragment {
 
     @Override
     public Query getQuery(DatabaseReference databaseReference) {
-        Query allPosts = databaseReference.child("meals");
-        //todo only other people posts
-        return allPosts;
+        Query othersPosts = databaseReference.child("meals").orderByChild("userKey").equalTo(false,getUid());
+        return othersPosts;
     }
 }
