@@ -84,8 +84,17 @@ public class MapSearchFragment extends AbstractLocationFragment implements OnMap
                     }
                 }
             });
-
-
+            //initialize camera position on epfl if no other location provide
+            CameraPosition cameraPos;
+            double currentLat = 46.5198;
+            double currentLong = 6.5657;
+            if(getSelectedLocation()!= null) {
+               updateWithNewLocation(getSelectedLocation());
+            }
+            else {
+                cameraPos = new CameraPosition.Builder().target(new LatLng(currentLat, currentLong)).zoom(10).build();
+                myGoogleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPos));
+            }
         }
     }
 
@@ -121,7 +130,7 @@ public class MapSearchFragment extends AbstractLocationFragment implements OnMap
                     addMarkerTo(m.getMealKey(), m.getLocation(), m.getTitle());
                 }
             }
-            addMarkerTo("mine", getSelectedLocation(), "My position");
+            //addMarkerTo("mine", getSelectedLocation(), "My position");
 
         } else {
             myGoogleMap.clear();
@@ -138,6 +147,7 @@ public class MapSearchFragment extends AbstractLocationFragment implements OnMap
 
     //adds marker at the position latitude, longitude to the map , entitled title
     private void addMarkerTo(String id, UserLocation location, String title) {
+        //// TODO: 15/01/17 handle markers at the same position
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(new LatLng(location.getLatitude(), location.getLongitude()));
         markerOptions.title(title);
@@ -147,21 +157,16 @@ public class MapSearchFragment extends AbstractLocationFragment implements OnMap
         myMarker.setTag(id);
     }
 
-    /*private Address getAddress(double latitude, double longitude){
-
-    }
-
-    private Address getAddress(String locationName){
-
-    }*/
 
     public Query getQuery(DatabaseReference databaseReference) {
-        Query othersPosts = databaseReference.child("meals").orderByChild("userKey").equalTo(false,getUid());
-        return othersPosts;
+        return databaseReference.child("meals");
     }
 
     protected void init(View view, Bundle savedInstanceState) {
         mParent = (HomeActivity) getActivity();
+
+        //init location bar
+        initLocationBar(view);
 
         // Gets the MapView from the XML layout and creates it
         mapView = (MapView) view.findViewById(R.id.myMap);
@@ -169,9 +174,6 @@ public class MapSearchFragment extends AbstractLocationFragment implements OnMap
 
         // Gets to GoogleMap from the MapView and does initialization stuff
         mapView.getMapAsync(this);
-
-        //init location bar
-        initLocationBar(view);
 
         //getting the list of other meal propositions
         initMealsList();
@@ -185,6 +187,7 @@ public class MapSearchFragment extends AbstractLocationFragment implements OnMap
             @Override
             public void onDataChange(DataSnapshot meals) {
                 nearByMealsList = findNearByMeals(meals);
+                updateWithNewLocation(getSelectedLocation());
             }
 
             @Override

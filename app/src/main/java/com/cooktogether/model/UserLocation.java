@@ -74,21 +74,21 @@ public class UserLocation {
         return this.longitude;
     }
 
-    /*public Address getAddress(){
-        return this.address;
-    }*/
-    /* transform the address into a name of location as it will appear to the user */
 
+    /* convert the address into a name of location as it will be displayed for the user */
     private String addressToName(Address address){
         String locationName = "";
-        if(address.getFeatureName() != null){
-            locationName = address.getFeatureName();
-        }
         if(address.getAdminArea() != null){
-            if(address.getFeatureName() != address.getAdminArea())
-                locationName += ", "+ address.getAdminArea();
+            locationName = address.getAdminArea();
         }
-        locationName += ", " +address.getCountryName();
+        if(address.getLocality() != null){
+            if(address.getAdminArea() != null && !address.getAdminArea().equals(address.getLocality()))
+                locationName += ", "+ address.getLocality();
+        }
+        if(!locationName.equals(""))
+            locationName += ", ";
+        locationName += address.getCountryName();
+
         return  locationName;
     }
 

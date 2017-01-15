@@ -31,7 +31,7 @@ public class SearchFragment extends AbstractBaseFragment {
         init(view);
         return view;
     }
-
+    //// TODO: 15/01/17 debug empty fragments when called after the first time 
     @Override
     protected void init(View view) {
         mParent = (HomeActivity) getActivity();
