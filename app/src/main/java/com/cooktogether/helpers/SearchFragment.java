@@ -1,19 +1,15 @@
 package com.cooktogether.helpers;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.cooktogether.R;
+import com.cooktogether.fragments.ListSearchFragment;
 import com.cooktogether.fragments.MapSearchFragment;
 import com.cooktogether.mainscreens.HomeActivity;
 
@@ -41,8 +37,8 @@ public class SearchFragment extends AbstractBaseFragment {
         mParent = (HomeActivity) getActivity();
 
         //init fragments
-        mList = new com.cooktogether.fragments.SearchFragment().newInstance();
-        mMap = new MapSearchFragment().newInstance();
+        mList =  ListSearchFragment.newInstance();
+        mMap = MapSearchFragment.newInstance();
 
         //init view pager
         viewPager = (ViewPager) view.findViewById(R.id.search_viewpager);

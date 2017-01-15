@@ -219,7 +219,7 @@ public class MapSearchFragment extends AbstractLocationFragment implements OnMap
     }
 
 
-    public Fragment newInstance() {
+    static public Fragment newInstance() {
         return new MapSearchFragment();
     }
 

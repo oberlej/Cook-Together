@@ -83,7 +83,7 @@ public abstract class AbstractLocationFragment extends AbstractBaseFragment {
 
 
     /*
-    For now it returns only the first address found to make it simple
+    For now it returns the 5 first address found to make it simple
      */
     private ArrayList<UserLocation> getLocation(String locationName) {
         Geocoder geo = new Geocoder(getContext(), Locale.getDefault());

@@ -2,7 +2,6 @@ package com.cooktogether.helpers;
 
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -10,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.cooktogether.R;
-import com.cooktogether.fragments.MyMealsFragment;
 import com.cooktogether.mainscreens.HomeActivity;
 import com.cooktogether.model.Meal;
 import com.cooktogether.viewholder.MealViewHolder;
@@ -21,12 +19,10 @@ import com.google.firebase.database.Query;
 
 
 public abstract class AbstractMealListFragment extends AbstractBaseFragment {
-    private FirebaseRecyclerAdapter<Meal, MealViewHolder> mAdapter;
+    protected RecyclerView.Adapter<MealViewHolder> mAdapter;
     protected RecyclerView mRecycler;
     protected LinearLayoutManager mManager;
 
-    public AbstractMealListFragment() {
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -49,7 +45,11 @@ public abstract class AbstractMealListFragment extends AbstractBaseFragment {
 
         // Set up FirebaseRecyclerAdapter with the Query
         Query mealsQuery = getQuery(getDB());
+        setAdapter(mealsQuery);
+        mRecycler.setAdapter(mAdapter);
+    }
 
+    protected void setAdapter(Query mealsQuery) {
         mAdapter = new FirebaseRecyclerAdapter<Meal, MealViewHolder>(Meal.class, R.layout.item_meal, MealViewHolder.class, mealsQuery) {
 
             @Override
@@ -79,17 +79,20 @@ public abstract class AbstractMealListFragment extends AbstractBaseFragment {
 
                 // Bind Post to ViewHolder, setting OnClickListener for the star button
                 viewHolder.bindToPost(model);
-
             }
         };
-        mRecycler.setAdapter(mAdapter);
+
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        cleanAdapter();
+    }
+
+    protected void cleanAdapter() {
         if (mAdapter != null) {
-            mAdapter.cleanup();
+            ((FirebaseRecyclerAdapter<Meal,MealViewHolder>)mAdapter).cleanup();
         }
     }
 
