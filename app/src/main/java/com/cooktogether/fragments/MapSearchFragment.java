@@ -166,6 +166,7 @@ public class MapSearchFragment extends AbstractLocationFragment implements OnMap
 
         addItem(id, latLng, location.toString(), title);
     }
+
     //adds item to the cluser
     private void addItem(String id, LatLng location, String snippet, String title) {
         //creates the meal marker item
@@ -307,6 +308,7 @@ public class MapSearchFragment extends AbstractLocationFragment implements OnMap
             myContentsView = mParent.getLayoutInflater().inflate(
                     R.layout.info_window, null);
         }
+
         @Override
         public View getInfoWindow(Marker marker) {
 
