@@ -2,6 +2,7 @@ package com.cooktogether.helpers;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Criteria;
@@ -11,6 +12,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
@@ -24,6 +26,7 @@ import android.widget.Toast;
 import com.cooktogether.R;
 import com.cooktogether.adapter.locationOptionsAdapter;
 import com.cooktogether.listener.RecyclerItemClickListener;
+import com.cooktogether.mainscreens.HomeActivity;
 import com.cooktogether.model.UserLocation;
 
 import java.io.IOException;
@@ -138,8 +141,9 @@ public abstract class AbstractLocationFragment extends AbstractBaseFragment {
                 })
         );
 
-        mLocationName.setText(selectedLocation.getName());
-
+        if(selectedLocation!= null) {
+            mLocationName.setText(selectedLocation.getName());
+        }
         mLocationName.addTextChangedListener(new TextWatcher() {
             ArrayList<UserLocation> locations = new ArrayList<UserLocation>();
 
@@ -166,6 +170,17 @@ public abstract class AbstractLocationFragment extends AbstractBaseFragment {
 
     }
 
+    private DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int choice) {
+            switch (choice) {
+                case DialogInterface.BUTTON_NEGATIVE:
+                    android.os.Process.killProcess(android.os.Process.myPid());
+                    break;
+            }
+        }
+    };
+
     public void initSelectedLocation() {
         LocationManager locationManager;
         String context = Context.LOCATION_SERVICE;
@@ -181,9 +196,14 @@ public abstract class AbstractLocationFragment extends AbstractBaseFragment {
 
         String provider = locationManager.getBestProvider(criteria, true);
 
-        Location location;//= new Location(provider);
+        Location location;
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(getContext(), "Cannot access to your current location, please verify your localization permission", Toast.LENGTH_LONG).show();
+            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+            String message ="Cannot access to your current location, please verify your location permission before using the application";
+            builder.setMessage(message)
+                    .setPositiveButton("Continue", dialogClickListener)
+                    .setNegativeButton("Close app", dialogClickListener).show();
+            return;
         }
         location = locationManager.getLastKnownLocation(provider);
         if (location != null) {
