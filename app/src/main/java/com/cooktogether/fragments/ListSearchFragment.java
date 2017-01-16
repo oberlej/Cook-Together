@@ -49,6 +49,7 @@ public class ListSearchFragment extends AbstractMealListFragment {
                 }
                 ((MealsListAdapter) mAdapter).setMeals(othersMeals);
                 mRecycler.setAdapter(mAdapter);
+                mEmptyList.setVisibility(View.GONE);
             }
 
             @Override
@@ -69,7 +70,10 @@ public class ListSearchFragment extends AbstractMealListFragment {
                     }
                 })
         );
-
+        if(othersMeals.isEmpty()) {
+            mEmptyList.setText("No meals have been proposed by other people lately. Make new propositions or come back later!");
+            mEmptyList.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override

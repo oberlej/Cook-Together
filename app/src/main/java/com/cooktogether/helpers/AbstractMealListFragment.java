@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.cooktogether.R;
 import com.cooktogether.mainscreens.HomeActivity;
@@ -22,6 +23,7 @@ public abstract class AbstractMealListFragment extends AbstractBaseFragment {
     protected RecyclerView.Adapter<MealViewHolder> mAdapter;
     protected RecyclerView mRecycler;
     protected LinearLayoutManager mManager;
+    protected TextView mEmptyList;
 
 
     @Override
@@ -36,7 +38,10 @@ public abstract class AbstractMealListFragment extends AbstractBaseFragment {
         mParent = (HomeActivity) getActivity();
         mRecycler = (RecyclerView) view.findViewById(R.id.meals_list_rcv);
         mRecycler.setHasFixedSize(true);
-
+        mEmptyList = (TextView) view.findViewById(R.id.meals_empty_list);
+        //to be shown in case of empty list
+        mEmptyList.setVisibility(View.VISIBLE);
+        mEmptyList.setText("Make new propositions of meals you would like to cook and share with people around you and let the fun begin!");
         // Set up Layout Manager, reverse layout
         mManager = new LinearLayoutManager(getContext());
         mManager.setReverseLayout(true);
@@ -47,6 +52,7 @@ public abstract class AbstractMealListFragment extends AbstractBaseFragment {
         Query mealsQuery = getQuery(getDB());
         setAdapter(mealsQuery);
         mRecycler.setAdapter(mAdapter);
+
     }
 
     protected void setAdapter(Query mealsQuery) {
@@ -76,7 +82,7 @@ public abstract class AbstractMealListFragment extends AbstractBaseFragment {
                         }
                     }
                 });
-
+                mEmptyList.setVisibility(View.GONE);
                 // Bind Post to ViewHolder, setting OnClickListener for the star button
                 viewHolder.bindToPost(model);
             }
