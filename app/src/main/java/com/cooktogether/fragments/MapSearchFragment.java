@@ -1,7 +1,9 @@
 package com.cooktogether.fragments;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
@@ -18,6 +20,7 @@ import android.widget.Toast;
 
 import com.cooktogether.R;
 import com.cooktogether.helpers.AbstractLocationFragment;
+import com.cooktogether.helpers.MealMarker;
 import com.cooktogether.mainscreens.HomeActivity;
 import com.cooktogether.model.Meal;
 import com.cooktogether.model.UserLocation;
@@ -36,8 +39,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
+import com.google.maps.android.clustering.Cluster;
+import com.google.maps.android.clustering.ClusterManager;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by hela on 08/01/17.
@@ -47,6 +53,11 @@ public class MapSearchFragment extends AbstractLocationFragment implements OnMap
     private GoogleMap myGoogleMap;
     private ArrayList<Meal> nearByMealsList;
     private MapView mapView;
+    private HashMap<LatLng, Integer> mMarkers; //the key is the position and the value is the nbr of markers at the same position
+
+    // Declare a variable for the cluster manager.
+    private ClusterManager<MealMarker> mClusterManager;
+    private MealMarker mSelectedItem;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -75,27 +86,19 @@ public class MapSearchFragment extends AbstractLocationFragment implements OnMap
             // Enable/disable zooming functionality
             myGoogleMap.getUiSettings().setZoomGesturesEnabled(true);
 
-            myGoogleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
 
-                @Override
-                public void onInfoWindowClick(Marker marker) {
-                    if (marker.getTag() != "mine") {
-                        ((HomeActivity) mParent).goToMeal((String) marker.getTag());
-                    }
-                }
-            });
             //initialize camera position on epfl if no other location provide
             CameraPosition cameraPos;
             double currentLat = 46.5198;
             double currentLong = 6.5657;
-            if(getSelectedLocation()!= null) {
-               updateWithNewLocation(getSelectedLocation());
-            }
-            else {
+            if (getSelectedLocation() != null) {
+                updateWithNewLocation(getSelectedLocation());
+            } else {
                 cameraPos = new CameraPosition.Builder().target(new LatLng(currentLat, currentLong)).zoom(10).build();
                 myGoogleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPos));
             }
         }
+        setUpClusterer();
     }
 
     private ArrayList<Meal> findNearByMeals(DataSnapshot meals) {
@@ -130,7 +133,6 @@ public class MapSearchFragment extends AbstractLocationFragment implements OnMap
                     addMarkerTo(m.getMealKey(), m.getLocation(), m.getTitle());
                 }
             }
-            //addMarkerTo("mine", getSelectedLocation(), "My position");
 
         } else {
             myGoogleMap.clear();
@@ -145,16 +147,68 @@ public class MapSearchFragment extends AbstractLocationFragment implements OnMap
 
     }
 
+    static final double COORDINATE_OFFSET = 1 / 60d; //can be adjusted
+
     //adds marker at the position latitude, longitude to the map , entitled title
     private void addMarkerTo(String id, UserLocation location, String title) {
         //// TODO: 15/01/17 handle markers at the same position
         MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(new LatLng(location.getLatitude(), location.getLongitude()));
-        markerOptions.title(title);
-        markerOptions.snippet(location.toString());
-        Marker myMarker = myGoogleMap.addMarker(markerOptions);
-        myMarker.showInfoWindow();
-        myMarker.setTag(id);
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+
+        //handle markers at the same position
+        if (mMarkers.containsKey(latLng)) {
+            int index = mMarkers.get(latLng);
+            mMarkers.put(latLng, index + 1);
+            latLng = new LatLng(location.getLatitude() + (index + 1) * COORDINATE_OFFSET, location.getLongitude() + (index + 1) * COORDINATE_OFFSET);
+        } else {
+            mMarkers.put(latLng, 0);
+        }
+
+        addItem(id, latLng, location.toString(), title);
+    }
+    //adds item to the cluser
+    private void addItem(String id, LatLng location, String snippet, String title) {
+        //creates the meal marker item
+        MealMarker offsetItem = new MealMarker(location.latitude, location.longitude, title, snippet, id);
+        //add it to the cluster
+        mClusterManager.addItem(offsetItem);
+    }
+
+    private void setUpClusterer() {
+
+        // Initialize the manager with the context and the map.
+        mClusterManager = new ClusterManager<MealMarker>(getContext(), myGoogleMap);
+
+        mClusterManager.setOnClusterItemInfoWindowClickListener(new ClusterManager.OnClusterItemInfoWindowClickListener<MealMarker>() {
+            @Override
+            public void onClusterItemInfoWindowClick(MealMarker mealMarker) {
+                ((HomeActivity) mParent).goToMeal((String) mealMarker.getMkey());
+            }
+        });
+
+        // Point the map's listeners at the listeners implemented by the cluster
+        // manager.
+
+        myGoogleMap.setOnCameraIdleListener(mClusterManager);
+        myGoogleMap.setOnMarkerClickListener(mClusterManager);
+        myGoogleMap.setInfoWindowAdapter(mClusterManager.getMarkerManager());
+
+        myGoogleMap.setOnInfoWindowClickListener(mClusterManager);
+
+        mClusterManager
+                .setOnClusterItemClickListener(new ClusterManager.OnClusterItemClickListener<MealMarker>() {
+                    @Override
+                    public boolean onClusterItemClick(MealMarker item) {
+                        mSelectedItem = item;
+                        return false;
+                    }
+                });
+
+
+        mClusterManager.getMarkerCollection().setOnInfoWindowAdapter(
+                new MyCustomAdapterForItems());
+        mClusterManager.getMarkerCollection().setOnInfoWindowAdapter(new MyCustomAdapterForItems());
+
     }
 
 
@@ -177,6 +231,9 @@ public class MapSearchFragment extends AbstractLocationFragment implements OnMap
 
         //getting the list of other meal propositions
         initMealsList();
+
+        //init markers
+        mMarkers = new HashMap<>();
     }
 
     private void initMealsList() {
@@ -240,5 +297,32 @@ public class MapSearchFragment extends AbstractLocationFragment implements OnMap
     @Override
     public void setmLocationName(View v) {
         mLocationName = (EditText) v.findViewById(R.id.create_location);
+    }
+
+    private class MyCustomAdapterForItems implements GoogleMap.InfoWindowAdapter {
+
+        private final View myContentsView;
+
+        MyCustomAdapterForItems() {
+            myContentsView = mParent.getLayoutInflater().inflate(
+                    R.layout.info_window, null);
+        }
+        @Override
+        public View getInfoWindow(Marker marker) {
+
+            TextView tvTitle = ((TextView) myContentsView
+                    .findViewById(R.id.infoTitle));
+            TextView tvSnippet = ((TextView) myContentsView
+                    .findViewById(R.id.infoSnippet));
+
+            tvTitle.setText(mSelectedItem.getMtitle());
+            tvSnippet.setText(mSelectedItem.getmSnippet());
+            return myContentsView;
+        }
+
+        @Override
+        public View getInfoContents(Marker marker) {
+            return null;
+        }
     }
 }
