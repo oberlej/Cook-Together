@@ -16,6 +16,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.cooktogether.fragments.MealNotEditableFragment;
 import com.cooktogether.fragments.ConversationFragment;
@@ -28,6 +30,8 @@ import com.cooktogether.helpers.AbstractBaseActivity;
 import com.cooktogether.R;
 import com.cooktogether.fragments.ConversationsListFragment;
 import com.cooktogether.helpers.SearchFragment;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class HomeActivity extends AbstractBaseActivity {
 
@@ -73,7 +77,19 @@ public class HomeActivity extends AbstractBaseActivity {
         // Inflate the header view at runtime
         View headerLayout = nvDrawer.inflateHeaderView(R.layout.nav_header);
         // We can now look up items within the header if needed
-//        ImageView ivHeaderPhoto = headerLayout.findViewById(R.id.imageView);
+        CircleImageView ivHeaderPhoto = (CircleImageView) headerLayout.findViewById(R.id.profile_picture_view);
+        ivHeaderPhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showProfile();
+            }
+        });
+        TextView mUserName = (TextView) headerLayout.findViewById(R.id.user_name_view);
+        loadUser(ivHeaderPhoto, mUserName);
+    }
+    //Todo use the same function as in the profile fragment
+    private void loadUser(CircleImageView userPic, TextView mUserName) {
+
     }
 
     public void loadDefaultScreen() {
