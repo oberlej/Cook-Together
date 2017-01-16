@@ -65,11 +65,6 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
     private boolean mAnswer;
     //private Button mContact_btn;
 
-    // for the list of location options
-    private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_meal, container, false);
@@ -151,27 +146,7 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
         mParent = (HomeActivity) getActivity();
 
         view.findViewById(R.id.create_new_day_btn).setOnClickListener(this);
-        /*//for the list of location options
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.location_options);
 
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
-        mRecyclerView.setHasFixedSize(true);
-
-        // use a linear layout manager
-        mLayoutManager = new LinearLayoutManager(getContext());
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.addOnItemTouchListener(
-                new RecyclerItemClickListener(getContext(), new RecyclerItemClickListener.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(View view, int position) {
-                        selectedLocation = ((locationOptionsAdapter) mAdapter).getSelectedLocation(position);
-                        mLocationName.setText(selectedLocation.toString());
-                        ((locationOptionsAdapter) mAdapter).clear();
-                        mRecyclerView.clearFocus();
-                })
-        );
-        */
         //init location bar
         initLocationBar(view);
 

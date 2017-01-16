@@ -31,13 +31,13 @@ public class SearchFragment extends AbstractBaseFragment {
         init(view);
         return view;
     }
-    //// TODO: 15/01/17 debug empty fragments when called after the first time 
+
     @Override
     protected void init(View view) {
         mParent = (HomeActivity) getActivity();
 
         //init fragments
-        mList =  ListSearchFragment.newInstance();
+        mList = ListSearchFragment.newInstance();
         mMap = MapSearchFragment.newInstance();
 
         //init view pager
@@ -51,7 +51,7 @@ public class SearchFragment extends AbstractBaseFragment {
 
         loadDefaultScreen();
     }
-    
+
     private void setupViewPager(final ViewPager viewPager) {
         adapter = new ViewPagerAdapter(mParent.getSupportFragmentManager());
         viewPager.setOffscreenPageLimit(1);
@@ -70,5 +70,10 @@ public class SearchFragment extends AbstractBaseFragment {
 
     public void loadDefaultScreen() {
         showListSearch();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
     }
 }

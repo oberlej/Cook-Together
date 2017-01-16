@@ -286,9 +286,6 @@ public class HomeActivity extends AbstractBaseActivity {
         mDrawer.closeDrawers();
     }
 
-    public View getLocationSearchButton(Fragment f){
-      return getSupportFragmentManager().findFragmentById(f.getId()).getView().findViewById(R.id.enter_location_btn);
-    }
 }
 
 

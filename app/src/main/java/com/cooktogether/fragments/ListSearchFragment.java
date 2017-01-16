@@ -21,13 +21,14 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 
 public class ListSearchFragment extends AbstractMealListFragment {
-    ArrayList<Meal> othersMeals;
+    private ArrayList<Meal> othersMeals;
 
     public static ListSearchFragment newInstance() {
         return new ListSearchFragment();
     }
 
     public ListSearchFragment() {
+        othersMeals = new ArrayList<Meal>();
     }
 
     @Override
@@ -38,7 +39,6 @@ public class ListSearchFragment extends AbstractMealListFragment {
 
     @Override
     protected void setAdapter(Query mealsQuery) {
-        othersMeals = new ArrayList<Meal>();
         mealsQuery.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot mealsSnapshot) {
@@ -47,7 +47,7 @@ public class ListSearchFragment extends AbstractMealListFragment {
                     if (!meal.getUserKey().equals(getUid()))
                         othersMeals.add(meal);
                 }
-                ((MealsListAdapter) mAdapter).setMeals(othersMeals); //= new MealsListAdapter(othersMeals);
+                ((MealsListAdapter) mAdapter).setMeals(othersMeals);
                 mRecycler.setAdapter(mAdapter);
             }
 
