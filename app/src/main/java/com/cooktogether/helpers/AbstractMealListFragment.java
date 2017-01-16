@@ -92,7 +92,7 @@ public abstract class AbstractMealListFragment extends AbstractBaseFragment {
 
     protected void cleanAdapter() {
         if (mAdapter != null) {
-            ((FirebaseRecyclerAdapter<Meal,MealViewHolder>)mAdapter).cleanup();
+            ((FirebaseRecyclerAdapter<Meal, MealViewHolder>) mAdapter).cleanup();
         }
     }
 

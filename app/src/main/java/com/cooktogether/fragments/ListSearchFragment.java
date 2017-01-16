@@ -21,7 +21,8 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 
 public class ListSearchFragment extends AbstractMealListFragment {
-    ArrayList<Meal> othersMeals ;
+    ArrayList<Meal> othersMeals;
+
     public static ListSearchFragment newInstance() {
         return new ListSearchFragment();
     }
@@ -36,7 +37,7 @@ public class ListSearchFragment extends AbstractMealListFragment {
     }
 
     @Override
-    protected void setAdapter(Query mealsQuery){
+    protected void setAdapter(Query mealsQuery) {
         othersMeals = new ArrayList<Meal>();
         mealsQuery.addValueEventListener(new ValueEventListener() {
             @Override
@@ -46,7 +47,7 @@ public class ListSearchFragment extends AbstractMealListFragment {
                     if (!meal.getUserKey().equals(getUid()))
                         othersMeals.add(meal);
                 }
-                ((MealsListAdapter)mAdapter).setMeals(othersMeals); //= new MealsListAdapter(othersMeals);
+                ((MealsListAdapter) mAdapter).setMeals(othersMeals); //= new MealsListAdapter(othersMeals);
                 mRecycler.setAdapter(mAdapter);
             }
 
@@ -74,7 +75,7 @@ public class ListSearchFragment extends AbstractMealListFragment {
     @Override
     protected void cleanAdapter() {
         if (mAdapter != null) {
-            ((MealsListAdapter)mAdapter).cleanup();
+            ((MealsListAdapter) mAdapter).cleanup();
         }
     }
 
