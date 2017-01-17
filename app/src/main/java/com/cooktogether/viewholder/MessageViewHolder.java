@@ -24,7 +24,7 @@ public class MessageViewHolder extends RecyclerView.ViewHolder{
     public void bindToPost(Message message, String userId) {
         content.setText(message.getContent());
         if(message.getSenderId().equals(userId)){
-            itemView.setBackgroundColor(rgb(135,206,235));
+            itemView.findViewById(R.id.message_content).setBackgroundColor(rgb(135,206,235));
             itemView.setRight(3);
         }
     }
