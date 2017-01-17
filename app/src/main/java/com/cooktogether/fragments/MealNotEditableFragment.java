@@ -161,7 +161,7 @@ public class MealNotEditableFragment extends Fragment {
         List<String> usersKeys = new ArrayList<String>();
         usersKeys.add(mParent.getUid());
         usersKeys.add(mealUserKey);
-        Conversation newConv = new Conversation(title.getText().toString(), conversationKey, mealKey, usersKeys);
+        Conversation newConv = new Conversation(title.getText().toString(), conversationKey, usersKeys);
 
         HashMap<String, Object> convMap = newConv.toHashMap();
         convMap.remove("messages"); //to not delete previous messages if any

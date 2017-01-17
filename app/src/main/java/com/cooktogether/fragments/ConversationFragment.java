@@ -27,6 +27,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -45,7 +46,6 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
     private String mConversationKey = null;
     private String mMealKey;
     private TextView mTitle;
-    private int nbrMessages;
     private EditText newMessage;
     private List<String> mUsersKeys;
     private Button mSendButton;
@@ -86,17 +86,14 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
         mParent.getDB().child("user-conversations").child(mParent.getUid())
                 .child(mConversationKey).addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(final DataSnapshot dataSnapshot) {
                 Conversation conversation = Conversation.parseSnapshot(dataSnapshot);
                 mTitle.setText(conversation.getTitle());
-                mMealKey = conversation.getMealKey();
                 mUsersKeys = conversation.getUsersKeys();
 
                 //to make sure the current user Id is always the first in the list
                 mUsersKeys.remove(mParent.getUid());
                 mUsersKeys.add(0, mParent.getUid());
-
-                nbrMessages = conversation.getMessages().size();
 
                 // Set up FirebaseRecyclerAdapter with the Query
                 mAdapter = new FirebaseRecyclerAdapter<Message, MessageViewHolder>(Message.class, R.layout.item_message, MessageViewHolder.class, dataSnapshot.child("messages").getRef()) {
@@ -115,7 +112,14 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
                         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                // Launch PostDetailActivity
+                                // Launch Post date of message
+                                TextView dateView = (TextView) v.findViewById(R.id.msg_date);
+                                if(dateView.getVisibility() == View.GONE) {
+                                    dateView.setText(model.getDate().toString());
+                                    dateView.setVisibility(View.VISIBLE);
+                                }
+                                else
+                                dateView.setVisibility(View.GONE);
                                 Toast.makeText(getContext(), "Message clicked", Toast.LENGTH_LONG).show();
                             }
                         });
@@ -139,7 +143,7 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
                             public boolean onLongClick(View v) {
 
                                 AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-                                String message = "Are you sure you want to delete your version of the conversation ?";
+                                String message = "Are you sure you want to delete your version of messages ?";
                                 builder.setMessage(message)
                                         .setPositiveButton("Yes", dialogClickListener)
                                         .setNegativeButton("No", dialogClickListener).show();
@@ -203,9 +207,11 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
     }
 
     public void sendMessage(View view) {
-        Message m = new Message(mParent.getUid(), newMessage.getText().toString());
+        Calendar calendar = Calendar.getInstance();
+        Message m = new Message(mParent.getUid(), newMessage.getText().toString(),calendar.getTime());
+
         //in case its the first message (once created or after been deleted
-        Conversation newConv = new Conversation(mTitle.getText().toString(), mConversationKey, mMealKey, mUsersKeys);
+        Conversation newConv = new Conversation(mTitle.getText().toString(), mConversationKey, mUsersKeys);
         HashMap<String, Object> convMap = newConv.toHashMap();
         convMap.remove("messages"); //to not delete previous messages if any
         mParent.getDB().child("user-conversations").child(mUsersKeys.get(1)).child(mConversationKey).getRef().updateChildren(convMap);
@@ -218,7 +224,7 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
         //clearingthe edit text field
         newMessage.setText("");
 
-        Toast.makeText(getContext(), "Message sent", Toast.LENGTH_LONG).show();
+        Toast.makeText(getContext(), "Message sent at "+ calendar.getTime(), Toast.LENGTH_LONG).show();
     }
 
     @Override

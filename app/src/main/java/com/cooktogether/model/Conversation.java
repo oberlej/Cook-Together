@@ -14,22 +14,19 @@ public class Conversation {
     private String title;
     private ArrayList<Message> messages;
     private String conversationKey;
-    private String mealKey;
     private List<String> usersKeys;
 
-    public Conversation(String title, String conversationKey, String mealKey, List<String> usersKeys) {
+    public Conversation(String title, String conversationKey, List<String> usersKeys) {
         this.title = title;
         this.messages = new ArrayList<Message>();
         this.conversationKey = conversationKey;
-        this.mealKey = mealKey;
         this.usersKeys = usersKeys;
     }
 
-    public Conversation(String title, ArrayList<Message> messages, String conversationKey, String mealKey, List<String> usersKeys) {
+    public Conversation(String title, ArrayList<Message> messages, String conversationKey, List<String> usersKeys) {
         this.title = title;
         this.messages = messages;
         this.conversationKey = conversationKey;
-        this.mealKey = mealKey;
         this.usersKeys = usersKeys;
     }
 
@@ -62,13 +59,6 @@ public class Conversation {
         this.conversationKey = conversationKey;
     }
 
-    public String getMealKey() {
-        return mealKey;
-    }
-
-    public void setMealKey(String mealKey) {
-        this.mealKey = mealKey;
-    }
 
     public static Conversation parseSnapshot(DataSnapshot snapshot) {
         ArrayList<Message> messages = new ArrayList<Message>();
@@ -83,7 +73,7 @@ public class Conversation {
             usersKeys.add((String) userKey.getValue());
         }
 
-        return new Conversation((String) snapshot.child("title").getValue(), messages, (String) snapshot.child("conversationKey").getValue(), (String) snapshot.child("mealKey").getValue(), usersKeys);
+        return new Conversation((String) snapshot.child("title").getValue(), messages, (String) snapshot.child("conversationKey").getValue(), usersKeys);
     }
 
     /*
@@ -94,7 +84,6 @@ public class Conversation {
         conversation.put("title", title);
         conversation.put("messages", messages);
         conversation.put("conversationKey", conversationKey);
-        conversation.put("mealKey", mealKey);
         conversation.put("usersKeys", usersKeys);
         return conversation;
     }
