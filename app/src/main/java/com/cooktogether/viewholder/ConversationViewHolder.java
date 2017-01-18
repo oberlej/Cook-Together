@@ -17,11 +17,13 @@ import java.util.ArrayList;
 public class ConversationViewHolder extends RecyclerView.ViewHolder{
     public TextView title;
     public TextView snap;
+    public TextView date;
 
     public ConversationViewHolder(View itemView) {
         super(itemView);
         title = (TextView) itemView.findViewById(R.id.conversation_title);
         snap = (TextView) itemView.findViewById(R.id.conversation_snap);
+        date = (TextView) itemView.findViewById(R.id.message_date);
     }
 
     public void bindToPost(Conversation conversation) {
@@ -29,7 +31,10 @@ public class ConversationViewHolder extends RecyclerView.ViewHolder{
         ArrayList<Message> m = conversation.getMessages();
         if(m.isEmpty())
             snap.setText("No messages");
-        else
-            snap.setText(m.get(m.size()-1).getContent());
+        else {
+            Message lastMessage = m.get(m.size() - 1);
+            snap.setText(lastMessage.getContent());
+            date.setText( lastMessage.getDate().toString());
+        }
     }
 }

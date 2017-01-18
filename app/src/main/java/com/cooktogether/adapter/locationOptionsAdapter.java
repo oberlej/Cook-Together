@@ -18,7 +18,7 @@ import java.util.ArrayList;
  */
 
 public class locationOptionsAdapter extends RecyclerView.Adapter<locationOptionsAdapter.ViewHolder>{
-    private ArrayList<UserLocation> moptions;
+    private ArrayList<UserLocation> mOptions;
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
     // you provide access to all the views for a data item in a view holder
@@ -33,11 +33,11 @@ public class locationOptionsAdapter extends RecyclerView.Adapter<locationOptions
 
     // Provide a suitable constructor (depends on the kind of dataset)
     public locationOptionsAdapter() {
-        moptions = new ArrayList<UserLocation>();
+        mOptions = new ArrayList<UserLocation>();
     }
 
     public void setMOptions(ArrayList<UserLocation> locations){
-        moptions = (ArrayList<UserLocation>) locations.clone();
+        mOptions = (ArrayList<UserLocation>) locations.clone();
     }
     // Create new views (invoked by the layout manager)
     @Override
@@ -57,24 +57,24 @@ public class locationOptionsAdapter extends RecyclerView.Adapter<locationOptions
     public void onBindViewHolder(ViewHolder holder, int position) {
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
-        holder.mTextView.setText(moptions.get(position).toString());
+        holder.mTextView.setText(mOptions.get(position).toString());
 
     }
 
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        return moptions.size();
+        return mOptions.size();
     }
 
     public UserLocation getSelectedLocation(int position){
-        if(position >=0 && position < moptions.size()) {
-            return moptions.get(position);
+        if(position >=0 && position < mOptions.size()) {
+            return mOptions.get(position);
         }
         return null; //should not happen
     }
 
     public void clear(){
-        moptions.clear();
+        mOptions.clear();
     }
 }

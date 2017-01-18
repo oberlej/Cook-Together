@@ -32,6 +32,7 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
@@ -154,15 +155,17 @@ public class MealNotEditableFragment extends Fragment {
 
     public void contact(View view) {
 
-        String conversationKey =  mParent.getDB().child("user-conversations").child(mParent.getUid()).push().getKey();
+        Query conversation = mParent.getDB().child("user-conversations").child(mParent.getUid()).child(mealKey);//mParent.getDB().child("users").child(mParent.getUid()).orderByChild(mealKey).equals(true); wont work until all the users are added to the users table
+        String conversationKey = mealKey; // here we consider that the conversation key is the meal key
 
         List<String> usersKeys = new ArrayList<String>();
         usersKeys.add(mParent.getUid());
         usersKeys.add(mealUserKey);
-        Conversation newConv = new Conversation(title.getText().toString(), conversationKey, mealKey, usersKeys);
+        Conversation newConv = new Conversation(title.getText().toString(), conversationKey, usersKeys);
 
-        mParent.getDB().child("user-conversations").child(mParent.getUid()).child(conversationKey).setValue(newConv);
-
+        HashMap<String, Object> convMap = newConv.toHashMap();
+        convMap.remove("messages"); //to not delete previous messages if any
+        conversation.getRef().updateChildren(convMap);
 
         mParent.goToConversation(conversationKey);
 

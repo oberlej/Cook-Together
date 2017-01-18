@@ -1,29 +1,25 @@
-<?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/search_drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- The ActionBar displayed at the top -->
-    <include
-        layout="@layout/toolbar_main"
+    <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
 
-    <!-- The main content view where fragments are loaded -->
-    <FrameLayout
-        android:id="@+id/search_screen_content"
+
+        <android.support.design.widget.TabLayout
+            android:id="@+id/search_tabs"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:tabGravity="fill"
+            app:tabMode="fixed" />
+    </android.support.design.widget.AppBarLayout>
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/search_viewpager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <!-- Note that `android:layout_gravity` needs to be set to 'start' -->
-    <android.support.design.widget.NavigationView
-        android:id="@+id/search_options_menu"
-        android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:layout_gravity="start"
-        android:background="@android:color/white"
-        app:menu="@menu/menu_search_options" />
-</android.support.v4.widget.DrawerLayout>
-
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+</android.support.design.widget.CoordinatorLayout>

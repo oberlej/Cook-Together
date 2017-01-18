@@ -2,12 +2,12 @@ package com.cooktogether.helpers;
 
 
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.cooktogether.R;
 import com.cooktogether.mainscreens.HomeActivity;
@@ -20,12 +20,11 @@ import com.google.firebase.database.Query;
 
 
 public abstract class AbstractMealListFragment extends AbstractBaseFragment {
-    private FirebaseRecyclerAdapter<Meal, MealViewHolder> mAdapter;
+    protected RecyclerView.Adapter<MealViewHolder> mAdapter;
     protected RecyclerView mRecycler;
     protected LinearLayoutManager mManager;
+    protected TextView mEmptyList;
 
-    public AbstractMealListFragment() {
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -35,12 +34,14 @@ public abstract class AbstractMealListFragment extends AbstractBaseFragment {
     }
 
     @Override
-    protected void init(View view) {
+    protected void init(final View view) {
         mParent = (HomeActivity) getActivity();
-
         mRecycler = (RecyclerView) view.findViewById(R.id.meals_list_rcv);
         mRecycler.setHasFixedSize(true);
-
+        mEmptyList = (TextView) view.findViewById(R.id.meals_empty_list);
+        //to be shown in case of empty list
+        mEmptyList.setVisibility(View.VISIBLE);
+        mEmptyList.setText("Make new propositions of meals you would like to cook and share with people around you and let the fun begin!");
         // Set up Layout Manager, reverse layout
         mManager = new LinearLayoutManager(getContext());
         mManager.setReverseLayout(true);
@@ -49,7 +50,12 @@ public abstract class AbstractMealListFragment extends AbstractBaseFragment {
 
         // Set up FirebaseRecyclerAdapter with the Query
         Query mealsQuery = getQuery(getDB());
+        setAdapter(mealsQuery);
+        mRecycler.setAdapter(mAdapter);
 
+    }
+
+    protected void setAdapter(Query mealsQuery) {
         mAdapter = new FirebaseRecyclerAdapter<Meal, MealViewHolder>(Meal.class, R.layout.item_meal, MealViewHolder.class, mealsQuery) {
 
             @Override
@@ -76,19 +82,23 @@ public abstract class AbstractMealListFragment extends AbstractBaseFragment {
                         }
                     }
                 });
-
+                mEmptyList.setVisibility(View.GONE);
                 // Bind Post to ViewHolder, setting OnClickListener for the star button
                 viewHolder.bindToPost(model);
             }
         };
-        mRecycler.setAdapter(mAdapter);
+
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        cleanAdapter();
+    }
+
+    protected void cleanAdapter() {
         if (mAdapter != null) {
-            mAdapter.cleanup();
+            ((FirebaseRecyclerAdapter<Meal, MealViewHolder>) mAdapter).cleanup();
         }
     }
 

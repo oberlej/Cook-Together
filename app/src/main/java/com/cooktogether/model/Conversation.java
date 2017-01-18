@@ -3,6 +3,7 @@ package com.cooktogether.model;
 import com.google.firebase.database.DataSnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -10,25 +11,22 @@ import java.util.List;
  */
 
 public class Conversation {
-    private String Title;
+    private String title;
     private ArrayList<Message> messages;
     private String conversationKey;
-    private String mealKey;
-    private List<String> usersKeys; //to change later to users
+    private List<String> usersKeys;
 
-    public Conversation(String title, String conversationKey, String mealKey, List<String> usersKeys) {
-        Title = title;
+    public Conversation(String title, String conversationKey, List<String> usersKeys) {
+        this.title = title;
         this.messages = new ArrayList<Message>();
         this.conversationKey = conversationKey;
-        this.mealKey = mealKey;
         this.usersKeys = usersKeys;
     }
 
-    public Conversation(String title, ArrayList<Message> messages, String conversationKey, String mealKey ,List<String> usersKeys) {
-        Title = title;
+    public Conversation(String title, ArrayList<Message> messages, String conversationKey, List<String> usersKeys) {
+        this.title = title;
         this.messages = messages;
         this.conversationKey = conversationKey;
-        this.mealKey = mealKey;
         this.usersKeys = usersKeys;
     }
 
@@ -45,19 +43,13 @@ public class Conversation {
     }
 
     public String getTitle() {
-        return Title;
+        return title;
     }
 
     public ArrayList<Message> getMessages() {
         return messages;
     }
 
-
-    /*public String getLastMessage() {
-        if(this.messages.isEmpty())
-            return "no messages";
-        return this.messages.get(this.messages.size()-1).getContent();
-    }*/
 
     public String getConversationKey() {
         return this.conversationKey;
@@ -67,27 +59,32 @@ public class Conversation {
         this.conversationKey = conversationKey;
     }
 
-    public String getMealKey() {
-        return mealKey;
-    }
-
-    public void setMealKey(String mealKey) {
-        this.mealKey = mealKey;
-    }
 
     public static Conversation parseSnapshot(DataSnapshot snapshot) {
         ArrayList<Message> messages = new ArrayList<Message>();
         if (snapshot.hasChild("messages")) {
-            for(DataSnapshot messageSnap : snapshot.child("messages").getChildren()){
+            for (DataSnapshot messageSnap : snapshot.child("messages").getChildren()) {
                 Message message = Message.parseSnapshot(messageSnap);
                 messages.add(message);
             }
         }
         List<String> usersKeys = new ArrayList<>();
-        for(DataSnapshot userKey : snapshot.child("usersKeys").getChildren()){
-            usersKeys.add((String)userKey.getValue());
+        for (DataSnapshot userKey : snapshot.child("usersKeys").getChildren()) {
+            usersKeys.add((String) userKey.getValue());
         }
 
-        return new Conversation((String)snapshot.child("title").getValue(), messages,(String) snapshot.child("conversationKey").getValue(),(String) snapshot.child("mealKey").getValue(),usersKeys );
+        return new Conversation((String) snapshot.child("title").getValue(), messages, (String) snapshot.child("conversationKey").getValue(), usersKeys);
+    }
+
+    /*
+    Convert the conversation model into a HashMap
+     */
+    public HashMap<String, Object> toHashMap() {
+        HashMap<String, Object> conversation = new HashMap<>();
+        conversation.put("title", title);
+        conversation.put("messages", messages);
+        conversation.put("conversationKey", conversationKey);
+        conversation.put("usersKeys", usersKeys);
+        return conversation;
     }
 }

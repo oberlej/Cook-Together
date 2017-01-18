@@ -19,6 +19,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -30,6 +31,7 @@ import com.cooktogether.R;
 import com.cooktogether.adapter.locationOptionsAdapter;
 import com.cooktogether.helpers.AbstractBaseFragment;
 
+import com.cooktogether.helpers.AbstractLocationFragment;
 import com.cooktogether.listener.RecyclerItemClickListener;
 
 import com.cooktogether.mainscreens.HomeActivity;
@@ -48,7 +50,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-public class MyMealFragment extends AbstractBaseFragment implements View.OnClickListener {
+public class MyMealFragment extends AbstractLocationFragment implements View.OnClickListener {
     private LinearLayout mListOfDays;
     private EditText mTitle;
     private EditText mDescription;
@@ -61,14 +63,7 @@ public class MyMealFragment extends AbstractBaseFragment implements View.OnClick
     private boolean mIsUpdate = false;
 
     private boolean mAnswer;
-    private EditText mLocationName;
     //private Button mContact_btn;
-
-    // for the list of location options
-    private RecyclerView mRecyclerView;
-    private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
-    private UserLocation selectedLocation;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -124,7 +119,7 @@ public class MyMealFragment extends AbstractBaseFragment implements View.OnClick
     }
 
     private boolean saveMeal() {
-        if (selectedLocation == null) {
+        if (getSelectedLocation() == null) {
             Toast.makeText(getContext(), "Unvalid location or no service available", Toast.LENGTH_LONG).show();
             return false;
             //todo Alert box to change the location
@@ -134,7 +129,7 @@ public class MyMealFragment extends AbstractBaseFragment implements View.OnClick
             mMealKey = getDB().child("meals").push().getKey();
         }
 
-        Meal m = new Meal(mTitle.getText().toString(), mDescription.getText().toString(), mParent.getUid(), mMealKey, mDaysFree, selectedLocation);
+        Meal m = new Meal(mTitle.getText().toString(), mDescription.getText().toString(), mParent.getUid(), mMealKey, mDaysFree, getSelectedLocation());
 
         getDB().child("meals").child(mMealKey).setValue(m);
 
@@ -151,58 +146,14 @@ public class MyMealFragment extends AbstractBaseFragment implements View.OnClick
         mParent = (HomeActivity) getActivity();
 
         view.findViewById(R.id.create_new_day_btn).setOnClickListener(this);
-        //for the list of location options
-        mRecyclerView = (RecyclerView) view.findViewById(R.id.location_options);
 
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
-        mRecyclerView.setHasFixedSize(true);
-
-        // use a linear layout manager
-        mLayoutManager = new LinearLayoutManager(getContext());
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.addOnItemTouchListener(
-                new RecyclerItemClickListener(getContext(), new RecyclerItemClickListener.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(View view, int position) {
-                        selectedLocation = ((locationOptionsAdapter) mAdapter).getSelectedLocation(position);
-                        mLocationName.setText(selectedLocation.toString());
-                        ((locationOptionsAdapter) mAdapter).clear();
-                        mRecyclerView.clearFocus();
-                    }
-                })
-        );
+        //init location bar
+        initLocationBar(view);
 
         mListOfDays = (LinearLayout) view.findViewById(R.id.create_list_of_days);
         mTitle = (EditText) view.findViewById(R.id.create_title);
         mDescription = (EditText) view.findViewById(R.id.create_description);
 
-        mLocationName = (EditText) view.findViewById(R.id.create_location);
-
-
-        mLocationName.addTextChangedListener(new TextWatcher() {
-            ArrayList<UserLocation> locations = new ArrayList<UserLocation>();
-
-            public void afterTextChanged(Editable s) {
-
-                if (mLocationName.isFocused()) {
-                    locations = getLocation(mLocationName.getText().toString());
-                    if (locations.isEmpty()) {
-                        mLocationName.setError("Location is not found, please try again");
-                    } else {
-                        mAdapter = new locationOptionsAdapter();
-                        mRecyclerView.setAdapter(mAdapter);
-                        ((locationOptionsAdapter) mAdapter).setMOptions(locations);
-                    }
-                }
-            }
-
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-        });
         initNotFreeDays();
         mDaysFree = new ArrayList<Day>();
 
@@ -296,7 +247,7 @@ public class MyMealFragment extends AbstractBaseFragment implements View.OnClick
 
     private void removeDay(View view) {
         //remove dayWrapper from list
-        View parent = (View) ((View) view.getParent()).getParent();
+        View parent = (View) (view.getParent()).getParent();
         Day day = (Day) parent.getTag(R.id.TAG_DAY);
         mListOfDays.removeView(parent);
         mDaysFree.remove(day);
@@ -307,7 +258,7 @@ public class MyMealFragment extends AbstractBaseFragment implements View.OnClick
     private void toggleMealTime(View view) {
         int id = view.getId();
         CheckBox cb = (CheckBox) view;
-        LinearLayout dayWrapper = (LinearLayout) (((View) view.getParent()).getParent());
+        LinearLayout dayWrapper = (LinearLayout) ((view.getParent()).getParent());
         Day d = (Day) dayWrapper.getTag(R.id.TAG_DAY);
         if (id == R.id.day_lunch_cb) {
             d.setLunch(cb.isChecked());
@@ -332,29 +283,15 @@ public class MyMealFragment extends AbstractBaseFragment implements View.OnClick
         }
     }
 
-    /*
-    For now it returns only the first address found to make it simple
-     */
-    private ArrayList<UserLocation> getLocation(String locationName) {
-        Geocoder geo = new Geocoder(getContext(), Locale.getDefault());
 
-        ArrayList<UserLocation> locations = new ArrayList<UserLocation>();
-
-        try {
-            List<Address> addresses = geo.getFromLocationName(locationName, 5);
-            if (addresses.size() > 0) {
-                for (Address address : addresses) {
-                    UserLocation location = new UserLocation();
-                    location.setLatitude(address.getLatitude());
-                    location.setLongitude(address.getLongitude());
-                    location.setAddress(address);
-                    locations.add(location);
-                }
-            }
-        } catch (IOException e) {
-            Log.e("getLocation", e.getMessage());
-        }
-        return locations;
+    @Override
+    public void setmButton(View v) {
+        mEnterButton = (Button) v.findViewById(R.id.enter_location_btn);
+        mEnterButton.setVisibility(View.GONE);
     }
 
+    @Override
+    public void setmLocationName(View v) {
+        mLocationName = (EditText) v.findViewById(R.id.create_location);
+    }
 }

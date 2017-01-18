@@ -20,6 +20,10 @@ import com.google.firebase.storage.StorageReference;
 public abstract class AbstractBaseFragment extends Fragment implements BasicFunctions{
     protected AbstractBaseActivity mParent;
 
+    public void onCreate(){
+
+    }
+
     protected abstract void init(View view);
 
     @Override

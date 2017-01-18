@@ -81,12 +81,14 @@ public class UserLocation {
 
     private String addressToName(Address address){
         String locationName = "";
-        if(address.getFeatureName() != null){
-            locationName = address.getFeatureName();
+        if(address.getLocality() != null){
+            locationName = address.getLocality();
         }
         if(address.getAdminArea() != null){
-            if(address.getFeatureName() != address.getAdminArea())
+            if(address.getLocality() != null && address.getLocality() != address.getAdminArea())
                 locationName += ", "+ address.getAdminArea();
+            else
+                locationName += address.getAdminArea();
         }
         locationName += ", " +address.getCountryName();
         return  locationName;
