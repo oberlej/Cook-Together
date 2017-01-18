@@ -22,6 +22,8 @@ import com.cooktogether.model.Conversation;
 import com.cooktogether.model.Day;
 import com.cooktogether.model.DayEnum;
 import com.cooktogether.model.Meal;
+import com.cooktogether.model.Reservation;
+import com.cooktogether.model.StatusEnum;
 import com.cooktogether.model.UserLocation;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -51,6 +53,7 @@ public class MealNotEditableFragment extends Fragment {
 
     private TextView locationName;
     private Button contact_btn;
+    private Button reserve_btn;
 
     private String mealKey = null;
     private String mealUserKey = null;
@@ -87,7 +90,43 @@ public class MealNotEditableFragment extends Fragment {
                 contact(v);
             }
         });
+        reserve_btn = (Button) view.findViewById(R.id.reserve_btn);
 
+        //TODO verify if a reservation hasn't been made by the user fot the same meal
+        /*Final boolean reserved;
+        mParent.getDB().child("meals").child(mealKey).child("reservations").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                Reservation r = Reservation.parseSnapshot(dataSnapshot);
+               reserved = mParent.getDB().child("users").child("reservations").orderByChild("reservationKey").equals(dataSnapshot.getKey());
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });*/
+        reserve_btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reserve(v);
+            }
+        });
         //for the list of location options
         locationName = (TextView) view.findViewById(R.id.meal_location);
 
@@ -171,6 +210,16 @@ public class MealNotEditableFragment extends Fragment {
 
     }
 
+    public void reserve(View v){
+        String reservationKey = mParent.getDB().child("reservations").push().getKey();
+        Reservation newReserv = new Reservation(reservationKey, mParent.getUid(), mealKey, StatusEnum.WAITING);
+        //set the new reservation
+        mParent.getDB().child("reservations").child(reservationKey).setValue(newReserv);
+        //update user reservations
+        mParent.getDB().child("users").child(mParent.getUid()).child("reservations").child(reservationKey).setValue(true);
+        //meals user reservations
+        mParent.getDB().child("meals").child(mealKey).child("reservations").child(reservationKey).setValue(true);
+    }
     public static Fragment newInstance() {
         return new MealNotEditableFragment();
     }

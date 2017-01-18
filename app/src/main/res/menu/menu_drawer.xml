@@ -19,6 +19,11 @@
             android:orderInCategory="@integer/SEARCH_MEAL_ORDER"
             android:title="Search Meal" />
         <item
+            android:id="@+id/nav_my_reservations"
+            android:icon="@drawable/ic_message_white_48dp"
+            android:orderInCategory="@integer/MY_MESSAGES_ORDER"
+            android:title="My reservations" />
+        <item
             android:id="@+id/nav_my_messages"
             android:icon="@drawable/ic_message_white_48dp"
             android:orderInCategory="@integer/MY_MESSAGES_ORDER"

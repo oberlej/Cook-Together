@@ -14,22 +14,58 @@ public class Meal {
     private String description;
     private String userKey;
     private String mealKey;
+    private List<Day> freeDays;
     private UserLocation location;
 
+    private int nbr_persons;
+    private int nbr_reservations;
+    private Boolean booked;
+    private List<String> reservations;
 
-    private List<Day> freeDays;
 
     public Meal() {
 
     }
 
-    public Meal(String title, String description, String userKey, String mealKey, List<Day> freeDays, UserLocation location) {
+/*    public Meal(String title, String description, String userKey, String mealKey, List<Day> freeDays,
+                UserLocation location, int nbr_persons) {
         this.title = title;
         this.description = description;
         this.userKey = userKey;
         this.mealKey = mealKey;
         this.freeDays = freeDays;
         this.location = location;
+        this.nbr_persons = nbr_persons;
+        this.nbr_reservations = 0;
+        this.booked = false;
+    }
+*/
+    public Meal(String title, String description, String userKey, String mealKey, List<Day> freeDays,
+                UserLocation location, int nbr_persons, int nbr_reservations, Boolean booked) {
+        this.title = title;
+        this.description = description;
+        this.userKey = userKey;
+        this.mealKey = mealKey;
+        this.freeDays = freeDays;
+        this.location = location;
+        this.nbr_persons = nbr_persons;
+        this.nbr_reservations = nbr_reservations;
+        this.booked = booked;
+    }
+
+    public Meal(String title, String description, String userKey, String mealKey, List<Day> freeDays,
+                UserLocation location, int nbr_persons, int nbr_reservations, Boolean booked,
+                List<String> reservations) {
+        this.title = title;
+        this.description = description;
+        this.userKey = userKey;
+        this.mealKey = mealKey;
+        this.freeDays = freeDays;
+        this.location = location;
+        this.nbr_persons = nbr_persons;
+        this.nbr_reservations = nbr_reservations;
+        this.booked = booked;
+        this.reservations = reservations;
     }
 
     public List<Day> getFreeDays() {
@@ -82,6 +118,33 @@ public class Meal {
         }
     }
 
+    public int getNbr_persons() {
+        return nbr_persons;
+    }
+
+    public void setNbr_persons(int nbr_persons) {
+        this.nbr_persons = nbr_persons;
+    }
+
+    public int getNbr_reservations() {
+        return nbr_reservations;
+    }
+
+    public void setNbr_reservations(int nbr_reservations) {
+        this.nbr_reservations = nbr_reservations;
+
+        if(this.nbr_reservations == this.nbr_persons)
+            setBooked(true);
+    }
+
+    public Boolean getBooked() {
+        return booked;
+    }
+
+    public void setBooked(Boolean booked) {
+        this.booked = booked;
+    }
+
     public static Meal parseSnapshot(DataSnapshot snapshot) {
         List<Day> freeDays = new ArrayList<Day>();
         for(DataSnapshot day : snapshot.child("freeDays").getChildren()){
@@ -104,7 +167,20 @@ public class Meal {
         location.setLatitude(lat);
         location.setName(locationName);
 
-        return new Meal((String) snapshot.child("title").getValue(), (String) snapshot.child("description").getValue(), (String) snapshot.child("userKey").getValue(), (String) snapshot.child("mealKey").getValue(), freeDays,location);
+        //reservation Part
+        int nbr_persons = ((Long) snapshot.child("nbr_persons").getValue()).intValue();
+        int nbr_reservations = ((Long) snapshot.child("nbr_reservations").getValue()).intValue();
+        boolean booked = (Boolean) snapshot.child("booked").getValue();
+
+        List<String> reservations = new ArrayList<String>();
+        for(DataSnapshot reservation : snapshot.child("reservations").getChildren()){
+            reservations.add(reservation.getKey());
+        }
+
+
+        return new Meal((String) snapshot.child("title").getValue(), (String) snapshot.child("description").getValue(),
+                (String) snapshot.child("userKey").getValue(), (String) snapshot.child("mealKey").getValue(),
+                freeDays, location, nbr_persons, nbr_reservations, booked, reservations );
     }
 
 }

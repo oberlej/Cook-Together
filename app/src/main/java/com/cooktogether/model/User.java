@@ -18,6 +18,7 @@ public class User {
     private String pictureURI;
     private boolean facebookConnected;
 
+
     public User() {
     }
 

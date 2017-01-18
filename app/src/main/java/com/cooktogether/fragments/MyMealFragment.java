@@ -2,6 +2,7 @@ package com.cooktogether.fragments;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
@@ -44,6 +45,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
+import org.w3c.dom.Text;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -63,6 +66,10 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
     private boolean mIsUpdate = false;
 
     private boolean mAnswer;
+    //reservation
+    private EditText mNbrPersons;
+    private TextView mNbrReservations;
+    private CheckBox mBooked;
     //private Button mContact_btn;
 
     @Override
@@ -127,9 +134,12 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
 
         if (!mIsUpdate) {
             mMealKey = getDB().child("meals").push().getKey();
+            mBooked.setChecked(false);
+            mNbrReservations.setText(0);
         }
 
-        Meal m = new Meal(mTitle.getText().toString(), mDescription.getText().toString(), mParent.getUid(), mMealKey, mDaysFree, getSelectedLocation());
+        Meal m = new Meal(mTitle.getText().toString(), mDescription.getText().toString(),
+                mParent.getUid(), mMealKey, mDaysFree, getSelectedLocation(), Integer.parseInt(mNbrPersons.getText().toString()), Integer.parseInt(mNbrReservations.getText().toString()), mBooked.isChecked());
 
         getDB().child("meals").child(mMealKey).setValue(m);
 
@@ -153,6 +163,10 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
         mListOfDays = (LinearLayout) view.findViewById(R.id.create_list_of_days);
         mTitle = (EditText) view.findViewById(R.id.create_title);
         mDescription = (EditText) view.findViewById(R.id.create_description);
+        //for the reservation part
+        mNbrPersons = (EditText) view.findViewById(R.id.set_nbr_persons);
+        mNbrReservations = (TextView) view.findViewById(R.id.nbr_reservations);
+        mBooked = (CheckBox) view.findViewById(R.id.set_is_booked);
 
         initNotFreeDays();
         mDaysFree = new ArrayList<Day>();
@@ -183,6 +197,9 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
                     mLocationName.setText(meal.getLocation().toString());
                     mTitle.setText(meal.getTitle());
                     mDescription.setText(meal.getDescription());
+                    mNbrPersons.setText(meal.getNbr_persons());
+                    mNbrReservations .setText(meal.getNbr_reservations());
+                    mBooked.setChecked(meal.getBooked());
                     initNotFreeDays();
                     for (Day d : meal.getFreeDays()) {
                         mDaysNotFree.remove(d);
