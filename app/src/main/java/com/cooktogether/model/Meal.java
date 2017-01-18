@@ -16,12 +16,11 @@ public class Meal {
     private String mealKey;
     private List<Day> freeDays;
     private UserLocation location;
-
+    
     private int nbr_persons;
     private int nbr_reservations;
     private Boolean booked;
     private List<String> reservations;
-
 
     public Meal() {
 

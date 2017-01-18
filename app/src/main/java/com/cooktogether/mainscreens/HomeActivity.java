@@ -29,6 +29,7 @@ import com.cooktogether.fragments.ProfileFragment;
 import com.cooktogether.helpers.AbstractBaseActivity;
 import com.cooktogether.R;
 import com.cooktogether.fragments.ConversationsListFragment;
+import com.cooktogether.model.User;
 import com.cooktogether.helpers.SearchFragment;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -46,6 +47,8 @@ public class HomeActivity extends AbstractBaseActivity {
     private String conversationKey;
 
     private MenuItem itemChecked = null;
+
+    private User mUser = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +90,7 @@ public class HomeActivity extends AbstractBaseActivity {
         TextView mUserName = (TextView) headerLayout.findViewById(R.id.user_name_view);
         loadUser(ivHeaderPhoto, mUserName);
     }
+
     //Todo use the same function as in the profile fragment
     private void loadUser(CircleImageView userPic, TextView mUserName) {
 
@@ -286,6 +290,13 @@ public class HomeActivity extends AbstractBaseActivity {
         mDrawer.closeDrawers();
     }
 
+    public User getUser() {
+        return mUser;
+    }
+
+    public void setUser(User mUser) {
+        this.mUser = mUser;
+    }
 }
 
 
