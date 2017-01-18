@@ -157,7 +157,7 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
         File picture = new File(getContext().getDir("profile_pictures", Context.MODE_PRIVATE) + "/" + getUid() + ".jpg");
 
         if (!picture.exists()) {
-            if (mUser.isFacebookConnected()) {
+            if (mUser.isFacebookConnected() && mUser.isFacebookPicture()) {
                 setFacebookPicture();
             } else {
                 resetPicture();
