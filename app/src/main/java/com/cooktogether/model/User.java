@@ -14,25 +14,27 @@ public class User {
     private String userName;
     private String email;
     private String birthDate;
+    private String description;
     private boolean facebookPicture;
-    private String pictureURI;
     private boolean facebookConnected;
+    private List<Review> reviews;
 
     public User() {
     }
 
-    public User(String userKey, String userName, String email, String birthDate, boolean facebookPicture, String pictureURI, boolean facebookConnected) {
+    public User(String userKey, String userName, String email, String birthDate, String description, boolean facebookPicture, boolean facebookConnected, ArrayList<Review> reviews) {
         this.userKey = userKey;
         this.userName = userName;
         this.email = email;
         this.birthDate = birthDate;
+        this.description = description;
         this.facebookPicture = facebookPicture;
-        this.pictureURI = pictureURI;
         this.facebookConnected = facebookConnected;
+        this.reviews = reviews;
     }
 
     public static User parseSnapshot(DataSnapshot snapshot) {
-        return new User((String) snapshot.child("userKey").getValue(), (String) snapshot.child("userName").getValue(), (String) snapshot.child("email").getValue(), (String) snapshot.child("birthDate").getValue(), (boolean) snapshot.child("facebookPicture").getValue(), (String) snapshot.child("pictureURI").getValue(), (boolean) snapshot.child("facebookConnected").getValue());
+        return new User((String) snapshot.child("userKey").getValue(), (String) snapshot.child("userName").getValue(), (String) snapshot.child("email").getValue(), (String) snapshot.child("birthDate").getValue(), (String) snapshot.child("description").getValue(), (boolean) snapshot.child("facebookPicture").getValue(), (boolean) snapshot.child("facebookConnected").getValue(), (ArrayList<Review>) snapshot.child("reviews").getValue());
     }
 
     public String getUserKey() {
@@ -67,14 +69,6 @@ public class User {
         this.birthDate = birthDate;
     }
 
-    public String getPictureURI() {
-        return pictureURI;
-    }
-
-    public void setPictureURI(String pictureURI) {
-        this.pictureURI = pictureURI;
-    }
-
     public boolean isFacebookConnected() {
         return facebookConnected;
     }
@@ -89,5 +83,21 @@ public class User {
 
     public void setFacebookPicture(boolean facebookPicture) {
         this.facebookPicture = facebookPicture;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public List<Review> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(List<Review> reviews) {
+        this.reviews = reviews;
     }
 }

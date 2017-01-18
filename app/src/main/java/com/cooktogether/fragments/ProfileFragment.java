@@ -2,6 +2,8 @@ package com.cooktogether.fragments;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -15,6 +17,7 @@ import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
@@ -23,6 +26,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -50,6 +54,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -62,8 +68,15 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
     private User mUser = null;
     private boolean mAnswer;
     private EditText mUserName;
+    private EditText mDescription;
     private TextView mUseFBPicture;
     private ImageView mDeletePicture;
+
+    static Calendar mCalendar;
+    DatePickerFragment dateFragment;
+    static final String DATE_FORMAT = "dd/MM/yyyy";
+    static SimpleDateFormat dateFormat = new SimpleDateFormat(DATE_FORMAT);
+    private static EditText mBirthDate;
 
     public static ProfileFragment newInstance() {
         return new ProfileFragment();
@@ -91,35 +104,48 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
         mUseFBPicture.setOnClickListener(this);
         mDeletePicture = (ImageView) view.findViewById(R.id.profile_delete_picture);
         mDeletePicture.setOnClickListener(this);
+        mBirthDate = (EditText) view.findViewById(R.id.profile_bday);
+        mCalendar = Calendar.getInstance();
+        mBirthDate.setOnClickListener(this);
+        mDescription = (EditText) view.findViewById(R.id.profile_description);
     }
 
     private void loadUser() {
-        getDB().child("users").child(getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (!dataSnapshot.exists()) {
-                    Toast.makeText(getContext(), "Failed to load profile. Please try logging out and back in.", Toast.LENGTH_LONG).show();
-                    ((HomeActivity) mParent).loadDefaultScreen();
-                    return;
-                }
-                mUser = User.parseSnapshot(dataSnapshot);
-                //user name
-                if (mUser.getUserName() != null && !mUser.getUserName().isEmpty()) {
+        mUser = ((HomeActivity) mParent).getUser();
+        if (mUser == null) {
+            getDB().child("users").child(getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (!dataSnapshot.exists()) {
+                        Toast.makeText(getContext(), "Failed to load profile. Please try logging out and back in.", Toast.LENGTH_LONG).show();
+                        ((HomeActivity) mParent).loadDefaultScreen();
+                        return;
+                    }
+                    mUser = User.parseSnapshot(dataSnapshot);
+                    ((HomeActivity) mParent).setUser(mUser);
                     mUserName.setText(mUser.getUserName());
+                    mBirthDate.setText(mUser.getBirthDate());
+                    mDescription.setText(mUser.getDescription());
+                    //profile pic
+                    loadPicture();
                 }
-                //profile pic
-                loadPicture();
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(getContext(), "Failed to load profile.", Toast.LENGTH_LONG).show();
-            }
-        });
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                    Toast.makeText(getContext(), "Failed to load profile.", Toast.LENGTH_LONG).show();
+                }
+            });
+        } else {
+            mUserName.setText(mUser.getUserName());
+            mBirthDate.setText(mUser.getBirthDate());
+            mDescription.setText(mUser.getDescription());
+            //profile pic
+            loadPicture();
+        }
     }
 
-    private Bitmap readPicture(String name) {
-        File f = new File(getContext().getDir("profile_pictures", Context.MODE_PRIVATE), name + ".jpg");
+    private Bitmap readPicture() {
+        File f = new File(getContext().getDir("profile_pictures", Context.MODE_PRIVATE), getUid() + ".jpg");
         Bitmap b = null;
         if (f != null) {
             b = BitmapFactory.decodeFile(f.getPath(), null);
@@ -128,24 +154,27 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
     }
 
     private void loadPicture() {
-        if (mUser.getPictureURI().isEmpty()) {
+        File picture = new File(getContext().getDir("profile_pictures", Context.MODE_PRIVATE) + "/" + getUid() + ".jpg");
+
+        if (!picture.exists()) {
             if (mUser.isFacebookConnected()) {
                 setFacebookPicture();
             } else {
                 resetPicture();
             }
         } else {
-            Bitmap picture = readPicture(getUid());
-            if (picture == null) {
-                writePicture(getUid());
+            Bitmap b = BitmapFactory.decodeFile(picture.getPath(), null);
+            if (b == null) {
+                Toast.makeText(getContext(), "Failed to load your picture. Please try again.", Toast.LENGTH_LONG).show();
+                resetPicture();
             } else {
-                mPicture.setImageBitmap(picture);
-            }
-            mDeletePicture.setVisibility(View.VISIBLE);
-            if (mUser.isFacebookPicture()) {
-                mUseFBPicture.setVisibility(View.GONE);
-            } else {
-                mUseFBPicture.setVisibility(View.VISIBLE);
+                mPicture.setImageBitmap(b);
+                mDeletePicture.setVisibility(View.VISIBLE);
+                if (mUser.isFacebookPicture()) {
+                    mUseFBPicture.setVisibility(View.GONE);
+                } else {
+                    mUseFBPicture.setVisibility(View.VISIBLE);
+                }
             }
         }
     }
@@ -172,35 +201,40 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
         });
     }
 
-    private void writePicture(final String name) {
-        StorageReference ref = getRootRef().child("profile_pictures").child(name);
-
-        File tmp = new File(getContext().getDir("profile_pictures", Context.MODE_PRIVATE) + "/" + name + ".jpg");
-        tmp.deleteOnExit();
-
-        final File picture = new File(getContext().getDir("profile_pictures", Context.MODE_PRIVATE), name + ".jpg");
-
-
-        ref.getFile(picture).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-            @Override
-            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-                Bitmap b = BitmapFactory.decodeFile(picture.getPath(), null);
-                if (b != null) {
-                    mPicture.setImageBitmap(b);
-                } else {
-                    resetPicture();
-                }
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                Toast.makeText(getContext(), "Failed to load the picture " + name + ". Please try again.", Toast.LENGTH_LONG).show();
-                resetPicture();
-            }
-        });
+    private String getPath() {
+        return getContext().getDir("profile_pictures", Context.MODE_PRIVATE) + "/" + getUid() + ".jpg";
     }
 
-    private void setFacebookPictureUri() {
+    private void writePicture() {
+        //delete old
+        File tmp = new File(getPath());
+        if (tmp.exists()) {
+            tmp.delete();
+        }
+
+        // Get the data from the ImageView as bytes
+        mPicture.setDrawingCacheEnabled(true);
+        mPicture.buildDrawingCache();
+        Bitmap bitmap = mPicture.getDrawingCache();
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+
+        //create new
+        File f = new File(getPath());
+        try {
+            if (f.createNewFile()) {
+                FileOutputStream fo = new FileOutputStream(f);
+                fo.write(bytes.toByteArray());
+                fo.close();
+            } else {
+                Toast.makeText(getContext(), "Failed to save your picture. Please try again.", Toast.LENGTH_LONG).show();
+            }
+        } catch (IOException e) {
+            Toast.makeText(getContext(), "Failed to save your picture. Please try again.", Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private String getFacebookPictureUri() {
         String facebookUserId = "";
         // find the Facebook profile and get the user's id
         for (UserInfo profile : getCurrentUser().getProviderData()) {
@@ -209,8 +243,10 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
                 facebookUserId = profile.getUid();
             }
         }
-        mUser.setPictureURI("https://graph.facebook.com/" + facebookUserId + "/picture?type=large");
-        mUser.setFacebookPicture(true);
+        if (!facebookUserId.isEmpty()) {
+            return "https://graph.facebook.com/" + facebookUserId + "/picture?type=large";
+        }
+        return "";
     }
 
     @Override
@@ -255,6 +291,13 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
     private void saveProfile() {
         //update mUser
         mUser.setUserName(mUserName.getText().toString());
+        mUser.setBirthDate(mBirthDate.getText().toString());
+        mUser.setDescription(mDescription.getText().toString());
+        saveUser();
+
+    }
+
+    private void saveUser() {
         //save mUser
         getDB().child("users").child(getUid()).setValue(mUser);
     }
@@ -271,20 +314,20 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == SELECT_PICTURE) {
             if (resultCode == Activity.RESULT_OK) {
-                mUser.setPictureURI(data.getData().toString());
                 mUser.setFacebookPicture(false);
-                Bitmap bitmap = getPath(data.getData());
+                Bitmap bitmap = getBitmap(data.getData());
                 mPicture.setImageBitmap(bitmap);
-                mUseFBPicture.setVisibility(View.VISIBLE);
+                if (mUser.isFacebookConnected()) {
+                    mUseFBPicture.setVisibility(View.VISIBLE);
+                } else {
+                    mUseFBPicture.setVisibility(View.GONE);
+                }
                 mDeletePicture.setVisibility(View.VISIBLE);
                 uploadPicture();
-                writePicture(getUid());
+                writePicture();
+                saveUser();
             } else {
-                mUseFBPicture.setVisibility(View.VISIBLE);
-                mDeletePicture.setVisibility(View.GONE);
-                mUser.setFacebookPicture(false);
-                mUser.setPictureURI("");
-                mPicture.setBackgroundResource(R.drawable.ic_photo_camera_black_48dp);
+                resetPicture();
             }
         }
     }
@@ -296,14 +339,14 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
             case MY_PERMISSIONS_REQUEST_READ_MEDIA: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    mPicture.setImageBitmap(getPath(Uri.parse(mUser.getPictureURI())));
+                    mPicture.setImageBitmap(getBitmap(Uri.parse(getPath())));
                 }
                 return;
             }
         }
     }
 
-    private Bitmap getPath(Uri uri) {
+    private Bitmap getBitmap(Uri uri) {
         Bitmap bitmap = null;
         try {
             int permissionCheck = ContextCompat.checkSelfPermission(getContext(), Manifest.permission.READ_EXTERNAL_STORAGE);
@@ -339,25 +382,38 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
                 setFacebookPicture();
                 break;
             case R.id.profile_delete_picture:
-                if (!mUser.getPictureURI().isEmpty()) {
-                    resetPicture();
-                }
+                resetPicture();
+                break;
+            case R.id.profile_bday:
+                showDatePickerDialog();
                 break;
         }
     }
 
     private void setFacebookPicture() {
-        setFacebookPictureUri();
-        new DownloadImage().execute(mUser.getPictureURI());
+        String uri = getFacebookPictureUri();
+        if (!uri.isEmpty()) {
+            new DownloadImage().execute(uri);
+        } else {
+            resetPicture();
+        }
     }
 
     private void resetPicture() {
+        File tmp = new File(getContext().getDir("profile_pictures", Context.MODE_PRIVATE) + "/" + getUid() + ".jpg");
+        if (tmp.exists()) {
+            tmp.delete();
+        }
         mUser.setFacebookPicture(false);
-        mUser.setPictureURI("");
-        mUseFBPicture.setVisibility(View.VISIBLE);
+        if (mUser.isFacebookConnected()) {
+            mUseFBPicture.setVisibility(View.VISIBLE);
+        } else {
+            mUseFBPicture.setVisibility(View.GONE);
+        }
         mDeletePicture.setVisibility(View.GONE);
         mPicture.setImageBitmap(null);
         mPicture.setBackgroundResource(R.drawable.ic_photo_camera_black_48dp);
+        saveUser();
     }
 
     private class DownloadImage extends AsyncTask<String, Void, Bitmap> {
@@ -368,7 +424,7 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
         protected Bitmap doInBackground(String... urls) {
             Bitmap mIcon11 = null;
             try {
-                InputStream in = new java.net.URL(mUser.getPictureURI()).openStream();
+                InputStream in = new java.net.URL(urls[0]).openStream();
                 mIcon11 = BitmapFactory.decodeStream(in);
             } catch (Exception e) {
             }
@@ -380,12 +436,44 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
                 mPicture.setImageBitmap(result);
                 mUseFBPicture.setVisibility(View.GONE);
                 mDeletePicture.setVisibility(View.VISIBLE);
+                mUser.setFacebookPicture(true);
+                saveUser();
                 uploadPicture();
-                writePicture(getUid());
+                writePicture();
             } else {
                 Toast.makeText(getContext(), "Failed to download your facebook profile picture. Please try again.", Toast.LENGTH_LONG).show();
                 resetPicture();
             }
+        }
+    }
+
+    public void updateDateButtonText() {
+        String dateForButton = dateFormat.format(mCalendar.getTime());
+        mBirthDate.setText(dateForButton);
+    }
+
+    private void showDatePickerDialog() {
+        dateFragment = new DatePickerFragment();
+        dateFragment.show(getFragmentManager(), "datePicker");
+    }
+
+    public static class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            // Use the current date as the default date in the picker
+            int year = mCalendar.get(Calendar.YEAR);
+            int month = mCalendar.get(Calendar.MONTH);
+            int day = mCalendar.get(Calendar.DAY_OF_MONTH);
+            // Create a new instance of DatePickerDialog and return it
+            return new DatePickerDialog(getActivity(), this, year, month, day);
+        }
+
+        public void onDateSet(DatePicker view, int year, int month, int day) {
+            mCalendar.set(Calendar.YEAR, year);
+            mCalendar.set(Calendar.MONTH, month);
+            mCalendar.set(Calendar.DAY_OF_MONTH, day);
+            String dateForButton = dateFormat.format(mCalendar.getTime());
+            mBirthDate.setText(dateForButton);
         }
     }
 }

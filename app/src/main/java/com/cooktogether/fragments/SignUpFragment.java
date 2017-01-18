@@ -17,6 +17,7 @@ import com.cooktogether.helpers.AbstractBaseActivity;
 import com.cooktogether.helpers.AbstractBaseFragment;
 import com.cooktogether.mainscreens.AuthenticationActivity;
 import com.cooktogether.mainscreens.HomeActivity;
+import com.cooktogether.model.Review;
 import com.cooktogether.model.User;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -25,6 +26,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.ArrayList;
 
 public class SignUpFragment extends AbstractBaseFragment {
 
@@ -86,7 +89,7 @@ public class SignUpFragment extends AbstractBaseFragment {
                                     if (task.isSuccessful()) {
                                         //create user in db
                                         FirebaseUser cu = getCurrentUser();
-                                        User newUser = new User(cu.getUid(), cu.getDisplayName(), cu.getEmail(), "",false, "", false);
+                                        User newUser = new User(cu.getUid(), cu.getDisplayName(), cu.getEmail(), "", "", false, false, new ArrayList<Review>());
                                         getDB().child("users").child(cu.getUid()).setValue(newUser);
 
                                         Intent intent = new Intent(getContext(), HomeActivity.class);

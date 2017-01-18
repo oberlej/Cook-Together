@@ -16,7 +16,6 @@ public class Meal {
     private String mealKey;
     private UserLocation location;
 
-
     private List<Day> freeDays;
 
     public Meal() {

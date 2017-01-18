@@ -28,6 +28,7 @@ import com.cooktogether.helpers.AbstractBaseActivity;
 import com.cooktogether.R;
 import com.cooktogether.fragments.ConversationsListFragment;
 import com.cooktogether.helpers.LocalizationFragment;
+import com.cooktogether.model.User;
 
 public class HomeActivity extends AbstractBaseActivity {
 
@@ -42,6 +43,8 @@ public class HomeActivity extends AbstractBaseActivity {
     private String conversationKey;
 
     private MenuItem itemChecked = null;
+
+    private User mUser = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -268,6 +271,14 @@ public class HomeActivity extends AbstractBaseActivity {
         //itemChecked = null;
         setTitle("Proposed Meal");
         mDrawer.closeDrawers();
+    }
+
+    public User getUser() {
+        return mUser;
+    }
+
+    public void setUser(User mUser) {
+        this.mUser = mUser;
     }
 }
 

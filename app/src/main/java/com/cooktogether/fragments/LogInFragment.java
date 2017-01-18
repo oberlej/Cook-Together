@@ -19,6 +19,7 @@ import com.cooktogether.R;
 import com.cooktogether.helpers.AbstractBaseFragment;
 import com.cooktogether.mainscreens.AuthenticationActivity;
 import com.cooktogether.mainscreens.HomeActivity;
+import com.cooktogether.model.Review;
 import com.cooktogether.model.User;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -38,6 +39,8 @@ import com.google.firebase.auth.UserInfo;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
 
 public class LogInFragment extends AbstractBaseFragment {
     protected EditText emailEditText;
@@ -89,6 +92,7 @@ public class LogInFragment extends AbstractBaseFragment {
                                 @Override
                                 public void onComplete(@NonNull Task<AuthResult> task) {
                                     if (task.isSuccessful()) {
+                                        checkIfFirstTimeForUser(false);
                                         Intent intent = new Intent(getContext(), HomeActivity.class);
                                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -140,27 +144,31 @@ public class LogInFragment extends AbstractBaseFragment {
                         if (!task.isSuccessful()) {
                             Toast.makeText(getContext(), "Authentication failed.", Toast.LENGTH_LONG).show();
                         } else {
-                            //check if it is the first time the user connects to our app
-                            getDB().child("users").child(getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot dataSnapshot) {
-                                    if (dataSnapshot.exists()) {
-                                        //user has already connected once
-                                    } else {
-                                        //first time => create user entry
-                                        FirebaseUser cu = getCurrentUser();
-                                        User newUser = new User(cu.getUid(), cu.getDisplayName(), cu.getEmail(), "",true, "", true);
-                                        getDB().child("users").child(cu.getUid()).setValue(newUser);
-                                    }
-                                }
-
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-                                    Toast.makeText(getContext(), "Something went wrong. Please logout and try logging in again.", Toast.LENGTH_LONG).show();
-                                }
-                            });
+                            checkIfFirstTimeForUser(true);
                         }
                     }
                 });
+    }
+
+    private void checkIfFirstTimeForUser(final boolean facebook) {
+        //check if it is the first time the user connects to our app
+        getDB().child("users").child(getCurrentUser().getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.exists()) {
+                    //user has already connected once
+                } else {
+                    //first time => create user entry
+                    FirebaseUser cu = getCurrentUser();
+                    User newUser = new User(cu.getUid(), cu.getDisplayName(), cu.getEmail(), "", "", facebook, facebook, new ArrayList<Review>());
+                    getDB().child("users").child(cu.getUid()).setValue(newUser);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Toast.makeText(getContext(), "Something went wrong. Please logout and try logging in again.", Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }
