@@ -3,4 +3,5 @@
     <item name="TAG_ORIG_INDEX" type="id" />
     <item name="TAG_CHILD_INDEX" type="id" />
     <item name="TAG_DAY" type="id" />
+    <item name="TAG_RSV_DEMAND" type="id"/>
 </resources>

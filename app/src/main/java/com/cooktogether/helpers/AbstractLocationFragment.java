@@ -49,42 +49,6 @@ public abstract class AbstractLocationFragment extends AbstractBaseFragment {
 
     private UserLocation selectedLocation;
 
-
-   /* public void goToLocation(View view){
-        //get the input of the user
-        EditText query = (EditText) view.findViewById(R.id.searchLocation);
-        //convert it to string
-        String locationName = query.getText().toString();
-
-        String addressString = "No address";
-        Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
-        Location location = new Location("");
-        try {
-            List<Address> addresses = geocoder.getFromLocationName(locationName, 1);
-            StringBuilder stringBuilder = new StringBuilder();
-            if(addresses.size() > 0) {
-                Address address = addresses.get(0);
-
-                for(int i = 0; i <= address.getMaxAddressLineIndex(); i++){
-                    stringBuilder.append("\n").append(address.getAddressLine(i));
-                }
-                stringBuilder.append(address.getCountryName());
-
-                location.setLongitude(address.getLongitude());
-                location.setLatitude(address.getLatitude());
-                updateWithNewLocation(location, getView());
-
-                addressString = stringBuilder.toString();
-
-            }
-        } catch (IOException e){
-            Log.e("goToLocation: ", e.getMessage());
-        }
-        System.out.println(addressString);
-    }
-*/
-
-
     /*
     For now it returns the 5 first address found to make it simple
      */
@@ -241,6 +205,8 @@ public abstract class AbstractLocationFragment extends AbstractBaseFragment {
     };
 
     protected Address getAddress(double latitude, double longitude) {
+        if(getContext() == null)
+            return null;
         Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
 
         try {

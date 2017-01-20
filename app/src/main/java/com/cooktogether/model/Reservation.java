@@ -19,6 +19,13 @@ public class Reservation {
         this.status = status.getStatus();
     }
 
+    public Reservation(String reservationKey, String userKey, String mealKey, String status) {
+        this.reservationKey = reservationKey;
+        this.userKey = userKey;
+        this.mealKey = mealKey;
+        this.status = status;
+    }
+
     public String getReservationKey() {
         return reservationKey;
     }
@@ -55,7 +62,7 @@ public class Reservation {
         String reservationKey = (String) snapshot.child("reservationKey").getValue();
         String userKey = (String) snapshot.child("userKey").getValue();
         String mealKey = (String) snapshot.child("mealKey").getValue();
-        StatusEnum status = StatusEnum.valueOf(((String) snapshot.child("status").getValue()));
+        String status = (String) snapshot.child("status").getValue();
 
         return new Reservation(reservationKey, userKey, mealKey, status);
     }

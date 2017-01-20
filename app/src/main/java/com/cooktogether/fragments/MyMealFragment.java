@@ -22,8 +22,10 @@ import android.view.ViewGroup;
 
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,10 +41,16 @@ import com.cooktogether.mainscreens.HomeActivity;
 import com.cooktogether.model.Day;
 import com.cooktogether.model.DayEnum;
 import com.cooktogether.model.Meal;
+import com.cooktogether.model.Reservation;
+import com.cooktogether.model.StatusEnum;
+import com.cooktogether.model.User;
 import com.cooktogether.model.UserLocation;
 
+import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import org.w3c.dom.Text;
@@ -66,11 +74,20 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
     private boolean mIsUpdate = false;
 
     private boolean mAnswer;
+
     //reservation
-    private EditText mNbrPersons;
-    private TextView mNbrReservations;
+    private int mNbrPersons;
+    private int mNbrReservations;
     private CheckBox mBooked;
-    //private Button mContact_btn;
+    private List<Reservation> mReservations;
+    private List<Reservation> mRsv_demands;
+    private ArrayList<User> mUsers = new ArrayList<User>();
+    private ProgressBar progressBar;
+
+    // for the list of rsv demands
+    private LinearLayout rsv_demands;
+    private TextView mNbrRsvView;
+    private EditText mNbrPersonsView;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -129,17 +146,16 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
         if (getSelectedLocation() == null) {
             Toast.makeText(getContext(), "Unvalid location or no service available", Toast.LENGTH_LONG).show();
             return false;
-            //todo Alert box to change the location
         }
 
         if (!mIsUpdate) {
             mMealKey = getDB().child("meals").push().getKey();
             mBooked.setChecked(false);
-            mNbrReservations.setText(0);
+            mNbrReservations = 0;
         }
 
         Meal m = new Meal(mTitle.getText().toString(), mDescription.getText().toString(),
-                mParent.getUid(), mMealKey, mDaysFree, getSelectedLocation(), Integer.parseInt(mNbrPersons.getText().toString()), Integer.parseInt(mNbrReservations.getText().toString()), mBooked.isChecked());
+                mParent.getUid(), mMealKey, mDaysFree, getSelectedLocation(), mNbrPersons, mNbrReservations, mBooked.isChecked());
 
         getDB().child("meals").child(mMealKey).setValue(m);
 
@@ -154,7 +170,6 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
     @Override
     protected void init(View view) {
         mParent = (HomeActivity) getActivity();
-
         view.findViewById(R.id.create_new_day_btn).setOnClickListener(this);
 
         //init location bar
@@ -164,9 +179,13 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
         mTitle = (EditText) view.findViewById(R.id.create_title);
         mDescription = (EditText) view.findViewById(R.id.create_description);
         //for the reservation part
-        mNbrPersons = (EditText) view.findViewById(R.id.set_nbr_persons);
-        mNbrReservations = (TextView) view.findViewById(R.id.nbr_reservations);
+        mNbrRsvView = (TextView) view.findViewById(R.id.nbr_reservations);
+        mNbrPersonsView = (EditText) view.findViewById(R.id.set_nbr_persons);
         mBooked = (CheckBox) view.findViewById(R.id.set_is_booked);
+        mReservations = new ArrayList<>();
+        mRsv_demands = new ArrayList<>();
+        rsv_demands= (LinearLayout) view.findViewById(R.id.rsv_demands);
+        progressBar = (ProgressBar) view.findViewById(R.id.progressBar1);
 
         initNotFreeDays();
         mDaysFree = new ArrayList<Day>();
@@ -178,6 +197,19 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
         }
     }
 
+    private void updateRsvDemands() {
+        rsv_demands.removeAllViews();
+        for (Reservation rsv_d : mRsv_demands) {
+            View rsv_demandWrapper = mParent.getLayoutInflater().inflate(R.layout.item_rsv_demand, rsv_demands, false);
+            rsv_demandWrapper.setTag(R.id.TAG_RSV_DEMAND, rsv_d);
+            ((TextView) rsv_demandWrapper.findViewById(R.id.user_name)).setText(mUsers.get(mRsv_demands.indexOf(rsv_d)).getUserName());
+            ((CheckBox) rsv_demandWrapper.findViewById(R.id.accept_rsv_demand)).setChecked(false);
+            rsv_demandWrapper.findViewById(R.id.accept_rsv_demand).setOnClickListener(this);
+            rsv_demandWrapper.findViewById(R.id.refuse_rsv_demand).setOnClickListener(this);
+            rsv_demands.addView(rsv_demandWrapper);
+        }
+    }
+
     private void initNotFreeDays() {
         mDaysNotFree = new ArrayList<Day>();
         for (DayEnum de : DayEnum.values()) {
@@ -186,6 +218,7 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
     }
 
     private void loadMeal() {
+
         if (mIsUpdate) {
             //// TODO: 1/7/17 change to single valueeventlistenenr ?? 
             getDB().child("meals").child(mMealKey).addValueEventListener(new ValueEventListener() {
@@ -197,9 +230,62 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
                     mLocationName.setText(meal.getLocation().toString());
                     mTitle.setText(meal.getTitle());
                     mDescription.setText(meal.getDescription());
-                    mNbrPersons.setText(meal.getNbr_persons());
-                    mNbrReservations .setText(meal.getNbr_reservations());
+
+                    mNbrPersons = meal.getNbrPersons();
+                    progressBar.setMax(mNbrPersons);
+                    mNbrPersonsView.setText(String.valueOf(mNbrPersons));
+
+                    mNbrReservations = meal.getNbrReservations();
+                    progressBar.setProgress(mNbrReservations);
+                    mNbrRsvView.setText(mNbrReservations +"/"+ mNbrPersons + "reservations");
+
                     mBooked.setChecked(meal.getBooked());
+
+                    getDB().child("reservations").orderByChild("mealKey").equalTo(mMealKey).addChildEventListener(new ChildEventListener() {
+                        @Override
+                        public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+                            final Reservation rsv = Reservation.parseSnapshot(dataSnapshot);
+                            mReservations.add(rsv);
+                            if(StatusEnum.valueOf(rsv.getStatus().toUpperCase()).equals(StatusEnum.WAITING)) {
+
+                                getDB().child("users").child(rsv.getUserKey()).addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        User user = User.parseSnapshot(dataSnapshot);
+                                        mUsers.add(user);
+                                        mRsv_demands.add(rsv);
+                                        updateRsvDemands();
+                                    }
+
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+
+                                    }
+                                });
+                            }
+                        }
+
+                        @Override
+                        public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+                        }
+
+                        @Override
+                        public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+                        }
+
+                        @Override
+                        public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+
                     initNotFreeDays();
                     for (Day d : meal.getFreeDays()) {
                         mDaysNotFree.remove(d);
@@ -210,8 +296,10 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
-                    Toast.makeText(getContext(), "Failed to load meal.", Toast.LENGTH_LONG).show();
-                    ((HomeActivity) mParent).loadDefaultScreen();
+                    if(getContext()!= null) {
+                        Toast.makeText(getContext(), "Failed to load meal.", Toast.LENGTH_LONG).show();
+                        ((HomeActivity) mParent).loadDefaultScreen();
+                    }
                 }
             });
         }
@@ -297,7 +385,38 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
             case R.id.day_dinner_cb:
                 toggleMealTime(v);
                 break;
+            case R.id.accept_rsv_demand:
+                removeRsvDemand(v);
+                break;
+            case  R.id.refuse_rsv_demand:
+                removeRsvDemand(v);
+                break;
         }
+    }
+
+    private void removeRsvDemand(View v) {
+        View parent = (View) (v.getParent()).getParent();
+        Reservation rsv = (Reservation) parent.getTag(R.id.TAG_RSV_DEMAND);
+        rsv_demands.removeView(parent);
+        mUsers.remove(mRsv_demands.indexOf(rsv));
+        mRsv_demands.remove(rsv);
+
+        //Update the database
+        CheckBox accept = (CheckBox) parent.findViewById(R.id.accept_rsv_demand);
+
+        DatabaseReference meal = getDB().child("meals").child(rsv.getMealKey());
+        if(accept.isChecked()) {
+            getDB().child("reservations").child(rsv.getReservationKey()).child("status").setValue(StatusEnum.ACCEPTED.getStatus());
+        }else {
+            getDB().child("reservations").child(rsv.getReservationKey()).child("status").setValue(StatusEnum.REFUSED.getStatus());
+            mNbrReservations--;
+            meal.child("nbrReservations").setValue(mNbrReservations);
+        }
+
+
+        if(mNbrReservations == mNbrPersons)
+            meal.child("booked").setValue(true);
+
     }
 
 

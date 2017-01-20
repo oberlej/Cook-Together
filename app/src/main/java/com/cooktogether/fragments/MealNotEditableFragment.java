@@ -1,11 +1,8 @@
 package com.cooktogether.fragments;
 
 import android.content.Context;
-import android.location.Address;
-import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +10,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,19 +22,14 @@ import com.cooktogether.model.DayEnum;
 import com.cooktogether.model.Meal;
 import com.cooktogether.model.Reservation;
 import com.cooktogether.model.StatusEnum;
-import com.cooktogether.model.UserLocation;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Created by hela on 07/01/17.
@@ -58,6 +51,10 @@ public class MealNotEditableFragment extends Fragment {
     private String mealKey = null;
     private String mealUserKey = null;
     private HomeActivity mParent;
+    private int mNbrReservations;
+    private int mNbrPersons;
+    private ProgressBar progressBar;
+    private TextView progressBarTxt;
 
     public MealNotEditableFragment() {
 
@@ -90,48 +87,22 @@ public class MealNotEditableFragment extends Fragment {
                 contact(v);
             }
         });
+
+        progressBar = (ProgressBar) view.findViewById(R.id.progressBar2);
+        progressBarTxt = (TextView) view.findViewById(R.id.progress_bar_txt);
+
         reserve_btn = (Button) view.findViewById(R.id.reserve_btn);
-
-        //TODO verify if a reservation hasn't been made by the user fot the same meal
-        /*Final boolean reserved;
-        mParent.getDB().child("meals").child(mealKey).child("reservations").addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Reservation r = Reservation.parseSnapshot(dataSnapshot);
-               reserved = mParent.getDB().child("users").child("reservations").orderByChild("reservationKey").equals(dataSnapshot.getKey());
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });*/
         reserve_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 reserve(v);
             }
         });
+
         //for the list of location options
         locationName = (TextView) view.findViewById(R.id.meal_location);
 
         initNotFreeDays();
-        daysFree = new ArrayList<Day>();
         loadMeal();
     }
 
@@ -147,21 +118,62 @@ public class MealNotEditableFragment extends Fragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Meal meal = Meal.parseSnapshot(dataSnapshot);
+
                 mealUserKey = meal.getUserKey();
                 locationName.setText(meal.getLocation().toString());
                 title.setText(meal.getTitle());
                 description.setText(meal.getDescription());
+
                 initNotFreeDays();
+                daysFree = new ArrayList<Day>();
                 for (Day d : meal.getFreeDays()) {
                     daysNotFree.remove(d);
                     daysFree.add(d);
                 }
                 updateFreeDaysLayout();
+
+                mNbrReservations = meal.getNbrReservations();
+                progressBar.setProgress(mNbrReservations);
+
+                mNbrPersons = meal.getNbrPersons();
+                progressBar.setMax(mNbrPersons);
+                progressBarTxt.setText(mNbrReservations +"/"+mNbrPersons+" places reserved");
+                if (meal.getBooked()) {
+                    reserve_btn.setText("BOOKED");
+                    reserve_btn.setEnabled(false);
+                }
+
+                HashMap<String, String> rsv = new HashMap<String, String>();
+                if (dataSnapshot.hasChild("reservations")) {
+                    for (DataSnapshot d : dataSnapshot.child("reservations").getChildren())
+                        rsv.put((String) d.getValue(), d.getKey());
+                }
+                if (rsv.containsKey(mParent.getUid())) {
+                    Query q = mParent.getDB().child("reservations").child(rsv.get(mParent.getUid()));
+                    q.addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Reservation r = Reservation.parseSnapshot(dataSnapshot);
+                            if (r.getStatus().equals(StatusEnum.WAITING.getStatus()))
+                                reserve_btn.setText("WAITING FOR A RESPONSE");
+                            else if (r.equals(StatusEnum.ACCEPTED.getStatus()))
+                                reserve_btn.setText("Reservation Accepted!");
+                            else
+                                reserve_btn.setText("Reservation Refused");
+                            reserve_btn.setEnabled(false);
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+                }
+                reserve_btn.setVisibility(View.VISIBLE);
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(getContext(), "Failed to load meal.", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -210,7 +222,7 @@ public class MealNotEditableFragment extends Fragment {
 
     }
 
-    public void reserve(View v){
+    public void reserve(View v) {
         String reservationKey = mParent.getDB().child("reservations").push().getKey();
         Reservation newReserv = new Reservation(reservationKey, mParent.getUid(), mealKey, StatusEnum.WAITING);
         //set the new reservation
@@ -218,8 +230,14 @@ public class MealNotEditableFragment extends Fragment {
         //update user reservations
         mParent.getDB().child("users").child(mParent.getUid()).child("reservations").child(reservationKey).setValue(true);
         //meals user reservations
-        mParent.getDB().child("meals").child(mealKey).child("reservations").child(reservationKey).setValue(true);
+        mParent.getDB().child("meals").child(mealKey).child("reservations").child(reservationKey).setValue(mParent.getUid());
+        mParent.getDB().child("meals").child(mealKey).child("nbrReservations").setValue(mNbrReservations + 1);
+        if (mNbrReservations + 1 == mNbrPersons) {
+            mParent.getDB().child("meals").child(mealKey).child("booked").setValue(true);
+        }
+        Toast.makeText(getContext(), "A reservation demand has been!", Toast.LENGTH_LONG).show();
     }
+
     public static Fragment newInstance() {
         return new MealNotEditableFragment();
     }

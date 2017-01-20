@@ -16,9 +16,9 @@ public class Meal {
     private String mealKey;
     private List<Day> freeDays;
     private UserLocation location;
-    
-    private int nbr_persons;
-    private int nbr_reservations;
+
+    private int nbrPersons;
+    private int nbrReservations;
     private Boolean booked;
     private List<String> reservations;
 
@@ -47,8 +47,8 @@ public class Meal {
         this.mealKey = mealKey;
         this.freeDays = freeDays;
         this.location = location;
-        this.nbr_persons = nbr_persons;
-        this.nbr_reservations = nbr_reservations;
+        this.nbrPersons = nbr_persons;
+        this.nbrReservations = nbr_reservations;
         this.booked = booked;
     }
 
@@ -61,8 +61,8 @@ public class Meal {
         this.mealKey = mealKey;
         this.freeDays = freeDays;
         this.location = location;
-        this.nbr_persons = nbr_persons;
-        this.nbr_reservations = nbr_reservations;
+        this.nbrPersons = nbr_persons;
+        this.nbrReservations = nbr_reservations;
         this.booked = booked;
         this.reservations = reservations;
     }
@@ -117,23 +117,31 @@ public class Meal {
         }
     }
 
-    public int getNbr_persons() {
-        return nbr_persons;
+    public int getNbrPersons() {
+        return nbrPersons;
     }
 
-    public void setNbr_persons(int nbr_persons) {
-        this.nbr_persons = nbr_persons;
+    public void setNbrPersons(int nbrPersons) {
+        this.nbrPersons = nbrPersons;
     }
 
-    public int getNbr_reservations() {
-        return nbr_reservations;
+    public int getNbrReservations() {
+        return nbrReservations;
     }
 
-    public void setNbr_reservations(int nbr_reservations) {
-        this.nbr_reservations = nbr_reservations;
+    public void setNbr_reservations(int nbrReservations) {
+        this.nbrReservations = nbrReservations;
 
-        if(this.nbr_reservations == this.nbr_persons)
+        if(this.nbrReservations == this.nbrPersons)
             setBooked(true);
+    }
+
+    public List<String> getReservations() {
+        return reservations;
+    }
+
+    public void setReservations(List<String> reservations) {
+        this.reservations = reservations;
     }
 
     public Boolean getBooked() {
@@ -167,8 +175,8 @@ public class Meal {
         location.setName(locationName);
 
         //reservation Part
-        int nbr_persons = ((Long) snapshot.child("nbr_persons").getValue()).intValue();
-        int nbr_reservations = ((Long) snapshot.child("nbr_reservations").getValue()).intValue();
+        int nbr_persons = ((Long) snapshot.child("nbrPersons").getValue()).intValue();
+        int nbr_reservations = ((Long) snapshot.child("nbrReservations").getValue()).intValue();
         boolean booked = (Boolean) snapshot.child("booked").getValue();
 
         List<String> reservations = new ArrayList<String>();

@@ -64,26 +64,54 @@
                 android:scrollbars="vertical"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Number of persons"/>
             <EditText
                 android:id="@+id/set_nbr_persons"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:inputType="number" />
+            </LinearLayout>
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
                 <TextView
                     android:id="@+id/nbr_reservations"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-                <TextView
+                    android:layout_height="wrap_content"
+                    android:text="0"/>
+                <ProgressBar
+                    android:id="@+id/progressBar1"
+                    style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="reservations made"/>
+                    android:layout_marginTop="20dp"
+                    android:indeterminate="false"
+                    android:minHeight="50dp"
+                    android:minWidth="200dp"
+                    android:progress="1" />
             </LinearLayout>
-            <CheckBox
+                <LinearLayout
+                  android:id="@+id/rsv_demands"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"/>
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+                <TextView
+                    android:text="Set as booked"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+                <CheckBox
                 android:id="@+id/set_is_booked"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
+            </LinearLayout>
         </LinearLayout>
 </ScrollView>
