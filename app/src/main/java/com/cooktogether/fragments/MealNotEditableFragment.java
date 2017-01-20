@@ -241,5 +241,10 @@ public class MealNotEditableFragment extends Fragment {
     public static Fragment newInstance() {
         return new MealNotEditableFragment();
     }
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        ((HomeActivity)mParent).mMealKey = null;
+    }
 }
 

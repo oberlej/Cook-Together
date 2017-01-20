@@ -57,7 +57,7 @@ public class HomeActivity extends AbstractBaseActivity {
 
     private ActionBarDrawerToggle drawerToggle;
 
-    private String mMealKey = "";
+    public String mMealKey = "";
     private String conversationKey;
 
     private MenuItem itemChecked = null;

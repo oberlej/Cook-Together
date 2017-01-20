@@ -430,4 +430,10 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
     public void setmLocationName(View v) {
         mLocationName = (EditText) v.findViewById(R.id.create_location);
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        ((HomeActivity)mParent).mMealKey = null;
+    }
 }
