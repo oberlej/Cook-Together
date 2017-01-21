@@ -54,6 +54,11 @@
     <string name="slide_2_desc">Want to try a meal? Propose it and let people contact you</string>
     <string name="slide_3_title">Running out of ideas?</string>
     <string name="slide_3_desc">Check what people around you are proposing and contact them if interested!</string>
+    <string name="new_meal">New Meal</string>
+    <string name="my_meals">My Meals</string>
+    <string name="search_meal">Search Meal</string>
+    <string name="my_messages">My Messages</string>
+    <string name="my_reservations">My reservations</string>
 </resources>
 
 

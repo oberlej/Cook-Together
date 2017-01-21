@@ -77,7 +77,7 @@ public class MyMealsFragment extends AbstractMealListFragment {
                         Meal selectedMeal = ((MealsListAdapter) mAdapter).getSelectedMeal(position);
                         // Launch Meal Details Fragment
                         ((HomeActivity) mParent).setMealKey(selectedMeal.getMealKey());
-                        ((HomeActivity) mParent).selectDrawerItem(((HomeActivity) mParent).getNvDrawer().getMenu().findItem(R.id.nav_meal_detail), getString(R.string.update_meal));
+                        ((HomeActivity) mParent).selectDrawerItem(((HomeActivity) mParent).getNvDrawer().getMenu().findItem(R.id.nav_meal_detail), getString(R.string.new_meal));
                     }
                 })
         );
