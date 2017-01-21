@@ -216,7 +216,8 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
                     mNbrRsvView.setText(mNbrReservations + "/" + mNbrPersons + "reservations");
 
                     mBooked.setChecked(meal.getBooked());
-
+                    if (meal.getBooked())
+                        disableEdit();
                     getDB().child("reservations").orderByChild("mealKey").equalTo(mMealKey).addChildEventListener(new ChildEventListener() {
                         @Override
                         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
@@ -288,6 +289,15 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
         }
     }
 
+    private void disableEdit() {
+        mTitle.setEnabled(false);
+        mDescription.setEnabled(false);
+        mTitle.getRootView().findViewById(R.id.create_new_day_btn).setEnabled(false);
+        mTitle.getRootView().findViewById(R.id.create_location).setEnabled(false);
+        mBooked.setEnabled(false);
+        mNbrPersonsView.setEnabled(false);
+    }
+
     private void initRsvAccepted() {
         rsv_accepted.removeAllViews();
         for (Reservation rsv : mRsv_accepted.keySet())
@@ -345,9 +355,15 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
             ((TextView) dayWrapper.findViewById(R.id.day_name)).setText(d.getName());
             ((CheckBox) dayWrapper.findViewById(R.id.day_lunch_cb)).setChecked(d.isLunch());
             ((CheckBox) dayWrapper.findViewById(R.id.day_dinner_cb)).setChecked(d.isDinner());
-            dayWrapper.findViewById(R.id.day_dinner_cb).setOnClickListener(this);
-            dayWrapper.findViewById(R.id.day_lunch_cb).setOnClickListener(this);
-            dayWrapper.findViewById(R.id.day_remove_btn).setOnClickListener(this);
+            if (mBooked.isChecked()) {
+                dayWrapper.findViewById(R.id.day_dinner_cb).setClickable(false);
+                dayWrapper.findViewById(R.id.day_lunch_cb).setClickable(false);
+                dayWrapper.findViewById(R.id.day_remove_btn).setClickable(false);
+            } else {
+                dayWrapper.findViewById(R.id.day_dinner_cb).setOnClickListener(this);
+                dayWrapper.findViewById(R.id.day_lunch_cb).setOnClickListener(this);
+                dayWrapper.findViewById(R.id.day_remove_btn).setOnClickListener(this);
+            }
             mListOfDays.addView(dayWrapper);
         }
     }
