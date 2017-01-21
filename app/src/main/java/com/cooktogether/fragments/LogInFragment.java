@@ -162,7 +162,7 @@ public class LogInFragment extends AbstractBaseFragment {
                 } else {
                     //first time => create user entry
                     FirebaseUser cu = getCurrentUser();
-                    User newUser = new User(cu.getUid(), cu.getDisplayName(), cu.getEmail(), "", "", facebook, facebook, new ArrayList<Review>());
+                    User newUser = new User(cu.getUid(), cu.getDisplayName(), cu.getEmail(), "", "", facebook, facebook, new ArrayList<Review>(), new ArrayList<String>());
                     getDB().child("users").child(cu.getUid()).setValue(newUser);
                 }
             }

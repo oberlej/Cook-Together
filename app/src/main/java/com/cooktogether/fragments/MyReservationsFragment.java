@@ -90,7 +90,6 @@ public class MyReservationsFragment  extends AbstractBaseFragment {
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             Meal m = Meal.parseSnapshot(dataSnapshot);
                             meals.add(m);
-                            cleanAdapter();
                             mAdapter = new ReservationListAdapter(meals, reservations);
                             mRecycler.setAdapter(mAdapter);
                             mEmptyList.setVisibility(View.GONE);
@@ -158,6 +157,6 @@ public class MyReservationsFragment  extends AbstractBaseFragment {
     }
 
     public Query getQuery(DatabaseReference databaseReference){
-        return getDB().child("reservations");
+        return databaseReference.child("reservations");
     }
 }

@@ -176,6 +176,8 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
         mRsv_demands = new HashMap<Reservation, User>();
         mRsv_accepted = new HashMap<Reservation, User>();
 
+
+        mDaysFree = new ArrayList<Day>();
         initNotFreeDays();
 
         mMealKey = ((HomeActivity) mParent).getMealKey();
@@ -193,7 +195,6 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
     }
 
     private void loadMeal() {
-        mDaysFree = new ArrayList<Day>();
         if (mIsUpdate) {
             //// TODO: 1/7/17 change to single valueeventlistenenr ?? 
             getDB().child("meals").child(mMealKey).addValueEventListener(new ValueEventListener() {
