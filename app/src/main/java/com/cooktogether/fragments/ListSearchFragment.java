@@ -34,7 +34,7 @@ public class ListSearchFragment extends AbstractMealListFragment {
     }
 
     @Override
-    protected void setAdapter(Query mealsQuery) {
+    public void setAdapter(Query mealsQuery) {
         mealsQuery.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot mealsSnapshot) {
@@ -74,7 +74,7 @@ public class ListSearchFragment extends AbstractMealListFragment {
     }
 
     @Override
-    protected void cleanAdapter() {
+    public void cleanAdapter() {
         if (mAdapter != null) {
             ((MealsListAdapter) mAdapter).cleanup();
         }

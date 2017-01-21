@@ -3,10 +3,7 @@ package com.cooktogether.mainscreens;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -18,34 +15,25 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.cooktogether.fragments.MealNotEditableFragment;
+import com.cooktogether.R;
 import com.cooktogether.fragments.ConversationFragment;
-
+import com.cooktogether.fragments.ConversationsListFragment;
+import com.cooktogether.fragments.MealNotEditableFragment;
 import com.cooktogether.fragments.MyMealFragment;
 import com.cooktogether.fragments.MyMealsFragment;
+import com.cooktogether.fragments.MyMealsListFragment;
 import com.cooktogether.fragments.MyReservationsFragment;
 import com.cooktogether.fragments.ProfileFragment;
-
 import com.cooktogether.helpers.AbstractBaseActivity;
-import com.cooktogether.R;
-import com.cooktogether.fragments.ConversationsListFragment;
+import com.cooktogether.helpers.SearchFragment;
 import com.cooktogether.helpers.UploadPicture;
 import com.cooktogether.model.User;
-import com.cooktogether.helpers.SearchFragment;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.UploadTask;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -136,7 +124,7 @@ public class HomeActivity extends AbstractBaseActivity {
             mUserName.setText(mUser.getUserName());
             //profile pic
             picLoader = new UploadPicture(HomeActivity.this, mUser, userPic, getCurrentUser(), getRootRef(), getDB());
-           loadPicture();
+            loadPicture();
 
         }
     }
@@ -144,9 +132,11 @@ public class HomeActivity extends AbstractBaseActivity {
     public void loadPicture() {
         picLoader.loadPicture();
     }
-    public void resetPicture(){
+
+    public void resetPicture() {
         picLoader.resetPicture();
     }
+
     public void loadDefaultScreen() {
         MenuItem defaultItem = nvDrawer.getMenu().findItem(R.id.nav_my_meals);
         selectDrawerItem(defaultItem, defaultItem.getTitle().toString());
@@ -197,7 +187,7 @@ public class HomeActivity extends AbstractBaseActivity {
         itemChecked = menuItem;
         switch (menuItem.getItemId()) {
             case R.id.nav_my_meals:
-                fragmentClass = MyMealsFragment.class;
+                fragmentClass = MyMealsListFragment.class;
                 break;
             case R.id.nav_meal_detail:
                 fragmentClass = MyMealFragment.class;
