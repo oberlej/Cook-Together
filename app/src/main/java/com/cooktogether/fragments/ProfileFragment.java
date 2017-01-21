@@ -351,8 +351,10 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
                 picLoader.uploadPicture();
                 picLoader.writePicture();
                 saveUser();
+                ((HomeActivity)mParent).loadPicture();
             } else {
                 resetPicture();
+                ((HomeActivity)mParent).resetPicture();
             }
         }
     }

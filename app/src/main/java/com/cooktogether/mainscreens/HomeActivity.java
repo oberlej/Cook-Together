@@ -64,6 +64,7 @@ public class HomeActivity extends AbstractBaseActivity {
     private MenuItem itemChecked = null;
 
     private User mUser = null;
+    private UploadPicture picLoader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,11 +104,13 @@ public class HomeActivity extends AbstractBaseActivity {
             }
         });
         TextView mUserName = (TextView) headerLayout.findViewById(R.id.user_name_view);
+
         loadUser(ivHeaderPhoto, mUserName);
     }
 
     //Todo use the same function as in the profile fragment
     private void loadUser(final CircleImageView userPic, final TextView mUserName) {
+
         if (mUser == null) {
             getDB().child("users").child(getUid()).addValueEventListener(new ValueEventListener() {
                 @Override
@@ -119,8 +122,9 @@ public class HomeActivity extends AbstractBaseActivity {
                     }
                     mUser = User.parseSnapshot(dataSnapshot);
                     mUserName.setText(mUser.getUserName());
+                    picLoader = new UploadPicture(HomeActivity.this, mUser, userPic, getCurrentUser(), getRootRef(), getDB());
                     //profile pic
-                    new UploadPicture(HomeActivity.this, mUser, userPic, getCurrentUser(), getRootRef(), getDB()).loadPicture();
+                    loadPicture();
                 }
 
                 @Override
@@ -131,11 +135,18 @@ public class HomeActivity extends AbstractBaseActivity {
         } else {
             mUserName.setText(mUser.getUserName());
             //profile pic
-            new UploadPicture(this, mUser, userPic, getCurrentUser(), getRootRef(),getDB()).loadPicture();
+            picLoader = new UploadPicture(HomeActivity.this, mUser, userPic, getCurrentUser(), getRootRef(), getDB());
+           loadPicture();
 
         }
     }
 
+    public void loadPicture() {
+        picLoader.loadPicture();
+    }
+    public void resetPicture(){
+        picLoader.resetPicture();
+    }
     public void loadDefaultScreen() {
         MenuItem defaultItem = nvDrawer.getMenu().findItem(R.id.nav_my_meals);
         selectDrawerItem(defaultItem, defaultItem.getTitle().toString());
