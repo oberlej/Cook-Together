@@ -109,7 +109,7 @@ public class HomeActivity extends AbstractBaseActivity {
     //Todo use the same function as in the profile fragment
     private void loadUser(final CircleImageView userPic, final TextView mUserName) {
         if (mUser == null) {
-            getDB().child("users").child(getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            getDB().child("users").child(getUid()).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if (!dataSnapshot.exists()) {
