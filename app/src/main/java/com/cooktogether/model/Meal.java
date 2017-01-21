@@ -164,8 +164,8 @@ public class Meal {
 
         if(snapshot.hasChild("location")) {
             DataSnapshot loc = snapshot.child("location");
-            lat = (Double) loc.child("latitude").getValue();
-            lon = (Double) loc.child("longitude").getValue();
+            lat = getDouble(loc.child("latitude").getValue());
+            lat = getDouble(loc.child("longitude").getValue());
             locationName = (String) loc.child("name").getValue();
         }
 
@@ -190,4 +190,10 @@ public class Meal {
                 freeDays, location, nbr_persons, nbr_reservations, booked, reservations );
     }
 
+    public static Double getDouble(Object firebaseValue){
+        if(firebaseValue instanceof Long){
+            return ((Long)firebaseValue).doubleValue();
+        }
+        return (Double) firebaseValue;
+    }
 }

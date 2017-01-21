@@ -25,6 +25,7 @@ import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
 import com.facebook.Profile;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
@@ -130,6 +131,7 @@ public class LogInFragment extends AbstractBaseFragment {
                 Toast.makeText(getContext(), "Authentication failed. " + error.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
+
     }
 
     private void handleFacebookAccessToken(AccessToken token) {
