@@ -2,27 +2,16 @@ package com.cooktogether.fragments;
 
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
-import android.location.Address;
-import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -30,22 +19,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cooktogether.R;
-
-import com.cooktogether.adapter.locationOptionsAdapter;
-import com.cooktogether.helpers.AbstractBaseFragment;
-
 import com.cooktogether.helpers.AbstractLocationFragment;
-import com.cooktogether.listener.RecyclerItemClickListener;
-
 import com.cooktogether.mainscreens.HomeActivity;
+import com.cooktogether.model.Conversation;
 import com.cooktogether.model.Day;
 import com.cooktogether.model.DayEnum;
 import com.cooktogether.model.Meal;
 import com.cooktogether.model.Reservation;
 import com.cooktogether.model.StatusEnum;
 import com.cooktogether.model.User;
-import com.cooktogether.model.UserLocation;
-
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -53,13 +35,10 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
-import org.w3c.dom.Text;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 
 public class MyMealFragment extends AbstractLocationFragment implements View.OnClickListener {
     private LinearLayout mListOfDays;
@@ -80,14 +59,16 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
     private int mNbrReservations;
     private CheckBox mBooked;
     private List<Reservation> mReservations;
-    private List<Reservation> mRsv_demands;
-    private ArrayList<User> mUsers = new ArrayList<User>();
+    private HashMap<Reservation, User> mRsv_demands;
+    private HashMap<Reservation, User> mRsv_accepted;
     private ProgressBar progressBar;
 
     // for the list of rsv demands
     private LinearLayout rsv_demands;
     private TextView mNbrRsvView;
     private EditText mNbrPersonsView;
+    //for the list of rsv_accepted
+    private LinearLayout rsv_accepted;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -181,11 +162,16 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
         //for the reservation part
         mNbrRsvView = (TextView) view.findViewById(R.id.nbr_reservations);
         mNbrPersonsView = (EditText) view.findViewById(R.id.set_nbr_persons);
+
         mBooked = (CheckBox) view.findViewById(R.id.set_is_booked);
-        mReservations = new ArrayList<>();
-        mRsv_demands = new ArrayList<>();
-        rsv_demands= (LinearLayout) view.findViewById(R.id.rsv_demands);
+        rsv_demands = (LinearLayout) view.findViewById(R.id.rsv_demands);
+        rsv_accepted = (LinearLayout) view.findViewById(R.id.rsv_accepted);
         progressBar = (ProgressBar) view.findViewById(R.id.progressBar1);
+
+
+        mReservations = new ArrayList<>();
+        mRsv_demands = new HashMap<Reservation, User>();
+        mRsv_accepted = new HashMap<Reservation, User>();
 
         initNotFreeDays();
         mDaysFree = new ArrayList<Day>();
@@ -199,10 +185,14 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
 
     private void updateRsvDemands() {
         rsv_demands.removeAllViews();
-        for (Reservation rsv_d : mRsv_demands) {
+        if (mRsv_demands.isEmpty())
+            rsv_demands.getRootView().findViewById(R.id.rsv_demands_text).setVisibility(View.GONE);
+        else
+            rsv_demands.getRootView().findViewById(R.id.rsv_demands_text).setVisibility(View.VISIBLE);
+        for (Reservation rsv_d : mRsv_demands.keySet()) {
             View rsv_demandWrapper = mParent.getLayoutInflater().inflate(R.layout.item_rsv_demand, rsv_demands, false);
             rsv_demandWrapper.setTag(R.id.TAG_RSV_DEMAND, rsv_d);
-            ((TextView) rsv_demandWrapper.findViewById(R.id.user_name)).setText(mUsers.get(mRsv_demands.indexOf(rsv_d)).getUserName());
+            ((TextView) rsv_demandWrapper.findViewById(R.id.user_name)).setText(mRsv_demands.get(rsv_d).getUserName());
             ((CheckBox) rsv_demandWrapper.findViewById(R.id.accept_rsv_demand)).setChecked(false);
             rsv_demandWrapper.findViewById(R.id.accept_rsv_demand).setOnClickListener(this);
             rsv_demandWrapper.findViewById(R.id.refuse_rsv_demand).setOnClickListener(this);
@@ -237,7 +227,7 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
 
                     mNbrReservations = meal.getNbrReservations();
                     progressBar.setProgress(mNbrReservations);
-                    mNbrRsvView.setText(mNbrReservations +"/"+ mNbrPersons + "reservations");
+                    mNbrRsvView.setText(mNbrReservations + "/" + mNbrPersons + "reservations");
 
                     mBooked.setChecked(meal.getBooked());
 
@@ -245,16 +235,22 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
                         @Override
                         public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                             final Reservation rsv = Reservation.parseSnapshot(dataSnapshot);
-                            mReservations.add(rsv);
-                            if(StatusEnum.valueOf(rsv.getStatus().toUpperCase()).equals(StatusEnum.WAITING)) {
+                            if (!mReservations.contains(rsv))
+                                mReservations.add(rsv);
+                            if (StatusEnum.valueOf(rsv.getStatus().toUpperCase()).equals(StatusEnum.WAITING) || StatusEnum.valueOf(rsv.getStatus().toUpperCase()).equals(StatusEnum.ACCEPTED)) {
 
                                 getDB().child("users").child(rsv.getUserKey()).addListenerForSingleValueEvent(new ValueEventListener() {
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
                                         User user = User.parseSnapshot(dataSnapshot);
-                                        mUsers.add(user);
-                                        mRsv_demands.add(rsv);
-                                        updateRsvDemands();
+                                        if(StatusEnum.valueOf(rsv.getStatus().toUpperCase()).equals(StatusEnum.WAITING)) {
+                                            mRsv_demands.put(rsv, user);
+                                            updateRsvDemands();
+                                        }
+                                        else{
+                                            mRsv_accepted.put(rsv, user);
+                                            updateRsvAccepted(rsv);
+                                        }
                                     }
 
                                     @Override
@@ -296,7 +292,7 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
-                    if(getContext()!= null) {
+                    if (getContext() != null) {
                         Toast.makeText(getContext(), "Failed to load meal.", Toast.LENGTH_LONG).show();
                         ((HomeActivity) mParent).loadDefaultScreen();
                     }
@@ -388,35 +384,67 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
             case R.id.accept_rsv_demand:
                 removeRsvDemand(v);
                 break;
-            case  R.id.refuse_rsv_demand:
+            case R.id.refuse_rsv_demand:
                 removeRsvDemand(v);
                 break;
+            case R.id.contact_user_btn:
+                contact(v);
+                break;
         }
+    }
+
+    private void contact(View v) {
+        View parent = (View) (v.getParent()).getParent();
+        Reservation rsv = (Reservation) parent.getTag(R.id.TAG_RSV_ACCEPTED);
+        Query conversation = mParent.getDB().child("user-conversations").child(mParent.getUid()).child(rsv.getMealKey());//mParent.getDB().child("users").child(mParent.getUid()).orderByChild(mealKey).equals(true); wont work until all the users are added to the users table
+        String conversationKey = rsv.getMealKey(); // here we consider that the conversation key is the meal key
+
+        List<String> usersKeys = new ArrayList<String>();
+        usersKeys.add(mParent.getUid());
+        usersKeys.add(rsv.getUserKey());
+        Conversation newConv = new Conversation(mTitle.getText().toString(), conversationKey, usersKeys);
+
+        HashMap<String, Object> convMap = newConv.toHashMap();
+        convMap.remove("messages"); //to not delete previous messages if any
+        conversation.getRef().updateChildren(convMap);
+
+        ((HomeActivity)mParent).goToConversation(conversationKey);
     }
 
     private void removeRsvDemand(View v) {
         View parent = (View) (v.getParent()).getParent();
         Reservation rsv = (Reservation) parent.getTag(R.id.TAG_RSV_DEMAND);
         rsv_demands.removeView(parent);
-        mUsers.remove(mRsv_demands.indexOf(rsv));
+        User user = mRsv_demands.get(rsv);
         mRsv_demands.remove(rsv);
 
         //Update the database
         CheckBox accept = (CheckBox) parent.findViewById(R.id.accept_rsv_demand);
 
         DatabaseReference meal = getDB().child("meals").child(rsv.getMealKey());
-        if(accept.isChecked()) {
+
+        if (accept.isChecked()) {
             getDB().child("reservations").child(rsv.getReservationKey()).child("status").setValue(StatusEnum.ACCEPTED.getStatus());
-        }else {
+            mRsv_accepted.put(rsv, user);
+            updateRsvAccepted(rsv);
+        } else {
             getDB().child("reservations").child(rsv.getReservationKey()).child("status").setValue(StatusEnum.REFUSED.getStatus());
             mNbrReservations--;
             meal.child("nbrReservations").setValue(mNbrReservations);
         }
-
-
-        if(mNbrReservations == mNbrPersons)
+        if (mNbrReservations == mNbrPersons)
             meal.child("booked").setValue(true);
+        else
+            meal.child("booked").setValue(false);
+    }
 
+    private void updateRsvAccepted(Reservation rsv) {
+        rsv_accepted.getRootView().findViewById(R.id.rsv_accepted_text).setVisibility(View.VISIBLE);
+        View rsvWrapper = mParent.getLayoutInflater().inflate(R.layout.item_rsv_accepted, rsv_accepted, false);
+        rsvWrapper.setTag(R.id.TAG_RSV_ACCEPTED, rsv);
+        ((TextView) rsvWrapper.findViewById(R.id.user_name)).setText(mRsv_accepted.get(rsv).getUserName());
+        rsvWrapper.findViewById(R.id.contact_user_btn).setOnClickListener(this);
+        rsv_accepted.addView(rsvWrapper);
     }
 
 
@@ -434,6 +462,6 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
     @Override
     public void onDestroy() {
         super.onDestroy();
-        ((HomeActivity)mParent).mMealKey = null;
+        ((HomeActivity) mParent).mMealKey = null;
     }
 }

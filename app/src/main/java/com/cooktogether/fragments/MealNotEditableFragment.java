@@ -141,6 +141,7 @@ public class MealNotEditableFragment extends Fragment {
                 if (meal.getBooked()) {
                     reserve_btn.setText("BOOKED");
                     reserve_btn.setEnabled(false);
+                    contact_btn.setEnabled(false);
                 }
 
                 HashMap<String, String> rsv = new HashMap<String, String>();
@@ -149,6 +150,7 @@ public class MealNotEditableFragment extends Fragment {
                         rsv.put((String) d.getValue(), d.getKey());
                 }
                 if (rsv.containsKey(mParent.getUid())) {
+                    contact_btn.setEnabled(true);
                     Query q = mParent.getDB().child("reservations").child(rsv.get(mParent.getUid()));
                     q.addValueEventListener(new ValueEventListener() {
                         @Override

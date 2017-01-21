@@ -179,7 +179,8 @@ public class ConversationFragment extends Fragment implements View.OnClickListen
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(getContext(), "Failed to load Conversation.", Toast.LENGTH_SHORT).show();
+                if(getContext() != null)
+                    Toast.makeText(getContext(), "Failed to load Conversation.", Toast.LENGTH_SHORT).show();
             }
 
         });
