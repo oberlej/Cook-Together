@@ -34,6 +34,7 @@ import com.cooktogether.fragments.ProfileFragment;
 import com.cooktogether.helpers.AbstractBaseActivity;
 import com.cooktogether.R;
 import com.cooktogether.fragments.ConversationsListFragment;
+import com.cooktogether.helpers.UploadPicture;
 import com.cooktogether.model.User;
 import com.cooktogether.helpers.SearchFragment;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -119,7 +120,7 @@ public class HomeActivity extends AbstractBaseActivity {
                     mUser = User.parseSnapshot(dataSnapshot);
                     mUserName.setText(mUser.getUserName());
                     //profile pic
-                    //loadPicture(userPic);
+                    new UploadPicture(HomeActivity.this, mUser, userPic, getCurrentUser(), getRootRef(), getDB()).loadPicture();
                 }
 
                 @Override
@@ -130,35 +131,11 @@ public class HomeActivity extends AbstractBaseActivity {
         } else {
             mUserName.setText(mUser.getUserName());
             //profile pic
-            //loadPicture(userPic);
+            new UploadPicture(this, mUser, userPic, getCurrentUser(), getRootRef(),getDB()).loadPicture();
+
         }
     }
 
-   /* private void loadPicture(CircleImageView userPic) {
-        File picture = new File(HomeActivity.this.getDir("profile_pictures", Context.MODE_PRIVATE) + "/" + getUid() + ".jpg");
-
-        if (!picture.exists()) {
-            if (mUser.isFacebookConnected() && mUser.isFacebookPicture()) {
-                setFacebookPicture();
-            } else {
-                resetPicture();
-            }
-        } else {
-            Bitmap b = BitmapFactory.decodeFile(picture.getPath(), null);
-            if (b == null) {
-                Toast.makeText(HomeActivity.this, "Failed to load your picture. Please try again.", Toast.LENGTH_LONG).show();
-                resetPicture();
-            } else {
-                userPic.setImageBitmap(b);
-                if (mUser.isFacebookPicture()) {
-                    mUseFBPicture.setVisibility(View.GONE);
-                } else {
-                    mUseFBPicture.setVisibility(View.VISIBLE);
-                }
-            }
-        }
-    }
-*/
     public void loadDefaultScreen() {
         MenuItem defaultItem = nvDrawer.getMenu().findItem(R.id.nav_my_meals);
         selectDrawerItem(defaultItem, defaultItem.getTitle().toString());

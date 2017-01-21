@@ -175,7 +175,7 @@ public abstract class AbstractLocationFragment extends AbstractBaseFragment {
             double lon = location.getLongitude();
             setSelectedLocation(new UserLocation(lat, lon, getAddress(lat, lon)));
         } else {
-            setSelectedLocation(new UserLocation(0, 0));
+            setSelectedLocation(new UserLocation(46.5198,  6.5657)); //todo see if we leave it this way
         }
         locationManager.requestLocationUpdates(provider, 2000, 10, locationListener);
     }

@@ -9,16 +9,23 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
+        <!-- user pic -->
+        <include
+            layout="@layout/profile_pic"
+            android:layout_width="80dp"
+            android:layout_height="80dp" />
+
+        <!-- user pic -->
         <TextView
             android:id="@+id/user_name"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_weight="1"
-            android:text="Day"
+            android:layout_marginLeft="5dp"
             android:textColor="@android:color/primary_text_light" />
 
-
+        <!-- accept the reservation -->
         <CheckBox
             android:id="@+id/accept_rsv_demand"
             android:layout_width="0dp"
@@ -26,6 +33,7 @@
             android:layout_weight="1"
             android:text="Accept" />
 
+        <!-- refuse the reservation -->
         <CheckBox
             android:id="@+id/refuse_rsv_demand"
             android:layout_width="0dp"
