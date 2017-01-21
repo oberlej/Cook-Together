@@ -66,4 +66,10 @@ public class Reservation {
 
         return new Reservation(reservationKey, userKey, mealKey, status);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        Reservation rsv = (Reservation) o;
+        return rsv.getReservationKey().equals(this.reservationKey);
+    }
 }

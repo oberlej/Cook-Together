@@ -29,10 +29,6 @@ import com.cooktogether.model.Meal;
 import com.cooktogether.model.Reservation;
 import com.cooktogether.model.StatusEnum;
 import com.cooktogether.model.User;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseAuthProvider;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserInfo;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -141,7 +137,7 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
             mBooked.setChecked(false);
             mNbrReservations = 0;
         }
-
+        mNbrPersons = Integer.valueOf(mNbrPersonsView.getText().toString());
         Meal m = new Meal(mTitle.getText().toString(), mDescription.getText().toString(),
                 mParent.getUid(), mMealKey, mDaysFree, getSelectedLocation(), mNbrPersons, mNbrReservations, mBooked.isChecked());
 
@@ -181,33 +177,11 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
         mRsv_accepted = new HashMap<Reservation, User>();
 
         initNotFreeDays();
-        mDaysFree = new ArrayList<Day>();
 
         mMealKey = ((HomeActivity) mParent).getMealKey();
         mIsUpdate = mMealKey != null && !mMealKey.isEmpty();
         if (mIsUpdate) {
             loadMeal();
-        }
-    }
-
-    private void updateRsvDemands() {
-        rsv_demands.removeAllViews();
-        if (mRsv_demands.isEmpty())
-            rsv_demands.getRootView().findViewById(R.id.rsv_demands_text).setVisibility(View.GONE);
-        else
-            rsv_demands.getRootView().findViewById(R.id.rsv_demands_text).setVisibility(View.VISIBLE);
-        for (Reservation rsv_d : mRsv_demands.keySet()) {
-            View rsv_demandWrapper = mParent.getLayoutInflater().inflate(R.layout.item_rsv_demand, rsv_demands, false);
-            rsv_demandWrapper.setTag(R.id.TAG_RSV_DEMAND, rsv_d);
-
-            CircleImageView userPic = (CircleImageView) rsv_demandWrapper.findViewById(R.id.profile_pic);
-            new UploadPicture(getContext(), mRsv_demands.get(rsv_d), userPic, null , getRootRef(), getDB()).loadPicture();
-
-            ((TextView) rsv_demandWrapper.findViewById(R.id.user_name)).setText(mRsv_demands.get(rsv_d).getUserName());
-            ((CheckBox) rsv_demandWrapper.findViewById(R.id.accept_rsv_demand)).setChecked(false);
-            rsv_demandWrapper.findViewById(R.id.accept_rsv_demand).setOnClickListener(this);
-            rsv_demandWrapper.findViewById(R.id.refuse_rsv_demand).setOnClickListener(this);
-            rsv_demands.addView(rsv_demandWrapper);
         }
     }
 
@@ -219,7 +193,7 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
     }
 
     private void loadMeal() {
-
+        mDaysFree = new ArrayList<Day>();
         if (mIsUpdate) {
             //// TODO: 1/7/17 change to single valueeventlistenenr ?? 
             getDB().child("meals").child(mMealKey).addValueEventListener(new ValueEventListener() {
@@ -254,13 +228,14 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
                                     @Override
                                     public void onDataChange(DataSnapshot dataSnapshot) {
                                         User user = User.parseSnapshot(dataSnapshot);
-                                        if(StatusEnum.valueOf(rsv.getStatus().toUpperCase()).equals(StatusEnum.WAITING)) {
+                                        if (StatusEnum.valueOf(rsv.getStatus().toUpperCase()).equals(StatusEnum.WAITING)) {
                                             mRsv_demands.put(rsv, user);
                                             updateRsvDemands();
-                                        }
-                                        else{
-                                            mRsv_accepted.put(rsv, user);
-                                            updateRsvAccepted(rsv);
+                                        } else {
+                                            if (!mRsv_accepted.containsKey(rsv)) {
+                                                mRsv_accepted.put(rsv, user);
+                                                updateRsvAccepted(rsv);
+                                            }
                                         }
                                     }
 
@@ -310,6 +285,46 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
                 }
             });
         }
+    }
+
+    private void initRsvAccepted() {
+        rsv_accepted.removeAllViews();
+        for (Reservation rsv : mRsv_accepted.keySet())
+            updateRsvAccepted(rsv);
+    }
+
+    private void updateRsvDemands() {
+        rsv_demands.removeAllViews();
+        if (mRsv_demands.isEmpty())
+            rsv_demands.getRootView().findViewById(R.id.rsv_demands_text).setVisibility(View.GONE);
+        else
+            rsv_demands.getRootView().findViewById(R.id.rsv_demands_text).setVisibility(View.VISIBLE);
+        for (Reservation rsv_d : mRsv_demands.keySet()) {
+            View rsv_demandWrapper = mParent.getLayoutInflater().inflate(R.layout.item_rsv_demand, rsv_demands, false);
+            rsv_demandWrapper.setTag(R.id.TAG_RSV_DEMAND, rsv_d);
+
+            CircleImageView userPic = (CircleImageView) rsv_demandWrapper.findViewById(R.id.profile_pic);
+            new UploadPicture(getContext(), mRsv_demands.get(rsv_d), userPic, null, getRootRef(), getDB()).loadPicture();
+
+            ((TextView) rsv_demandWrapper.findViewById(R.id.user_name)).setText(mRsv_demands.get(rsv_d).getUserName());
+            ((CheckBox) rsv_demandWrapper.findViewById(R.id.accept_rsv_demand)).setChecked(false);
+            rsv_demandWrapper.findViewById(R.id.accept_rsv_demand).setOnClickListener(this);
+            rsv_demandWrapper.findViewById(R.id.refuse_rsv_demand).setOnClickListener(this);
+            rsv_demands.addView(rsv_demandWrapper);
+        }
+    }
+
+    private void updateRsvAccepted(Reservation rsv) {
+        rsv_accepted.getRootView().findViewById(R.id.rsv_accepted_text).setVisibility(View.VISIBLE);
+        View rsvWrapper = mParent.getLayoutInflater().inflate(R.layout.item_rsv_accepted, rsv_accepted, false);
+        rsvWrapper.setTag(R.id.TAG_RSV_ACCEPTED, rsv);
+        ((TextView) rsvWrapper.findViewById(R.id.user_name)).setText(mRsv_accepted.get(rsv).getUserName());
+
+        CircleImageView userPic = (CircleImageView) rsvWrapper.findViewById(R.id.profile_pic);
+        new UploadPicture(getContext(), mRsv_accepted.get(rsv), userPic, null, getRootRef(), getDB()).loadPicture();
+
+        rsvWrapper.findViewById(R.id.contact_user_btn).setOnClickListener(this);
+        rsv_accepted.addView(rsvWrapper);
     }
 
     private String[] getNames(List<Day> list) {
@@ -419,7 +434,7 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
         convMap.remove("messages"); //to not delete previous messages if any
         conversation.getRef().updateChildren(convMap);
 
-        ((HomeActivity)mParent).goToConversation(conversationKey);
+        ((HomeActivity) mParent).goToConversation(conversationKey);
     }
 
     private void removeRsvDemand(View v) {
@@ -428,14 +443,17 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
         rsv_demands.removeView(parent);
         User user = mRsv_demands.get(rsv);
         mRsv_demands.remove(rsv);
+        if (mRsv_demands.isEmpty())
+            rsv_demands.getRootView().findViewById(R.id.rsv_demands_text).setVisibility(View.GONE);
 
         //Update the database
         CheckBox accept = (CheckBox) parent.findViewById(R.id.accept_rsv_demand);
-
+        CheckBox refuse = (CheckBox) parent.findViewById(R.id.refuse_rsv_demand);
         DatabaseReference meal = getDB().child("meals").child(rsv.getMealKey());
 
         if (accept.isChecked()) {
             getDB().child("reservations").child(rsv.getReservationKey()).child("status").setValue(StatusEnum.ACCEPTED.getStatus());
+            rsv.setStatus(StatusEnum.ACCEPTED);
             mRsv_accepted.put(rsv, user);
             updateRsvAccepted(rsv);
         } else {
@@ -447,19 +465,6 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
             meal.child("booked").setValue(true);
         else
             meal.child("booked").setValue(false);
-    }
-
-    private void updateRsvAccepted(Reservation rsv) {
-        rsv_accepted.getRootView().findViewById(R.id.rsv_accepted_text).setVisibility(View.VISIBLE);
-        View rsvWrapper = mParent.getLayoutInflater().inflate(R.layout.item_rsv_accepted, rsv_accepted, false);
-        rsvWrapper.setTag(R.id.TAG_RSV_ACCEPTED, rsv);
-        ((TextView) rsvWrapper.findViewById(R.id.user_name)).setText(mRsv_accepted.get(rsv).getUserName());
-
-        CircleImageView userPic = (CircleImageView) rsvWrapper.findViewById(R.id.profile_pic);
-        new UploadPicture(getContext(), mRsv_accepted.get(rsv), userPic, null , getRootRef(), getDB()).loadPicture();
-
-        rsvWrapper.findViewById(R.id.contact_user_btn).setOnClickListener(this);
-        rsv_accepted.addView(rsvWrapper);
     }
 
 
