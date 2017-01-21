@@ -64,6 +64,7 @@ public class User {
                 reservations.add(reservation.getKey());
             }
         }
+
         return new User((String) snapshot.child("userKey").getValue(),
                 (String) snapshot.child("userName").getValue(), (String) snapshot.child("email").getValue(),
                 (String) snapshot.child("birthDate").getValue(), (String) snapshot.child("description").getValue(),

@@ -94,7 +94,7 @@ public class UploadPicture {
         mPicture.setImageBitmap(null);
         mPicture.setBackgroundResource(R.drawable.ic_photo_camera_black_48dp);
         picSet = false;
-        saveUser();
+        db.child("users").child(mUser.getUserKey()).child("facebookPicture").setValue(false);
     }
 
     private String getFacebookPictureUri() {
@@ -191,7 +191,8 @@ public class UploadPicture {
             if (result != null) {
                 mPicture.setImageBitmap(result);
                 mUser.setFacebookPicture(true);
-                saveUser();
+                db.child("users").child(mUser.getUserKey()).child("facebookPicture").setValue(true);
+                //saveUser();
                 uploadPicture();
                 writePicture();
             } else {

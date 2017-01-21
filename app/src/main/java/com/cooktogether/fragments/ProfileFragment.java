@@ -43,6 +43,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.UserInfo;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
@@ -310,13 +312,19 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
         mUser.setUserName(mUserName.getText().toString());
         mUser.setBirthDate(mBirthDate.getText().toString());
         mUser.setDescription(mDescription.getText().toString());
+
         saveUser();
 
     }
 
     private void saveUser() {
         //save mUser
-        getDB().child("users").child(getUid()).setValue(mUser);
+        //getDB().child("users").child(getUid()).setValue(mUser);
+        DatabaseReference ref = getDB().child("users").child(getUid());
+        ref.child("userName").setValue(mUser.getUserName());
+        ref.child("birthDate").setValue(mUser.getBirthDate());
+        ref.child("description").setValue(mUser.getDescription());
+        ref.child("facebookPicture").setValue(mUser.isFacebookPicture());
     }
 
     @Override
