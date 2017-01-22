@@ -20,8 +20,8 @@
             android:title="@string/search_meal" />
         <item
             android:id="@+id/nav_my_reservations"
-            android:icon="@drawable/ic_message_white_48dp"
-            android:orderInCategory="@integer/MY_MESSAGES_ORDER"
+            android:icon="@drawable/ic_shopping_basket_black_24dp"
+            android:orderInCategory="@integer/MY_RESERVATIONS_ORDER"
             android:title="@string/my_reservations" />
         <item
             android:id="@+id/nav_my_messages"
