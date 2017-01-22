@@ -14,11 +14,15 @@ public class Message {
     private String content;
     private Date date;
 
+    public Message() {
+    }
+
     public Message(String senderId, String content, Date date) {
         this.senderId = senderId;
         this.content = content;
         this.date = date;
     }
+
     public Message(String senderId, String content, java.util.Date date) {
         this.senderId = senderId;
         this.content = content;
@@ -48,14 +52,14 @@ public class Message {
     public static Message parseSnapshot(DataSnapshot snapshot) {
         DataSnapshot d = snapshot.child("date");
 
-        int year = ((Long)d.child("year").getValue()).intValue();
-        int month = ((Long)d.child("month").getValue()).intValue();
-        int day = ((Long)d.child("day").getValue()).intValue();
-        int hrs =((Long)d.child("hrs").getValue()).intValue();
-        int min = ((Long)d.child("min").getValue()).intValue();
+        int year = ((Long) d.child("year").getValue()).intValue();
+        int month = ((Long) d.child("month").getValue()).intValue();
+        int day = ((Long) d.child("day").getValue()).intValue();
+        int hrs = ((Long) d.child("hrs").getValue()).intValue();
+        int min = ((Long) d.child("min").getValue()).intValue();
 
         com.cooktogether.model.Date date = new com.cooktogether.model.Date(year, month, day, hrs, min);
 
-        return new Message((String)snapshot.child("senderId").getValue(), (String)snapshot.child("content").getValue(), date);
+        return new Message((String) snapshot.child("senderId").getValue(), (String) snapshot.child("content").getValue(), date);
     }
 }

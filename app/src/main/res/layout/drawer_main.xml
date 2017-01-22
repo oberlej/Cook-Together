@@ -8,9 +8,9 @@
 
     <!-- This LinearLayout represents the contents of the screen  -->
     <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:layout_height="match_parent">
 
         <!-- The ActionBar displayed at the top -->
         <include
@@ -32,7 +32,7 @@
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_gravity="start"
-        android:fitsSystemWindows="true"
         android:background="@android:color/white"
+        android:fitsSystemWindows="true"
         app:menu="@menu/menu_drawer" />
 </android.support.v4.widget.DrawerLayout>

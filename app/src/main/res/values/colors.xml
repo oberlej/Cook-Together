@@ -4,6 +4,7 @@
     <color name="colorPrimaryDark">#303f9f</color>
     <color name="colorAccent">#ff4081</color>
     <color name="actionBarText">#FFFFFF</color>
+    <color name="bg_bubble_self">#DDDDDD</color>
 
     <!-- Screens background color-->
     <color name="bg_screen1">#20d2bb</color>
@@ -19,6 +20,8 @@
     <color name="dot_light_screen1">#8cf9eb</color>
     <color name="dot_light_screen2">#93c6fd</color>
     <color name="dot_light_screen3">#e4b5fc</color>
+
+
 
     <array name="array_dot_active">
         <item>@color/dot_light_screen1</item>

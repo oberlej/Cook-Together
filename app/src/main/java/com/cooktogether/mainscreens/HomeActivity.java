@@ -19,7 +19,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cooktogether.R;
-import com.cooktogether.fragments.ConversationFragment;
+import com.cooktogether.fragments.ChatFragment;
 import com.cooktogether.fragments.ConversationsListFragment;
 import com.cooktogether.fragments.MealNotEditableFragment;
 import com.cooktogether.fragments.MyMealFragment;
@@ -315,7 +315,7 @@ public class HomeActivity extends AbstractBaseActivity {
 
     public void goToConversation(String conversationKey) {
         setConversationKey(conversationKey);
-        Fragment f = ConversationFragment.newInstance();
+        Fragment f = ChatFragment.newInstance();
         showFragment(f);
         //itemChecked.setChecked(false);
         //itemChecked = null;

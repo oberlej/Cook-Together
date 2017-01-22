@@ -13,6 +13,9 @@ public class Date {
     private int hrs;
     private int min;
 
+    public Date() {
+    }
+
     public Date(java.util.Date date) {
         year = date.getYear();
         month = date.getMonth();
