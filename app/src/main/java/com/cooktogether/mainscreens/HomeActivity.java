@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -74,7 +75,7 @@ public class HomeActivity extends AbstractBaseActivity {
         mToolbar = (Toolbar) findViewById(R.id.toolbar_main);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
-        getSupportActionBar().setTitle("Cook Together");
+        getSupportActionBar().setTitle(getString(R.string.app_name));
 
         // Setup drawer
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -96,17 +97,36 @@ public class HomeActivity extends AbstractBaseActivity {
         TextView mUserName = (TextView) headerLayout.findViewById(R.id.user_name_view);
 
         loadUser(ivHeaderPhoto, mUserName);
+        setMenuCounterListener();
+    }
+
+    private void setMenuCounterListener() {
+        getDB().child(getString(R.string.db_users)).child(getUid()).child(getString(R.string.db_unread)).addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot == null || !dataSnapshot.exists()) {
+                    return;
+                }
+                int unread = ((Long) dataSnapshot.getValue()).intValue();
+                setMenuCounter(R.id.nav_my_messages, unread);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                Toast.makeText(HomeActivity.this, R.string.fail_load_profile, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 
     //Todo use the same function as in the profile fragment
     private void loadUser(final CircleImageView userPic, final TextView mUserName) {
 
         if (mUser == null) {
-            getDB().child("users").child(getUid()).addValueEventListener(new ValueEventListener() {
+            getDB().child(getString(R.string.db_users)).child(getUid()).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if (!dataSnapshot.exists()) {
-                        Toast.makeText(HomeActivity.this, "Failed to load profile. Please try logging out and back in.", Toast.LENGTH_LONG).show();
+                        Toast.makeText(HomeActivity.this, getString(R.string.fail_load_profile), Toast.LENGTH_LONG).show();
                         loadDefaultScreen();
                         return;
                     }
@@ -119,7 +139,7 @@ public class HomeActivity extends AbstractBaseActivity {
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
-                    Toast.makeText(HomeActivity.this, "Failed to load profile.", Toast.LENGTH_LONG).show();
+                    Toast.makeText(HomeActivity.this, getString(R.string.fail_load_profile), Toast.LENGTH_LONG).show();
                 }
             });
         } else {
@@ -235,9 +255,6 @@ public class HomeActivity extends AbstractBaseActivity {
     public void showProfile() {
         Fragment f = ProfileFragment.newInstance();
         showFragment(f);
-        //itemChecked.setChecked(false);
-        //itemChecked = null;
-        setTitle("Profile");
         mDrawer.closeDrawers();
     }
 
@@ -321,7 +338,6 @@ public class HomeActivity extends AbstractBaseActivity {
         showFragment(f);
         //itemChecked.setChecked(false);
         //itemChecked = null;
-        setTitle("Conversation");
         mDrawer.closeDrawers();
 
     }
@@ -332,7 +348,6 @@ public class HomeActivity extends AbstractBaseActivity {
         showFragment(f);
         //itemChecked.setChecked(false);
         //itemChecked = null;
-        setTitle("Proposed Meal");
         mDrawer.closeDrawers();
     }
 
@@ -345,6 +360,11 @@ public class HomeActivity extends AbstractBaseActivity {
             return;
 
         inputManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
+    }
+
+    public void setMenuCounter(@IdRes int itemId, int count) {
+        TextView view = (TextView) nvDrawer.getMenu().findItem(itemId).getActionView();
+        view.setText(count > 0 ? String.valueOf(count) : null);
     }
 
     public User getUser() {

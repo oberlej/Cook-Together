@@ -65,6 +65,17 @@
     <string name="reservation_demands">Reservation demands :</string>
     <string name="description_not_editable">Desciption :</string>
     <string name="reserve">Reserve</string>
+
+    <!--firebase db fields-->
+    <string name="db_user_conversations">user-conversations</string>
+    <string name="db_messages">messages</string>
+    <string name="db_unread">unread</string>
+    <string name="db_rank">rank</string>
+    <string name="db_users">users</string>
+
+    <!--error msg-->
+    <string name="fail_load_conv">Failed to load Conversation.</string>
+    <string name="fail_load_profile">"Failed to load profile. Please try logging out and back in."</string>
 </resources>
 
 

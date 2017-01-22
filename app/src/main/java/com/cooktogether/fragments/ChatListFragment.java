@@ -79,7 +79,7 @@ public class ChatListFragment extends AbstractBaseFragment {
 
 
         // Set up FirebaseRecyclerAdapter with the Query
-        Query conversationsQuery = getQuery(mParent.getDB());
+        Query conversationsQuery = getQuery(getDB());
         queryAdapter(conversationsQuery);
     }
 
@@ -151,7 +151,7 @@ public class ChatListFragment extends AbstractBaseFragment {
     }
 
     public Query getQuery(DatabaseReference databaseReference) {
-        return databaseReference.child("user-conversations").child(mParent.getUid()).orderByChild("rank");
+        return databaseReference.child(getString(R.string.db_user_conversations)).child(mParent.getUid()).orderByChild(getString(R.string.db_rank));
     }
 
     private OnFailureListener failureListener = new OnFailureListener() {
