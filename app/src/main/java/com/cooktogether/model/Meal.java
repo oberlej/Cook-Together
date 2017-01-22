@@ -165,7 +165,7 @@ public class Meal {
         if(snapshot.hasChild("location")) {
             DataSnapshot loc = snapshot.child("location");
             lat = getDouble(loc.child("latitude").getValue());
-            lat = getDouble(loc.child("longitude").getValue());
+            lon = getDouble(loc.child("longitude").getValue());
             locationName = (String) loc.child("name").getValue();
         }
 
