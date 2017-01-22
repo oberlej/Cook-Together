@@ -55,6 +55,6 @@
         android:layout_marginTop="6dp"
         android:divider="@android:color/transparent"
         android:dividerHeight="0dp"
-        android:transcriptMode="normal" />
+        android:transcriptMode="alwaysScroll" />
 
 </RelativeLayout>

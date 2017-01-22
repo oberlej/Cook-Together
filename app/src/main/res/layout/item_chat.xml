@@ -14,6 +14,7 @@
         android:layout_margin="0dp"
         android:background="@drawable/bg_bubble_gray"
         android:gravity="start"
+        android:minWidth="15dp"
         android:textIsSelectable="true" />
 
     <TextView
@@ -23,6 +24,7 @@
         android:layout_alignRight="@id/message_text"
         android:layout_below="@id/message_text"
         android:layout_margin="0dp"
+        android:minWidth="15dp"
         android:textSize="10sp" />
 
 </RelativeLayout>
