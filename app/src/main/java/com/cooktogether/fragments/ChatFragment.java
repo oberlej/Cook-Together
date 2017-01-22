@@ -126,7 +126,6 @@ public class ChatFragment extends Fragment {
                 };
 
                 mList.setAdapter(mAdapter);
-//                mList.smoothScrollToPosition(mAdapter.getCount());
             }
 
             @Override
@@ -206,7 +205,6 @@ public class ChatFragment extends Fragment {
         mParent.getDB().child("user-conversations").child(mUsersKeys.get(1)).child(mConversationKey).child("rank").setValue(0 - calendar.getTime().getTime());
         //clearingthe edit text field
         mMessage.setText("");
-        mList.smoothScrollToPosition(mAdapter.getCount()+1);
     }
 
     private OnFailureListener failureListener = new OnFailureListener() {
