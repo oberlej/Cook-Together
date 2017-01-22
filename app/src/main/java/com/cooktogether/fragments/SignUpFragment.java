@@ -89,7 +89,7 @@ public class SignUpFragment extends AbstractBaseFragment {
                                     if (task.isSuccessful()) {
                                         //create user in db
                                         FirebaseUser cu = getCurrentUser();
-                                        User newUser = new User(cu.getUid(), cu.getDisplayName(), cu.getEmail(), "", "", false, false, new ArrayList<Review>());
+                                        User newUser = new User(cu.getUid(), cu.getDisplayName(), cu.getEmail(), "", "", false, false, new ArrayList<Review>(), new ArrayList<String>());
                                         getDB().child("users").child(cu.getUid()).setValue(newUser);
 
                                         Intent intent = new Intent(getContext(), HomeActivity.class);

@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <!-- list of meals -->
     <android.support.v7.widget.RecyclerView
         android:id="@+id/meals_list_rcv"
         android:layout_width="match_parent"
@@ -14,6 +16,8 @@
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
         android:scrollbars="vertical" />
+
+    <!--text to show in case of empty list -->
     <TextView
         android:id="@+id/meals_empty_list"
         android:layout_width="match_parent"
@@ -22,5 +26,17 @@
         android:layout_marginLeft="50dp"
         android:layout_marginRight="50dp"
         android:layout_marginTop="50dp" />
+
+    <!-- floating button to add new meal -->
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/add_new_meal_floating_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignBottom="@id/meals_list_rcv"
+        android:layout_margin="24dp"
+        android:src="@drawable/ic_add_circle_outline_black_48dp"
+        app:layout_anchor="@id/meals_list_rcv"
+        app:layout_anchorGravity="bottom|right|end" />
 
 </RelativeLayout>

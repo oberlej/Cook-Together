@@ -56,6 +56,11 @@
     <string name="slide_3_desc">Check what people around you are proposing and contact them if interested!</string>
     <string name="message_empty">Please enter a message</string>
     <string name="enter_message">Enter message</string>
+    <string name="new_meal">New Meal</string>
+    <string name="my_meals">My Meals</string>
+    <string name="search_meal">Search Meal</string>
+    <string name="my_messages">My Messages</string>
+    <string name="my_reservations">My reservations</string>
 </resources>
 
 

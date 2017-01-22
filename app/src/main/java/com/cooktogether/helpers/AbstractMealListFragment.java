@@ -11,10 +11,7 @@ import android.widget.TextView;
 
 import com.cooktogether.R;
 import com.cooktogether.mainscreens.HomeActivity;
-import com.cooktogether.model.Meal;
 import com.cooktogether.viewholder.MealViewHolder;
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 
@@ -39,9 +36,11 @@ public abstract class AbstractMealListFragment extends AbstractBaseFragment {
         mRecycler = (RecyclerView) view.findViewById(R.id.meals_list_rcv);
         mRecycler.setHasFixedSize(true);
         mEmptyList = (TextView) view.findViewById(R.id.meals_empty_list);
+
         //to be shown in case of empty list
         mEmptyList.setVisibility(View.VISIBLE);
         mEmptyList.setText("Make new propositions of meals you would like to cook and share with people around you and let the fun begin!");
+
         // Set up Layout Manager, reverse layout
         mManager = new LinearLayoutManager(getContext());
         mManager.setReverseLayout(true);
@@ -53,42 +52,19 @@ public abstract class AbstractMealListFragment extends AbstractBaseFragment {
         setAdapter(mealsQuery);
         mRecycler.setAdapter(mAdapter);
 
+        //floating button
+        view.findViewById(R.id.add_new_meal_floating_btn).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Launch new meal 
+                ((HomeActivity) mParent).setMealKey(null);
+                ((HomeActivity) mParent).selectDrawerItem(((HomeActivity) mParent).getNvDrawer().getMenu().findItem(R.id.nav_meal_detail), getString(R.string.update_meal));
+            }
+        });
+
     }
 
-    protected void setAdapter(Query mealsQuery) {
-        mAdapter = new FirebaseRecyclerAdapter<Meal, MealViewHolder>(Meal.class, R.layout.item_meal, MealViewHolder.class, mealsQuery) {
-
-            @Override
-            protected Meal parseSnapshot(DataSnapshot snapshot) {
-                return Meal.parseSnapshot(snapshot);
-            }
-
-            @Override
-            protected void populateViewHolder(final MealViewHolder viewHolder, final Meal model, final int position) {
-                final DatabaseReference mealRef = getRef(position);
-
-                // Set click listener for the whole meal view
-                final String mealKey = mealRef.getKey();
-                viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        // Launch Meal Details Fragment
-                        ((HomeActivity) mParent).setMealKey(mealKey);
-                        //if the user is the one who proposed the meal, they can edit it
-                        if (model.getUserKey().equals(mParent.getUid())) {
-                            ((HomeActivity) mParent).selectDrawerItem(((HomeActivity) mParent).getNvDrawer().getMenu().findItem(R.id.nav_meal_detail), getString(R.string.update_meal));
-                        } else {
-                            ((HomeActivity) mParent).goToMeal(mealKey);
-                        }
-                    }
-                });
-                mEmptyList.setVisibility(View.GONE);
-                // Bind Post to ViewHolder, setting OnClickListener for the star button
-                viewHolder.bindToPost(model);
-            }
-        };
-
-    }
+    public abstract void setAdapter(Query mealsQuery);
 
     @Override
     public void onDestroy() {
@@ -96,11 +72,7 @@ public abstract class AbstractMealListFragment extends AbstractBaseFragment {
         cleanAdapter();
     }
 
-    protected void cleanAdapter() {
-        if (mAdapter != null) {
-            ((FirebaseRecyclerAdapter<Meal, MealViewHolder>) mAdapter).cleanup();
-        }
-    }
+    public abstract void cleanAdapter();
 
     public abstract Query getQuery(DatabaseReference databaseReference);
 }

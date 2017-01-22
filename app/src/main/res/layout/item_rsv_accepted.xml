@@ -8,14 +8,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
-
         <!-- user pic -->
         <include
             layout="@layout/profile_pic"
             android:layout_width="80dp"
-            android:layout_height="80dp" />
-
-        <!-- user pic -->
+            android:layout_height="80dp"/>
+        <!-- user name -->
         <TextView
             android:id="@+id/user_name"
             android:layout_width="0dp"
@@ -24,22 +22,13 @@
             android:layout_weight="1"
             android:layout_marginLeft="5dp"
             android:textColor="@android:color/primary_text_light" />
-
-        <!-- accept the reservation -->
-        <CheckBox
-            android:id="@+id/accept_rsv_demand"
-            android:layout_width="0dp"
+        <!-- contact button -->
+        <Button
+            android:id="@+id/contact_user_btn"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Accept" />
+            android:text="@string/contact"/>
 
-        <!-- refuse the reservation -->
-        <CheckBox
-            android:id="@+id/refuse_rsv_demand"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Refuse" />
     </LinearLayout>
 
     <View style="@style/Divider" />

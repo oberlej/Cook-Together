@@ -137,18 +137,20 @@ public class MealNotEditableFragment extends Fragment {
 
                 mNbrPersons = meal.getNbrPersons();
                 progressBar.setMax(mNbrPersons);
-                progressBarTxt.setText(mNbrReservations +"/"+mNbrPersons+" places reserved");
+                progressBarTxt.setText(mNbrReservations + "/" + mNbrPersons + " places reserved");
                 if (meal.getBooked()) {
                     reserve_btn.setText("BOOKED");
                     reserve_btn.setEnabled(false);
+                    contact_btn.setEnabled(false);
                 }
 
-                HashMap<String, String> rsv = new HashMap<String, String>();
+                HashMap<String, String> rsv = new HashMap<String, String>();//userkey, reservation key
                 if (dataSnapshot.hasChild("reservations")) {
                     for (DataSnapshot d : dataSnapshot.child("reservations").getChildren())
                         rsv.put((String) d.getValue(), d.getKey());
                 }
                 if (rsv.containsKey(mParent.getUid())) {
+                    contact_btn.setEnabled(true);
                     Query q = mParent.getDB().child("reservations").child(rsv.get(mParent.getUid()));
                     q.addValueEventListener(new ValueEventListener() {
                         @Override
@@ -156,7 +158,7 @@ public class MealNotEditableFragment extends Fragment {
                             Reservation r = Reservation.parseSnapshot(dataSnapshot);
                             if (r.getStatus().equals(StatusEnum.WAITING.getStatus()))
                                 reserve_btn.setText("WAITING FOR A RESPONSE");
-                            else if (r.equals(StatusEnum.ACCEPTED.getStatus()))
+                            else if (r.getStatus().equals(StatusEnum.ACCEPTED.getStatus()))
                                 reserve_btn.setText("Reservation Accepted!");
                             else
                                 reserve_btn.setText("Reservation Refused");
@@ -241,10 +243,11 @@ public class MealNotEditableFragment extends Fragment {
     public static Fragment newInstance() {
         return new MealNotEditableFragment();
     }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
-        ((HomeActivity)mParent).mMealKey = null;
+        ((HomeActivity) mParent).mMealKey = null;
     }
 }
 

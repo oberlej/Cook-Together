@@ -3,10 +3,7 @@ package com.cooktogether.mainscreens;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -18,33 +15,25 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.cooktogether.R;
 import com.cooktogether.fragments.ChatFragment;
+import com.cooktogether.fragments.ConversationsListFragment;
 import com.cooktogether.fragments.MealNotEditableFragment;
-
 import com.cooktogether.fragments.MyMealFragment;
 import com.cooktogether.fragments.MyMealsFragment;
+import com.cooktogether.fragments.MyMealsListFragment;
 import com.cooktogether.fragments.MyReservationsFragment;
 import com.cooktogether.fragments.ProfileFragment;
-
 import com.cooktogether.helpers.AbstractBaseActivity;
-import com.cooktogether.R;
-import com.cooktogether.fragments.ConversationsListFragment;
-import com.cooktogether.model.User;
 import com.cooktogether.helpers.SearchFragment;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.cooktogether.helpers.UploadPicture;
+import com.cooktogether.model.User;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.UploadTask;
-
-import java.io.ByteArrayOutputStream;
-import java.io.File;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
@@ -63,6 +52,7 @@ public class HomeActivity extends AbstractBaseActivity {
     private MenuItem itemChecked = null;
 
     private User mUser = null;
+    private UploadPicture picLoader;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,13 +92,15 @@ public class HomeActivity extends AbstractBaseActivity {
             }
         });
         TextView mUserName = (TextView) headerLayout.findViewById(R.id.user_name_view);
+
         loadUser(ivHeaderPhoto, mUserName);
     }
 
     //Todo use the same function as in the profile fragment
     private void loadUser(final CircleImageView userPic, final TextView mUserName) {
+
         if (mUser == null) {
-            getDB().child("users").child(getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
+            getDB().child("users").child(getUid()).addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if (!dataSnapshot.exists()) {
@@ -118,8 +110,9 @@ public class HomeActivity extends AbstractBaseActivity {
                     }
                     mUser = User.parseSnapshot(dataSnapshot);
                     mUserName.setText(mUser.getUserName());
+                    picLoader = new UploadPicture(HomeActivity.this, mUser, userPic, getCurrentUser(), getRootRef(), getDB());
                     //profile pic
-                    //loadPicture(userPic);
+                    loadPicture();
                 }
 
                 @Override
@@ -130,35 +123,20 @@ public class HomeActivity extends AbstractBaseActivity {
         } else {
             mUserName.setText(mUser.getUserName());
             //profile pic
-            //loadPicture(userPic);
+            picLoader = new UploadPicture(HomeActivity.this, mUser, userPic, getCurrentUser(), getRootRef(), getDB());
+            loadPicture();
+
         }
     }
 
-   /* private void loadPicture(CircleImageView userPic) {
-        File picture = new File(HomeActivity.this.getDir("profile_pictures", Context.MODE_PRIVATE) + "/" + getUid() + ".jpg");
-
-        if (!picture.exists()) {
-            if (mUser.isFacebookConnected() && mUser.isFacebookPicture()) {
-                setFacebookPicture();
-            } else {
-                resetPicture();
-            }
-        } else {
-            Bitmap b = BitmapFactory.decodeFile(picture.getPath(), null);
-            if (b == null) {
-                Toast.makeText(HomeActivity.this, "Failed to load your picture. Please try again.", Toast.LENGTH_LONG).show();
-                resetPicture();
-            } else {
-                userPic.setImageBitmap(b);
-                if (mUser.isFacebookPicture()) {
-                    mUseFBPicture.setVisibility(View.GONE);
-                } else {
-                    mUseFBPicture.setVisibility(View.VISIBLE);
-                }
-            }
-        }
+    public void loadPicture() {
+        picLoader.loadPicture();
     }
-*/
+
+    public void resetPicture() {
+        picLoader.resetPicture();
+    }
+
     public void loadDefaultScreen() {
         MenuItem defaultItem = nvDrawer.getMenu().findItem(R.id.nav_my_meals);
         selectDrawerItem(defaultItem, defaultItem.getTitle().toString());
@@ -209,7 +187,7 @@ public class HomeActivity extends AbstractBaseActivity {
         itemChecked = menuItem;
         switch (menuItem.getItemId()) {
             case R.id.nav_my_meals:
-                fragmentClass = MyMealsFragment.class;
+                fragmentClass = MyMealsListFragment.class;
                 break;
             case R.id.nav_meal_detail:
                 fragmentClass = MyMealFragment.class;

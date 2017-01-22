@@ -35,6 +35,7 @@ import android.widget.Toast;
 import com.cooktogether.R;
 import com.cooktogether.helpers.AbstractBaseFragment;
 import com.cooktogether.helpers.DownloadImage;
+import com.cooktogether.helpers.UploadPicture;
 import com.cooktogether.mainscreens.HomeActivity;
 import com.cooktogether.model.User;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -42,6 +43,8 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.UserInfo;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
@@ -64,6 +67,7 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
     private static final int SELECT_PICTURE = 1234;
     private static final int MY_PERMISSIONS_REQUEST_READ_MEDIA = 1293;
     private CircleImageView mPicture;
+    private UploadPicture picLoader;
 
     private User mUser = null;
     private boolean mAnswer;
@@ -112,6 +116,7 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
 
     private void loadUser() {
         mUser = ((HomeActivity) mParent).getUser();
+        picLoader = new UploadPicture(getContext(), mUser, mPicture, getCurrentUser(), getRootRef(), getDB());
         if (mUser == null) {
             getDB().child("users").child(getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -144,17 +149,30 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
         }
     }
 
-    private Bitmap readPicture() {
+    /*private Bitmap readPicture() {
         File f = new File(getContext().getDir("profile_pictures", Context.MODE_PRIVATE), getUid() + ".jpg");
         Bitmap b = null;
         if (f != null) {
             b = BitmapFactory.decodeFile(f.getPath(), null);
         }
         return b;
-    }
+    }*/
 
     private void loadPicture() {
-        File picture = new File(getContext().getDir("profile_pictures", Context.MODE_PRIVATE) + "/" + getUid() + ".jpg");
+        picLoader.loadPicture();
+
+        if (mUser.isFacebookPicture()) {
+            mUseFBPicture.setVisibility(View.GONE);
+        } else {
+            mUseFBPicture.setVisibility(View.VISIBLE);
+        }
+
+        if(picLoader.isPicSet())
+            mDeletePicture.setVisibility(View.VISIBLE);
+        else
+            mDeletePicture.setVisibility(View.GONE);
+
+        /* File picture = new File(getContext().getDir("profile_pictures", Context.MODE_PRIVATE) + "/" + getUid() + ".jpg");
 
         if (!picture.exists()) {
             if (mUser.isFacebookConnected() && mUser.isFacebookPicture()) {
@@ -176,10 +194,10 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
                     mUseFBPicture.setVisibility(View.VISIBLE);
                 }
             }
-        }
+        }*/
     }
 
-    private void uploadPicture() {
+    /* private void uploadPicture() {
         // Get the data from an ImageView as bytes
         mPicture.setDrawingCacheEnabled(true);
         mPicture.buildDrawingCache();
@@ -248,6 +266,7 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
         }
         return "";
     }
+    */
 
     @Override
     public void onAttach(Context context) {
@@ -293,13 +312,19 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
         mUser.setUserName(mUserName.getText().toString());
         mUser.setBirthDate(mBirthDate.getText().toString());
         mUser.setDescription(mDescription.getText().toString());
+
         saveUser();
 
     }
 
     private void saveUser() {
         //save mUser
-        getDB().child("users").child(getUid()).setValue(mUser);
+        //getDB().child("users").child(getUid()).setValue(mUser);
+        DatabaseReference ref = getDB().child("users").child(getUid());
+        ref.child("userName").setValue(mUser.getUserName());
+        ref.child("birthDate").setValue(mUser.getBirthDate());
+        ref.child("description").setValue(mUser.getDescription());
+        ref.child("facebookPicture").setValue(mUser.isFacebookPicture());
     }
 
     @Override
@@ -323,11 +348,13 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
                     mUseFBPicture.setVisibility(View.GONE);
                 }
                 mDeletePicture.setVisibility(View.VISIBLE);
-                uploadPicture();
-                writePicture();
+                picLoader.uploadPicture();
+                picLoader.writePicture();
                 saveUser();
+                ((HomeActivity)mParent).loadPicture();
             } else {
                 resetPicture();
+                ((HomeActivity)mParent).resetPicture();
             }
         }
     }
@@ -339,7 +366,7 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
             case MY_PERMISSIONS_REQUEST_READ_MEDIA: {
                 // If request is cancelled, the result arrays are empty.
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    mPicture.setImageBitmap(getBitmap(Uri.parse(getPath())));
+                    mPicture.setImageBitmap(getBitmap(Uri.parse(picLoader.getPath())));
                 }
                 return;
             }
@@ -391,32 +418,32 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
     }
 
     private void setFacebookPicture() {
+        picLoader.setFacebookPicture();
+        if (mUser.isFacebookPicture()) {
+            mUseFBPicture.setVisibility(View.GONE);
+            mDeletePicture.setVisibility(View.VISIBLE);
+        }
+        /*
         String uri = getFacebookPictureUri();
         if (!uri.isEmpty()) {
             new DownloadImage().execute(uri);
         } else {
             resetPicture();
         }
+         */
     }
 
     private void resetPicture() {
-        File tmp = new File(getContext().getDir("profile_pictures", Context.MODE_PRIVATE) + "/" + getUid() + ".jpg");
-        if (tmp.exists()) {
-            tmp.delete();
-        }
-        mUser.setFacebookPicture(false);
+        picLoader.resetPicture();
         if (mUser.isFacebookConnected()) {
             mUseFBPicture.setVisibility(View.VISIBLE);
         } else {
             mUseFBPicture.setVisibility(View.GONE);
         }
         mDeletePicture.setVisibility(View.GONE);
-        mPicture.setImageBitmap(null);
-        mPicture.setBackgroundResource(R.drawable.ic_photo_camera_black_48dp);
-        saveUser();
     }
 
-    private class DownloadImage extends AsyncTask<String, Void, Bitmap> {
+  /*  private class DownloadImage extends AsyncTask<String, Void, Bitmap> {
 
         public DownloadImage() {
         }
@@ -446,7 +473,7 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
             }
         }
     }
-
+*/
     public void updateDateButtonText() {
         String dateForButton = dateFormat.format(mCalendar.getTime());
         mBirthDate.setText(dateForButton);

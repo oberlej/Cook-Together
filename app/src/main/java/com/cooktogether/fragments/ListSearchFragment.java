@@ -3,15 +3,11 @@ package com.cooktogether.fragments;
 import android.view.View;
 import android.widget.Toast;
 
-import com.cooktogether.R;
 import com.cooktogether.adapter.MealsListAdapter;
 import com.cooktogether.helpers.AbstractMealListFragment;
 import com.cooktogether.listener.RecyclerItemClickListener;
 import com.cooktogether.mainscreens.HomeActivity;
 import com.cooktogether.model.Meal;
-import com.cooktogether.viewholder.MealViewHolder;
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
-import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -38,7 +34,7 @@ public class ListSearchFragment extends AbstractMealListFragment {
     }
 
     @Override
-    protected void setAdapter(Query mealsQuery) {
+    public void setAdapter(Query mealsQuery) {
         mealsQuery.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot mealsSnapshot) {
@@ -54,7 +50,8 @@ public class ListSearchFragment extends AbstractMealListFragment {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(getContext(), databaseError.getMessage(), Toast.LENGTH_LONG).show();
+                if (getContext() != null)
+                    Toast.makeText(getContext(), databaseError.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
 
@@ -70,14 +67,14 @@ public class ListSearchFragment extends AbstractMealListFragment {
                     }
                 })
         );
-        if(othersMeals.isEmpty()) {
+        if (othersMeals.isEmpty()) {
             mEmptyList.setText("No meals have been proposed by other people lately. Make new propositions or come back later!");
             mEmptyList.setVisibility(View.VISIBLE);
         }
     }
 
     @Override
-    protected void cleanAdapter() {
+    public void cleanAdapter() {
         if (mAdapter != null) {
             ((MealsListAdapter) mAdapter).cleanup();
         }

@@ -23,7 +23,7 @@ public class User {
     public User() {
     }
 
-    public User(String userKey, String userName, String email, String birthDate, String description,
+    /*public User(String userKey, String userName, String email, String birthDate, String description,
                 boolean facebookPicture, boolean facebookConnected, ArrayList<Review> reviews) {
         this.userKey = userKey;
         this.userName = userName;
@@ -35,7 +35,7 @@ public class User {
         this.reviews = reviews;
         this.reservations = new ArrayList<String>();
 
-    }
+    }*/
 
     public User(String userKey, String userName, String email, String birthDate, String description,
                 boolean facebookPicture, boolean facebookConnected, List<Review> reviews,
@@ -64,6 +64,7 @@ public class User {
                 reservations.add(reservation.getKey());
             }
         }
+
         return new User((String) snapshot.child("userKey").getValue(),
                 (String) snapshot.child("userName").getValue(), (String) snapshot.child("email").getValue(),
                 (String) snapshot.child("birthDate").getValue(), (String) snapshot.child("description").getValue(),

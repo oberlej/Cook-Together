@@ -7,27 +7,27 @@
             android:checked="true"
             android:icon="@drawable/ic_list_black_48dp"
             android:orderInCategory="@integer/MY_MEALS_ORDER"
-            android:title="My Meals" />
+            android:title="@string/my_meals" />
         <item
             android:id="@+id/nav_meal_detail"
             android:icon="@drawable/ic_add_circle_outline_black_48dp"
             android:orderInCategory="@integer/MEAL_DETAIL_ORDER"
-            android:title="New Meal" />
+            android:title="@string/new_meal" />
         <item
             android:id="@+id/nav_search_meal"
             android:icon="@drawable/ic_search_black_48dp"
             android:orderInCategory="@integer/SEARCH_MEAL_ORDER"
-            android:title="Search Meal" />
+            android:title="@string/search_meal" />
         <item
             android:id="@+id/nav_my_reservations"
             android:icon="@drawable/ic_message_white_48dp"
             android:orderInCategory="@integer/MY_MESSAGES_ORDER"
-            android:title="My reservations" />
+            android:title="@string/my_reservations" />
         <item
             android:id="@+id/nav_my_messages"
             android:icon="@drawable/ic_message_white_48dp"
             android:orderInCategory="@integer/MY_MESSAGES_ORDER"
-            android:title="My Messages" />
+            android:title="@string/my_messages" />
     </group>
     <group
         android:id="@+id/group2"
