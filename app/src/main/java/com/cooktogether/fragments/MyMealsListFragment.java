@@ -34,7 +34,8 @@ public class MyMealsListFragment extends AbstractBaseFragment{
     @Override
     protected void init(View view) {
         mParent = (HomeActivity) getActivity();
-
+        mParent.getSupportActionBar().setTitle("My Meals");
+        ((HomeActivity)mParent).hideKeyboard(getContext());
         //init fragments
 
         mCurrent = MyMealsFragment.newInstance();

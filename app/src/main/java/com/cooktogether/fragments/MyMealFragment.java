@@ -37,6 +37,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -155,7 +156,7 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
     protected void init(View view) {
         mParent = (HomeActivity) getActivity();
         view.findViewById(R.id.create_new_day_btn).setOnClickListener(this);
-
+        mParent.getSupportActionBar().setTitle("New Meal");
         //init location bar
         initLocationBar(view);
 
@@ -183,6 +184,7 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
         mMealKey = ((HomeActivity) mParent).getMealKey();
         mIsUpdate = mMealKey != null && !mMealKey.isEmpty();
         if (mIsUpdate) {
+            mParent.getSupportActionBar().setTitle("Update Meal");
             loadMeal();
         }
     }
@@ -445,7 +447,7 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
         List<String> usersKeys = new ArrayList<String>();
         usersKeys.add(mParent.getUid());
         usersKeys.add(rsv.getUserKey());
-        Conversation newConv = new Conversation(mTitle.getText().toString(), conversationKey, usersKeys);
+        Conversation newConv = new Conversation(mTitle.getText().toString(), conversationKey, usersKeys,0, 0-Calendar.getInstance().getTime().getTime());
 
         HashMap<String, Object> convMap = newConv.toHashMap();
         convMap.remove("messages"); //to not delete previous messages if any

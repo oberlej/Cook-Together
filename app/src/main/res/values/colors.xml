@@ -5,6 +5,8 @@
     <color name="colorAccent">#ff4081</color>
     <color name="actionBarText">#FFFFFF</color>
     <color name="bg_bubble_self">#DDDDDD</color>
+    <color name="list_divider">#dedede</color>
+
 
     <!-- Screens background color-->
     <color name="bg_screen1">#20d2bb</color>

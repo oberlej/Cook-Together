@@ -58,6 +58,9 @@ public class MyReservationsFragment  extends AbstractBaseFragment {
     @Override
     protected void init(final View view) {
         mParent = (HomeActivity) getActivity();
+        mParent.getSupportActionBar().setTitle("My Reservations");
+        ((HomeActivity)mParent).hideKeyboard(getContext());
+
         mRecycler = (RecyclerView) view.findViewById(R.id.reservation_list_rcv);
         mRecycler.setHasFixedSize(true);
 
