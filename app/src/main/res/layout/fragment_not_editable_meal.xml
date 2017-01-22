@@ -54,7 +54,7 @@
 
             <TextView
                 android:id="@+id/meal_location"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:maxLines="1" />
@@ -62,31 +62,11 @@
                 android:id="@+id/nbr_persons"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
-            <LinearLayout
+            <include
+                layout="@layout/reservations_progress_bar"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:id="@+id/nbr_reservations_view"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-                <ProgressBar
-                    android:id="@+id/progressBar2"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignParentLeft="true"
-                    android:layout_alignParentTop="true"
-                    android:layout_marginLeft="23dp"
-                    android:layout_marginTop="20dp"
-                    android:indeterminate="false"
-                    android:minHeight="50dp"
-                    android:minWidth="200dp"
-                    android:progress="1" />
-                <TextView
-                    android:id="@+id/progress_bar_txt"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"/>
-            </LinearLayout>
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"/>
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">

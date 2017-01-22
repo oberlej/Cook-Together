@@ -90,7 +90,7 @@ public class MealNotEditableFragment extends Fragment {
             }
         });
 
-        progressBar = (ProgressBar) view.findViewById(R.id.progressBar2);
+        progressBar = (ProgressBar) view.findViewById(R.id.reservations_progress_bar);
         progressBarTxt = (TextView) view.findViewById(R.id.progress_bar_txt);
 
         reserve_btn = (Button) view.findViewById(R.id.reserve_btn);

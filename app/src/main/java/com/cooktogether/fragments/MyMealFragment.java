@@ -191,13 +191,13 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
         mTitle = (EditText) view.findViewById(R.id.create_title);
         mDescription = (EditText) view.findViewById(R.id.create_description);
         //for the reservation part
-        mNbrRsvView = (TextView) view.findViewById(R.id.nbr_reservations);
+        mNbrRsvView = (TextView) view.findViewById(R.id.progress_bar_txt);
         mNbrPersonsView = (EditText) view.findViewById(R.id.set_nbr_persons);
 
         mBooked = (CheckBox) view.findViewById(R.id.set_is_booked);
         rsv_demands = (LinearLayout) view.findViewById(R.id.rsv_demands);
         rsv_accepted = (LinearLayout) view.findViewById(R.id.rsv_accepted);
-        progressBar = (ProgressBar) view.findViewById(R.id.progressBar1);
+        progressBar = (ProgressBar) view.findViewById(R.id.reservations_progress_bar);
 
 
         mReservations = new ArrayList<>();
