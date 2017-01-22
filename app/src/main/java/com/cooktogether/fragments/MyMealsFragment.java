@@ -9,6 +9,7 @@ import com.cooktogether.helpers.AbstractMealListFragment;
 import com.cooktogether.listener.RecyclerItemClickListener;
 import com.cooktogether.mainscreens.HomeActivity;
 import com.cooktogether.model.Meal;
+import com.cooktogether.model.User;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -16,6 +17,9 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MyMealsFragment extends AbstractMealListFragment {
     private boolean current;

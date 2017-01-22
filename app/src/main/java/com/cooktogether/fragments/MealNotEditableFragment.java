@@ -1,6 +1,7 @@
 package com.cooktogether.fragments;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -157,12 +158,19 @@ public class MealNotEditableFragment extends Fragment {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             Reservation r = Reservation.parseSnapshot(dataSnapshot);
-                            if (r.getStatus().equals(StatusEnum.WAITING.getStatus()))
+
+                            if (r.getStatus().equals(StatusEnum.WAITING.getStatus())) {
                                 reserve_btn.setText("WAITING FOR A RESPONSE");
-                            else if (r.getStatus().equals(StatusEnum.ACCEPTED.getStatus()))
+                                reserve_btn.setBackgroundColor(getResources().getColor(R.color.rsv_orange));
+                            }
+                            else if (r.getStatus().equals(StatusEnum.ACCEPTED.getStatus())) {
                                 reserve_btn.setText("Reservation Accepted!");
-                            else
+                                reserve_btn.setBackgroundColor(getResources().getColor(R.color.rsv_green));
+                            }
+                            else {
                                 reserve_btn.setText("Reservation Refused");
+                                reserve_btn.setBackgroundColor(getResources().getColor(R.color.rsv_red));
+                            }
                             reserve_btn.setEnabled(false);
                         }
 

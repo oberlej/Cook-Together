@@ -9,15 +9,15 @@ import com.google.maps.android.clustering.ClusterItem;
 
 public class MealMarker implements ClusterItem {
     private final LatLng mPosition;
-    private String mtitle; //meal title
+    private String mTitle; //meal title
     private String mSnippet; //meal location in this case
-    private String mkey; //user id ??
+    private String mKey; //meal key
 
     public MealMarker(double lat, double lng, String title, String snippet, String key) {
         mPosition = new LatLng(lat, lng);
-        mtitle = title;
+        mTitle = title;
         mSnippet = snippet;
-        mkey = key;
+        mKey = key;
     }
 
     @Override
@@ -25,15 +25,16 @@ public class MealMarker implements ClusterItem {
         return mPosition;
     }
 
-    public String getMtitle() {
-        return mtitle;
+    public String getmTitle() {
+        return mTitle;
     }
 
     public String getmSnippet() {
         return mSnippet;
     }
 
-    public String getMkey() {
-        return mkey;
+    public String getmKey() {
+        return mKey;
     }
+
 }

@@ -99,8 +99,8 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
         // Handle presses on the action bar items
         switch (item.getItemId()) {
             case R.id.action_save:
-                saveMeal();
-                ((HomeActivity) mParent).loadDefaultScreen();
+                if (saveMeal())
+                    ((HomeActivity) mParent).loadDefaultScreen();
                 return true;
             case R.id.action_cancel:
                 DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
@@ -128,17 +128,18 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
     }
 
     private boolean saveMeal() {
-        if (getSelectedLocation() == null) {
-            Toast.makeText(getContext(), "Unvalid location or no service available", Toast.LENGTH_LONG).show();
+        // verify the input of the user
+        if (!checkInputIsValid())
             return false;
-        }
+
+        mNbrPersons = Integer.valueOf(mNbrPersonsView.getText().toString());
 
         if (!mIsUpdate) {
             mMealKey = getDB().child("meals").push().getKey();
-            mBooked.setChecked(false);
+            mBooked.setEnabled(false);
             mNbrReservations = 0;
         }
-        mNbrPersons = Integer.valueOf(mNbrPersonsView.getText().toString());
+
         Meal m = new Meal(mTitle.getText().toString(), mDescription.getText().toString(),
                 mParent.getUid(), mMealKey, mDaysFree, getSelectedLocation(), mNbrPersons, mNbrReservations, mBooked.isChecked());
 
@@ -150,6 +151,32 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
             Toast.makeText(getContext(), "Meal " + mTitle.getText().toString() + " updated.", Toast.LENGTH_LONG).show();
         }
         return true;
+    }
+
+    private boolean checkInputIsValid() {
+        boolean valid = true;
+        if (mTitle.getText() == null || mTitle.getText().toString().isEmpty()) {
+            mTitle.setError("Please add a title to your meal!");
+            valid = false;
+        }
+
+        if (getSelectedLocation() == null) {
+            Toast.makeText(getContext(), "Unvalid location or no service available", Toast.LENGTH_LONG).show();
+            valid = false;
+        }
+
+        if (mNbrPersonsView.getText() == null || mNbrPersonsView.getText().toString().isEmpty()
+                || Integer.valueOf(mNbrPersonsView.getText().toString()) < 1) {
+            mNbrPersonsView.setError("Please put a valid number of persons");
+            valid = false;
+        }
+
+        if (mDaysFree.isEmpty()) {
+            ((Button) mListOfDays.getRootView().findViewById(R.id.create_new_day_btn)).setError("Please add at least one free day");
+            valid = false;
+        }
+        Toast.makeText(getContext(), "Please check the information you entered", Toast.LENGTH_LONG).show();
+        return valid;
     }
 
     @Override
@@ -417,6 +444,7 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.create_new_day_btn:
+                ((Button) v).setError(null);
                 addDay();
                 break;
             case R.id.day_remove_btn:

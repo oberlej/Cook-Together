@@ -26,19 +26,23 @@ public class Meal {
 
     }
 
-/*    public Meal(String title, String description, String userKey, String mealKey, List<Day> freeDays,
-                UserLocation location, int nbr_persons) {
-        this.title = title;
-        this.description = description;
-        this.userKey = userKey;
+    public Meal(String mealKey) {
         this.mealKey = mealKey;
-        this.freeDays = freeDays;
-        this.location = location;
-        this.nbr_persons = nbr_persons;
-        this.nbr_reservations = 0;
-        this.booked = false;
     }
-*/
+
+    /*    public Meal(String title, String description, String userKey, String mealKey, List<Day> freeDays,
+                    UserLocation location, int nbr_persons) {
+            this.title = title;
+            this.description = description;
+            this.userKey = userKey;
+            this.mealKey = mealKey;
+            this.freeDays = freeDays;
+            this.location = location;
+            this.nbr_persons = nbr_persons;
+            this.nbr_reservations = 0;
+            this.booked = false;
+        }
+    */
     public Meal(String title, String description, String userKey, String mealKey, List<Day> freeDays,
                 UserLocation location, int nbr_persons, int nbr_reservations, Boolean booked) {
         this.title = title;
@@ -165,7 +169,7 @@ public class Meal {
         if(snapshot.hasChild("location")) {
             DataSnapshot loc = snapshot.child("location");
             lat = getDouble(loc.child("latitude").getValue());
-            lat = getDouble(loc.child("longitude").getValue());
+            lon = getDouble(loc.child("longitude").getValue());
             locationName = (String) loc.child("name").getValue();
         }
 
@@ -195,5 +199,11 @@ public class Meal {
             return ((Long)firebaseValue).doubleValue();
         }
         return (Double) firebaseValue;
+    }
+
+    @Override
+    public boolean equals(Object o){
+        Meal m = (Meal)o;
+        return (m!= null && m.getMealKey().equals(this.mealKey));
     }
 }

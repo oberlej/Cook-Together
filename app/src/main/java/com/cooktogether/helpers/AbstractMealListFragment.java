@@ -56,7 +56,7 @@ public abstract class AbstractMealListFragment extends AbstractBaseFragment {
         view.findViewById(R.id.add_new_meal_floating_btn).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Launch new meal 
+                // Launch new meal
                 ((HomeActivity) mParent).setMealKey(null);
                 ((HomeActivity) mParent).selectDrawerItem(((HomeActivity) mParent).getNvDrawer().getMenu().findItem(R.id.nav_meal_detail), getString(R.string.update_meal));
             }
