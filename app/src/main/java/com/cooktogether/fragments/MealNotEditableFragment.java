@@ -29,6 +29,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -222,14 +223,14 @@ public class MealNotEditableFragment extends Fragment {
         List<String> usersKeys = new ArrayList<String>();
         usersKeys.add(mParent.getUid());
         usersKeys.add(mealUserKey);
-        Conversation newConv = new Conversation(title.getText().toString(), conversationKey, usersKeys);
+        Conversation newConv = new Conversation(title.getText().toString(), conversationKey, usersKeys, 0, 0 - Calendar.getInstance().getTime().getTime());
 
         HashMap<String, Object> convMap = newConv.toHashMap();
         convMap.remove("messages"); //to not delete previous messages if any
+        convMap.remove("unread"); //to not delete previous messages if any
         conversation.getRef().updateChildren(convMap);
 
         mParent.goToConversation(conversationKey);
-
     }
 
     public void reserve(View v) {

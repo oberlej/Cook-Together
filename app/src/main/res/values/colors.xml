@@ -5,6 +5,7 @@
     <color name="colorAccent">#ff4081</color>
     <color name="actionBarText">#FFFFFF</color>
     <color name="bg_bubble_self">#DDDDDD</color>
+    <color name="list_divider">#dedede</color>
     <color name="rsv_green">#32CD32</color>
     <color name="rsv_red">#FF0000</color>
     <color name="rsv_orange">#FFA500</color>

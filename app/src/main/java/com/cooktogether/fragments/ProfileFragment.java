@@ -34,7 +34,6 @@ import android.widget.Toast;
 
 import com.cooktogether.R;
 import com.cooktogether.helpers.AbstractBaseFragment;
-import com.cooktogether.helpers.DownloadImage;
 import com.cooktogether.helpers.UploadPicture;
 import com.cooktogether.mainscreens.HomeActivity;
 import com.cooktogether.model.User;
@@ -95,6 +94,8 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         init(view);
         loadUser();
+        mParent.getSupportActionBar().setTitle("My Profile");
+        ((HomeActivity)mParent).hideKeyboard(getContext());
         return view;
     }
 

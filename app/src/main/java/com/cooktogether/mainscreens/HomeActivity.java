@@ -1,5 +1,6 @@
 package com.cooktogether.mainscreens;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -20,7 +21,7 @@ import android.widget.Toast;
 
 import com.cooktogether.R;
 import com.cooktogether.fragments.ChatFragment;
-import com.cooktogether.fragments.ConversationsListFragment;
+import com.cooktogether.fragments.ChatListFragment;
 import com.cooktogether.fragments.MealNotEditableFragment;
 import com.cooktogether.fragments.MyMealFragment;
 import com.cooktogether.fragments.MyMealsFragment;
@@ -62,7 +63,6 @@ public class HomeActivity extends AbstractBaseActivity {
         setContentView(R.layout.drawer_main);
         init();
 
-
         //set default item
         loadDefaultScreen();
     }
@@ -73,6 +73,7 @@ public class HomeActivity extends AbstractBaseActivity {
         mToolbar = (Toolbar) findViewById(R.id.toolbar_main);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(true);
+        getSupportActionBar().setTitle("Cook Together");
 
         // Setup drawer
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -199,7 +200,7 @@ public class HomeActivity extends AbstractBaseActivity {
                 fragmentClass = MyReservationsFragment.class;
                 break;
             case R.id.nav_my_messages:
-                fragmentClass = ConversationsListFragment.class;
+                fragmentClass = ChatListFragment.class;
                 break;
             case R.id.nav_logout:
                 logout();
@@ -332,6 +333,17 @@ public class HomeActivity extends AbstractBaseActivity {
         //itemChecked = null;
         setTitle("Proposed Meal");
         mDrawer.closeDrawers();
+    }
+
+    public void hideKeyboard(Context ctx) {
+        InputMethodManager inputManager = (InputMethodManager) ctx.getSystemService(Context.INPUT_METHOD_SERVICE);
+
+        // check if no view has focus:
+        View v = ((Activity) ctx).getCurrentFocus();
+        if (v == null)
+            return;
+
+        inputManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
     }
 
     public User getUser() {

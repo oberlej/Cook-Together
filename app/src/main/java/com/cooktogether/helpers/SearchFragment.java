@@ -35,6 +35,7 @@ public class SearchFragment extends AbstractBaseFragment {
     @Override
     protected void init(View view) {
         mParent = (HomeActivity) getActivity();
+        mParent.getSupportActionBar().setTitle("Search for Meals");
 
         //init fragments
         mList = ListSearchFragment.newInstance();
