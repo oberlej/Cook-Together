@@ -1,4 +1,5 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <group
         android:id="@+id/group1"
         android:checkableBehavior="single">
@@ -27,7 +28,8 @@
             android:id="@+id/nav_my_messages"
             android:icon="@drawable/ic_message_white_48dp"
             android:orderInCategory="@integer/MY_MESSAGES_ORDER"
-            android:title="@string/my_messages" />
+            android:title="@string/my_messages"
+            app:actionLayout="@layout/menu_counter" />
     </group>
     <group
         android:id="@+id/group2"

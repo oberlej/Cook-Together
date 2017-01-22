@@ -2,7 +2,6 @@ package com.cooktogether.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cooktogether.R;
+import com.cooktogether.helpers.AbstractBaseFragment;
 import com.cooktogether.mainscreens.HomeActivity;
 import com.cooktogether.model.Conversation;
 import com.cooktogether.model.Message;
@@ -32,13 +32,12 @@ import java.util.List;
  * Created by hela on 06/01/17.
  */
 
-public class ChatFragment extends Fragment {
+public class ChatFragment extends AbstractBaseFragment {
 
     private FirebaseListAdapter<Message> mAdapter;
     private ListView mList;
     private Button mSendButton;
     private EditText mMessage;
-    protected HomeActivity mParent;
 
     private Conversation mConversation = null;
     private String mConversationKey = null;
@@ -58,15 +57,35 @@ public class ChatFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
         mParent = (HomeActivity) getActivity();
         mParent.checkIsConnected();
-
-        initFields(view);
+        init(view);
         loadConversation();
         return view;
     }
 
+    @Override
+    protected void init(View view) {
+        mList = (ListView) view.findViewById(R.id.chat_list);
+        mSendButton = (Button) view.findViewById(R.id.chat_send);
+
+        mSendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mMessage.getText().toString().trim().isEmpty()) {
+                    mMessage.setError(getString(R.string.message_empty));
+                    requestFocus(mMessage);
+                    return;
+                }
+                sendMessage(view);
+            }
+        });
+
+        mConversationKey = ((HomeActivity) mParent).getConversationKey();
+        mMessage = (EditText) view.findViewById(R.id.chat_text_input);
+    }
+
     private void loadConversation() {
 
-        mParent.getDB().child("user-conversations").child(mParent.getUid())
+        getDB().child(getString(R.string.db_user_conversations)).child(mParent.getUid())
                 .child(mConversationKey).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
@@ -75,8 +94,26 @@ public class ChatFragment extends Fragment {
                 //set unread to 0
                 if (conversation.getUnread() > 0) {
                     HashMap<String, Object> convMap = new HashMap<>();
-                    convMap.put("unread", 0);
+                    convMap.put(getString(R.string.db_unread), 0);
                     dataSnapshot.getRef().updateChildren(convMap);
+
+                    //set nb conv unread -1
+                    getDB().child(getString(R.string.db_users)).child(getUid()).child(getString(R.string.db_unread)).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            int unread = 1;
+                            if (dataSnapshot != null && dataSnapshot.exists()) {
+                                unread = ((Long) dataSnapshot.getValue()).intValue();
+                                if (unread < 1) unread = 1;
+                            }
+                            getDB().child(getString(R.string.db_users)).child(getUid()).child(getString(R.string.db_unread)).setValue(unread - 1);
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
                 }
 
                 mParent.getSupportActionBar().setTitle(conversation.getTitle());
@@ -87,7 +124,7 @@ public class ChatFragment extends Fragment {
                 mUsersKeys.add(0, mParent.getUid());
 
 
-                mAdapter = new FirebaseListAdapter<Message>(getActivity(), Message.class, R.layout.item_chat, dataSnapshot.child("messages").getRef()) {
+                mAdapter = new FirebaseListAdapter<Message>(getActivity(), Message.class, R.layout.item_chat, dataSnapshot.child(getString(R.string.db_messages)).getRef()) {
                     @Override
                     protected void populateView(View v, Message model, int position) {
                         // Get references to the views of message.xml
@@ -130,7 +167,7 @@ public class ChatFragment extends Fragment {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                Toast.makeText(getContext(), "Failed to load Conversation.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), R.string.fail_load_conv, Toast.LENGTH_SHORT).show();
             }
 
         });
@@ -140,26 +177,6 @@ public class ChatFragment extends Fragment {
         if (view.requestFocus()) {
             getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
         }
-    }
-
-    private void initFields(View view) {
-        mList = (ListView) view.findViewById(R.id.chat_list);
-        mSendButton = (Button) view.findViewById(R.id.chat_send);
-
-        mSendButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (mMessage.getText().toString().trim().isEmpty()) {
-                    mMessage.setError(getString(R.string.message_empty));
-                    requestFocus(mMessage);
-                    return;
-                }
-                sendMessage(view);
-            }
-        });
-
-        mConversationKey = mParent.getConversationKey();
-        mMessage = (EditText) view.findViewById(R.id.chat_text_input);
     }
 
     @Override
@@ -176,20 +193,38 @@ public class ChatFragment extends Fragment {
 
         //in case its the first message (once created or after been deleted
         HashMap<String, Object> convMap = mConversation.toHashMap();
-        convMap.remove("messages"); //to not delete previous messages if any
-        convMap.remove("unread"); //to not delete previous messages if any
-        mParent.getDB().child("user-conversations").child(mUsersKeys.get(1)).child(mConversationKey).getRef().updateChildren(convMap);
+        convMap.remove(getString(R.string.db_messages)); //to not delete previous messages if any
+        convMap.remove(getString(R.string.db_unread)); //to not delete previous messages if any
+        getDB().child(getString(R.string.db_user_conversations)).child(mUsersKeys.get(1)).child(mConversationKey).getRef().updateChildren(convMap);
 
         //updating messages of the conversation
-        mParent.getDB().child("user-conversations").child(mUsersKeys.get(1)).child(mConversationKey).child("messages").push().setValue(m);
+        getDB().child(getString(R.string.db_user_conversations)).child(mUsersKeys.get(1)).child(mConversationKey).child(getString(R.string.db_messages)).push().setValue(m);
         //update unread
-        mParent.getDB().child("user-conversations").child(mUsersKeys.get(1)).child(mConversationKey).addListenerForSingleValueEvent(new ValueEventListener() {
+        getDB().child(getString(R.string.db_user_conversations)).child(mUsersKeys.get(1)).child(mConversationKey).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Conversation receiverConv = Conversation.parseSnapshot(dataSnapshot);
+                if (receiverConv.getUnread() < 1) {
+                    //first unread message for this conversation
+                    getDB().child(getString(R.string.db_users)).child(mUsersKeys.get(1)).child(getString(R.string.db_unread)).addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            int unread = 0;
+                            if (dataSnapshot != null && dataSnapshot.exists()) {
+                                unread = ((Long) dataSnapshot.getValue()).intValue();
+                            }
+                            getDB().child(getString(R.string.db_users)).child(mUsersKeys.get(1)).child(getString(R.string.db_unread)).setValue(unread + 1);
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+                }
 
                 HashMap<String, Object> conversation = new HashMap<>();
-                conversation.put("unread", receiverConv.getUnread() + 1);
+                conversation.put(getString(R.string.db_unread), receiverConv.getUnread() + 1);
                 dataSnapshot.getRef().updateChildren(conversation);
             }
 
@@ -198,11 +233,11 @@ public class ChatFragment extends Fragment {
             }
         });
 
-        mParent.getDB().child("user-conversations").child(mUsersKeys.get(0)).child(mConversationKey).child("messages").push().setValue(m);
+        getDB().child(getString(R.string.db_user_conversations)).child(mUsersKeys.get(0)).child(mConversationKey).child(getString(R.string.db_messages)).push().setValue(m);
 
         //update rank so that the conv are displayed on top
-        mParent.getDB().child("user-conversations").child(mUsersKeys.get(0)).child(mConversationKey).child("rank").setValue(0 - calendar.getTime().getTime());
-        mParent.getDB().child("user-conversations").child(mUsersKeys.get(1)).child(mConversationKey).child("rank").setValue(0 - calendar.getTime().getTime());
+        getDB().child(getString(R.string.db_user_conversations)).child(mUsersKeys.get(0)).child(mConversationKey).child(getString(R.string.db_rank)).setValue(0 - calendar.getTime().getTime());
+        getDB().child(getString(R.string.db_user_conversations)).child(mUsersKeys.get(1)).child(mConversationKey).child(getString(R.string.db_rank)).setValue(0 - calendar.getTime().getTime());
         //clearingthe edit text field
         mMessage.setText("");
     }
@@ -213,6 +248,8 @@ public class ChatFragment extends Fragment {
             Toast.makeText(getContext(), e.getMessage().toString(), Toast.LENGTH_LONG).show();
         }
     };
+
+
 }
 
 
