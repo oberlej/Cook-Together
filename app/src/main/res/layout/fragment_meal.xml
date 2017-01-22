@@ -57,7 +57,7 @@
 
         <include
             layout="@layout/search_location_bar"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="93dp" />
 
         <android.support.v7.widget.RecyclerView
@@ -67,28 +67,34 @@
             android:scrollbars="vertical" />
 
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginBottom="10dp">
             <TextView
+                android:text="Number of persons"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Number of persons" />
-
+                android:layout_gravity="start|center_vertical"
+                android:layout_weight="0"/>
             <EditText
                 android:id="@+id/set_nbr_persons"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:inputType="number" />
+                android:inputType="number"
+                android:layout_gravity="center_vertical"/>
+
+            <include
+                layout="@layout/reservations_progress_bar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:gravity="end"
+                android:layout_marginLeft="10dp" />
         </LinearLayout>
 
-        <include
-            layout="@layout/reservations_progress_bar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"/>
-
         <TextView
+            style="@style/Header"
             android:id="@+id/rsv_accepted_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -102,7 +108,9 @@
             android:layout_height="wrap_content"
             android:orientation="vertical" />
 
+        <View style="@style/Divider"/>
         <TextView
+            style="@style/Header"
             android:id="@+id/rsv_demands_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

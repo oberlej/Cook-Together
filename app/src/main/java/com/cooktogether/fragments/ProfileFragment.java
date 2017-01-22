@@ -94,7 +94,15 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         init(view);
         loadUser();
-        mParent.getSupportActionBar().setTitle("My Profile");
+        if(!mUser.getUserKey().equals(getCurrentUser().getUid())) {
+            disableEdit();
+            mParent.getSupportActionBar().setTitle(mUser.getUserName() +" Profile");
+            setHasOptionsMenu(false);
+        }
+        else {
+            mParent.getSupportActionBar().setTitle("My Profile");
+            setHasOptionsMenu(true);
+        }
         ((HomeActivity)mParent).hideKeyboard(getContext());
         return view;
     }
@@ -102,6 +110,7 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
     @Override
     protected void init(View view) {
         mParent = (HomeActivity) getActivity();
+
         mPicture = (CircleImageView) view.findViewById(R.id.profile_picture);
         mPicture.setOnClickListener(this);
         mUserName = (EditText) view.findViewById(R.id.profile_user_name);
@@ -116,7 +125,7 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
     }
 
     private void loadUser() {
-        mUser = ((HomeActivity) mParent).getUser();
+        mUser = ((HomeActivity)mParent).getToVisit()!= null ? ((HomeActivity)mParent).getToVisit() :((HomeActivity) mParent).getUser();
         picLoader = new UploadPicture(getContext(), mUser, mPicture, getCurrentUser(), getRootRef(), getDB());
         if (mUser == null) {
             getDB().child("users").child(getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -273,7 +282,7 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
     public void onAttach(Context context) {
         super.onAttach(context);
         //=> calls on create options menu
-        setHasOptionsMenu(true);
+        setHasOptionsMenu(false);
     }
 
     @Override
@@ -503,5 +512,18 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
             String dateForButton = dateFormat.format(mCalendar.getTime());
             mBirthDate.setText(dateForButton);
         }
+    }
+    private void disableEdit(){
+        mPicture.setClickable(false);
+        mUserName.setEnabled(false);
+        mUseFBPicture.setVisibility(View.GONE);
+        mDeletePicture.setVisibility(View.GONE);
+        mBirthDate.setEnabled(false);
+        mDescription.setEnabled(false);
+    }
+    @Override
+    public void onDestroy(){
+        super.onDestroy();
+        ((HomeActivity)mParent).setToVisit(null);
     }
 }

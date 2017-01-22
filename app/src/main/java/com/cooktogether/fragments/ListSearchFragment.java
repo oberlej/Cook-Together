@@ -89,7 +89,8 @@ public class ListSearchFragment extends AbstractMealListFragment {
                     public void onItemClick(View view, int position) {
                         Meal selectedMeal = ((MealsListAdapter) mAdapter).getSelectedMeal(position);
                         // Launch Meal Details Fragment
-                        ((HomeActivity) mParent).setMealKey(selectedMeal.getMealKey());
+                        //to get the user pic
+                        ((HomeActivity)mParent).setToVisit(users.get(selectedMeal.getMealKey()));
                         ((HomeActivity) mParent).goToMeal(selectedMeal.getMealKey());
                     }
                 })

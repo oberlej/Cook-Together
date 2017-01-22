@@ -345,6 +345,7 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
 
             CircleImageView userPic = (CircleImageView) rsv_demandWrapper.findViewById(R.id.profile_pic);
             new UploadPicture(getContext(), mRsv_demands.get(rsv_d), userPic, null, getRootRef(), getDB()).loadPicture();
+            userPic.setOnClickListener(this);
 
             ((TextView) rsv_demandWrapper.findViewById(R.id.user_name)).setText(mRsv_demands.get(rsv_d).getUserName());
             ((CheckBox) rsv_demandWrapper.findViewById(R.id.accept_rsv_demand)).setChecked(false);
@@ -362,6 +363,7 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
 
         CircleImageView userPic = (CircleImageView) rsvWrapper.findViewById(R.id.profile_pic);
         new UploadPicture(getContext(), mRsv_accepted.get(rsv), userPic, null, getRootRef(), getDB()).loadPicture();
+        userPic.setOnClickListener(this);
 
         rsvWrapper.findViewById(R.id.contact_user_btn).setOnClickListener(this);
         rsv_accepted.addView(rsvWrapper);
@@ -463,7 +465,26 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
             case R.id.contact_user_btn:
                 contact(v);
                 break;
+            case R.id.profile_pic:
+                showProfile(v);
+                break;
         }
+    }
+
+    private void showProfile(View v) {
+        View parent = (View) (v.getParent()).getParent();
+        Reservation rsv;
+        User user;
+        if( parent.getTag(R.id.TAG_RSV_DEMAND) != null) {
+            rsv = (Reservation) parent.getTag(R.id.TAG_RSV_DEMAND);
+            user = mRsv_demands.get(rsv);
+        }
+        else{
+            rsv = (Reservation) parent.getTag(R.id.TAG_RSV_ACCEPTED);
+            user = mRsv_accepted.get(rsv);
+        }
+        ((HomeActivity)mParent).setToVisit(user);
+        ((HomeActivity)mParent).showProfile();
     }
 
     private void contact(View v) {

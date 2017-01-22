@@ -16,6 +16,7 @@ import com.cooktogether.listener.RecyclerItemClickListener;
 import com.cooktogether.mainscreens.HomeActivity;
 import com.cooktogether.model.Meal;
 import com.cooktogether.model.Reservation;
+import com.cooktogether.model.User;
 import com.cooktogether.viewholder.ReservationViewHolder;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
@@ -25,6 +26,7 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -38,6 +40,7 @@ public class MyReservationsFragment  extends AbstractBaseFragment {
     private TextView mEmptyList;
     private ArrayList<Reservation> reservations;
     private ArrayList<Meal> meals;
+    private HashMap<String, User> users;
 
     public static MyReservationsFragment newInstance() {
         return new MyReservationsFragment();
@@ -46,6 +49,7 @@ public class MyReservationsFragment  extends AbstractBaseFragment {
     public MyReservationsFragment() {
         this.reservations = new ArrayList<Reservation>();
         this.meals = new ArrayList<Meal>();
+        this.users = new HashMap<String, User>();
     }
 
     @Override
@@ -82,10 +86,11 @@ public class MyReservationsFragment  extends AbstractBaseFragment {
     }
 
     protected void setAdapter(Query reservationsQuery) {
+
         reservationsQuery.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-                Reservation rsv = Reservation.parseSnapshot(dataSnapshot);
+                final Reservation rsv = Reservation.parseSnapshot(dataSnapshot);
                 if(((HomeActivity)mParent).getUser().getReservations().contains(rsv.getReservationKey())){
                     reservations.add(rsv);
                     getDB().child("meals").child(rsv.getMealKey()).addValueEventListener(new ValueEventListener() {
@@ -96,6 +101,18 @@ public class MyReservationsFragment  extends AbstractBaseFragment {
                             mAdapter = new ReservationListAdapter(meals, reservations);
                             mRecycler.setAdapter(mAdapter);
                             mEmptyList.setVisibility(View.GONE);
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    });
+                    getDB().child("users").child(rsv.getUserKey()).addValueEventListener(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            User user = User.parseSnapshot(dataSnapshot);
+                            users.put(rsv.getMealKey(), user);
                         }
 
                         @Override
@@ -140,7 +157,7 @@ public class MyReservationsFragment  extends AbstractBaseFragment {
                     public void onItemClick(View view, int position) {
                         Meal selectedMeal = ((ReservationListAdapter) mAdapter).getSelectedMeal(position);
                         // Launch Meal Details Fragment
-                        ((HomeActivity) mParent).setMealKey(selectedMeal.getMealKey());
+                        ((HomeActivity)mParent).setToVisit(users.get(selectedMeal.getMealKey()));
                         ((HomeActivity) mParent).goToMeal(selectedMeal.getMealKey());
                     }
                 })

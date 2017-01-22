@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">#B8001A</color>
     <color name="colorPrimaryDark">#800000</color>
-    <color name="colorAccent">#00CC99</color>
+    <color name="colorAccent">#00CC99</color> <!--  #f1e07c-->
     <color name="actionBarText">#FFFFFF</color>
     <color name="bg_bubble_self">#DDDDDD</color>
     <color name="list_divider">#dedede</color>

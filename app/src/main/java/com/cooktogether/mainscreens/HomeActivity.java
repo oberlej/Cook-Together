@@ -55,6 +55,7 @@ public class HomeActivity extends AbstractBaseActivity {
 
     private User mUser = null;
     private UploadPicture picLoader;
+    private User toVisit = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -254,8 +255,6 @@ public class HomeActivity extends AbstractBaseActivity {
     public void showProfile() {
         Fragment f = ProfileFragment.newInstance();
         showFragment(f);
-        itemChecked.setChecked(false);
-        itemChecked = null;
         mDrawer.closeDrawers();
     }
 
@@ -374,6 +373,14 @@ public class HomeActivity extends AbstractBaseActivity {
 
     public void setUser(User mUser) {
         this.mUser = mUser;
+    }
+
+    public void setToVisit(User toVisit) {
+        this.toVisit = toVisit;
+    }
+
+    public User getToVisit() {
+        return toVisit;
     }
 }
 

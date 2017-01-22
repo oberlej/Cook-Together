@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cooktogether.R;
+import com.cooktogether.helpers.UploadPicture;
 import com.cooktogether.mainscreens.HomeActivity;
 import com.cooktogether.model.Conversation;
 import com.cooktogether.model.Day;
@@ -32,6 +33,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Created by hela on 07/01/17.
@@ -57,6 +60,8 @@ public class MealNotEditableFragment extends Fragment {
     private int mNbrPersons;
     private ProgressBar progressBar;
     private TextView progressBarTxt;
+    private boolean picUserClicked;
+    private TextView mNbrPersonsView;
 
     public MealNotEditableFragment() {
 
@@ -79,6 +84,20 @@ public class MealNotEditableFragment extends Fragment {
     private void initFields(View view) {
         mParent = (HomeActivity) getActivity();
         mealKey = mParent.getMealKey();
+        mParent.getSupportActionBar().setTitle("Proposed Meal");
+        if(mParent.getToVisit()!=null) { //should not happen
+            CircleImageView userPic = (CircleImageView) view.findViewById(R.id.profile_pic);
+            new UploadPicture(getContext(), mParent.getToVisit(), userPic, null, mParent.getRootRef(), mParent.getDB()).loadPicture();
+            userPic.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    picUserClicked = true;
+                    mParent.setToVisit(mParent.getToVisit());
+                    mParent.showProfile();
+                }
+            });
+        }
+
         title = (TextView) view.findViewById(R.id.meal_title);
         description = (TextView) view.findViewById(R.id.meal_description);
         mListOfDays = (LinearLayout) view.findViewById(R.id.list_of_days);
@@ -92,7 +111,7 @@ public class MealNotEditableFragment extends Fragment {
 
         progressBar = (ProgressBar) view.findViewById(R.id.reservations_progress_bar);
         progressBarTxt = (TextView) view.findViewById(R.id.progress_bar_txt);
-
+        mNbrPersonsView = (TextView)view.findViewById(R.id.nbr_persons);
         reserve_btn = (Button) view.findViewById(R.id.reserve_btn);
         reserve_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -138,6 +157,7 @@ public class MealNotEditableFragment extends Fragment {
                 progressBar.setProgress(mNbrReservations);
 
                 mNbrPersons = meal.getNbrPersons();
+                mNbrPersonsView.setText("Number of persons : "+ String.valueOf(mNbrPersons));
                 progressBar.setMax(mNbrPersons);
                 progressBarTxt.setText(mNbrReservations + "/" + mNbrPersons + " places reserved");
                 if (meal.getBooked()) {
@@ -257,6 +277,8 @@ public class MealNotEditableFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         ((HomeActivity) mParent).mMealKey = null;
+        if(!picUserClicked) //exit without visiting profile
+            ((HomeActivity)mParent).setToVisit(null);
     }
 }
 
