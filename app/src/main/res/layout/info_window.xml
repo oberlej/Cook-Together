@@ -6,6 +6,13 @@
     android:orientation="vertical"
     android:background="#FFFF">
 
+    <!-- user pic -->
+    <include
+        layout="@layout/profile_pic"
+        android:layout_width="40dp"
+        android:layout_height="40dp"/>
+
+    <!-- meal title -->
     <TextView
         android:id="@+id/infoTitle"
         android:textColor="@color/common_google_signin_btn_text_dark_focused"
@@ -13,6 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
+    <!-- some meal details -->
     <TextView
         android:id="@+id/infoSnippet"
         android:textColor="@color/com_facebook_button_background_color_selected"

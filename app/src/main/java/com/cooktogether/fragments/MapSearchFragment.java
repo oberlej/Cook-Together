@@ -15,8 +15,10 @@ import android.widget.TextView;
 import com.cooktogether.R;
 import com.cooktogether.helpers.AbstractLocationFragment;
 import com.cooktogether.helpers.MealMarker;
+import com.cooktogether.helpers.UploadPicture;
 import com.cooktogether.mainscreens.HomeActivity;
 import com.cooktogether.model.Meal;
+import com.cooktogether.model.User;
 import com.cooktogether.model.UserLocation;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -35,6 +37,8 @@ import com.google.maps.android.clustering.ClusterManager;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 /**
  * Created by hela on 08/01/17.
  */
@@ -42,6 +46,7 @@ import java.util.HashMap;
 public class MapSearchFragment extends AbstractLocationFragment implements OnMapReadyCallback {
     private GoogleMap myGoogleMap;
     private ArrayList<Meal> nearByMealsList;
+    private HashMap<String, User> usersList; //key is mealKey , value is the user
     private MapView mapView;
     private HashMap<LatLng, Integer> mMarkers; //the key is the position and the value is the nbr of markers at the same position
 
@@ -78,14 +83,16 @@ public class MapSearchFragment extends AbstractLocationFragment implements OnMap
 
     private void initMealsList() {
         nearByMealsList = new ArrayList<Meal>();
+        usersList = new HashMap<String, User>();
+
         Query mealsQuery = getQuery(getDB());
 
         mealsQuery.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot meals) {
-                nearByMealsList = findNearByMeals(meals);
+            public void onDataChange(final DataSnapshot meals) {
+                findNearByMeals(meals);
                 //add the markers
-                if (!nearByMealsList.isEmpty()) {
+                if(!nearByMealsList.isEmpty()){
                     for (Meal m : nearByMealsList) {
                         addMarkerTo(m.getMealKey(), m.getLocation(), m.getTitle());
                     }
@@ -150,7 +157,7 @@ public class MapSearchFragment extends AbstractLocationFragment implements OnMap
         mClusterManager.setOnClusterItemInfoWindowClickListener(new ClusterManager.OnClusterItemInfoWindowClickListener<MealMarker>() {
             @Override
             public void onClusterItemInfoWindowClick(MealMarker mealMarker) {
-                ((HomeActivity) mParent).goToMeal((String) mealMarker.getMkey());
+                ((HomeActivity) mParent).goToMeal((String) mealMarker.getmKey());
             }
         });
 
@@ -181,11 +188,10 @@ public class MapSearchFragment extends AbstractLocationFragment implements OnMap
     }
 
 
-    static final double COORDINATE_OFFSET = 1 / 70d; //can be adjusted
+    static final double COORDINATE_OFFSET = 1 / 80d; //can be adjusted
 
     //adds marker at the position latitude, longitude to the map , entitled title
-    private void addMarkerTo(String id, UserLocation location, String title) {
-        //// TODO: 15/01/17 handle markers at the same position
+    private void addMarkerTo(String mealKey, UserLocation location, String title) {
         LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
 
         //handle markers at the same position
@@ -197,26 +203,39 @@ public class MapSearchFragment extends AbstractLocationFragment implements OnMap
             mMarkers.put(latLng, 0);
         }
 
-        addItem(id, latLng, location.toString(), title);
+        addItem(mealKey, latLng, location.toString(), title);
     }
 
     //adds item to the cluser
-    private void addItem(String id, LatLng location, String snippet, String title) {
+    private void addItem(String mealKey, LatLng location, String snippet, String title) {
         //creates the meal marker item
-        MealMarker offsetItem = new MealMarker(location.latitude, location.longitude, title, snippet, id);
+        MealMarker offsetItem = new MealMarker(location.latitude, location.longitude, title, snippet, mealKey);
         //add it to the cluster
         mClusterManager.addItem(offsetItem);
     }
 
-    private ArrayList<Meal> findNearByMeals(DataSnapshot meals) {
-        ArrayList<Meal> nearByMeals = new ArrayList<Meal>();
+    private void findNearByMeals(DataSnapshot mealsData) {
+        nearByMealsList.clear();
+        usersList.clear();
 
-        for (DataSnapshot mealSnap : meals.getChildren()) {
-            Meal meal = Meal.parseSnapshot(mealSnap);
-            if (!meal.getUserKey().equals(getUid()))
-                nearByMeals.add(meal);
+        for (DataSnapshot mealSnap : mealsData.getChildren()) {
+            final Meal meal = Meal.parseSnapshot(mealSnap);
+            if (!meal.getUserKey().equals(getUid())) {
+                nearByMealsList.add(meal);
+                usersList.put(meal.getMealKey(), null);
+                getDB().child("users").child(meal.getUserKey()).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        User user = User.parseSnapshot(dataSnapshot);
+                        usersList.put(meal.getMealKey(), user);
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+            }
         }
-        return nearByMeals;
     }
 
 
@@ -251,6 +270,7 @@ public class MapSearchFragment extends AbstractLocationFragment implements OnMap
         super.onDestroy();
         //removes all the marker in the map
         nearByMealsList.clear();
+        usersList.clear();
         myGoogleMap.clear();
         mMarkers.clear();
         if (mClusterManager != null)
@@ -302,8 +322,12 @@ public class MapSearchFragment extends AbstractLocationFragment implements OnMap
             TextView tvSnippet = ((TextView) myContentsView
                     .findViewById(R.id.infoSnippet));
 
-            tvTitle.setText(mSelectedItem.getMtitle());
+            tvTitle.setText(mSelectedItem.getmTitle());
             tvSnippet.setText(mSelectedItem.getmSnippet());
+
+            CircleImageView userPic = (CircleImageView) myContentsView.findViewById(R.id.profile_pic);
+            new UploadPicture(getContext(), usersList.get(mSelectedItem.getmKey()) , userPic, null, getRootRef(), getDB()).loadPicture();
+
             return myContentsView;
         }
 
