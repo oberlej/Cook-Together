@@ -2,116 +2,127 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
     android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin">
+
+        <EditText
+            android:id="@+id/create_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/meal_title"
+            android:maxLines="1" />
+
+        <EditText
+            android:id="@+id/create_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top|start"
+            android:hint="@string/description"
+            android:maxLines="5" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <EditText
-                android:id="@+id/create_title"
+            <TextView
+                style="@style/Header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/meal_title"
-                android:maxLines="1" />
-
-            <EditText
-                android:id="@+id/create_description"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="top|start"
-                android:hint="@string/description"
-                android:maxLines="5" />
+                android:text="@string/free_days" />
 
             <LinearLayout
+                android:id="@+id/create_list_of_days"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
-                <TextView
-                    style="@style/Header"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/free_days" />
 
-                <LinearLayout
-                    android:id="@+id/create_list_of_days"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                </LinearLayout>
-
-                <Button
-                    android:layout_marginTop="10dp"
-                    android:id="@+id/create_new_day_btn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/add_day" />
             </LinearLayout>
 
-            <include
-                layout="@layout/search_location_bar"
-                android:layout_width="match_parent"
-                android:layout_height="93dp"/>
-
-            <android.support.v7.widget.RecyclerView
-                android:id="@+id/location_options"
-                android:scrollbars="vertical"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent" />
-            <LinearLayout
+            <Button
+                android:id="@+id/create_new_day_btn"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Number of persons"/>
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/add_day" />
+        </LinearLayout>
+
+        <include
+            layout="@layout/search_location_bar"
+            android:layout_width="match_parent"
+            android:layout_height="93dp" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/location_options"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scrollbars="vertical" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Number of persons" />
+
             <EditText
                 android:id="@+id/set_nbr_persons"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:inputType="number" />
-            </LinearLayout>
-            <LinearLayout
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/nbr_reservations"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:id="@+id/nbr_reservations"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="0"/>
-                <ProgressBar
-                    android:id="@+id/progressBar1"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="20dp"
-                    android:indeterminate="false"
-                    android:minHeight="50dp"
-                    android:minWidth="200dp"
-                    android:progress="1" />
-            </LinearLayout>
-                <LinearLayout
-                  android:id="@+id/rsv_demands"
-                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"/>
-            <LinearLayout
+                android:text="0" />
+
+            <ProgressBar
+                android:id="@+id/progressBar1"
+                style="?android:attr/progressBarStyleHorizontal"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
-                <TextView
-                    android:text="Set as booked"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content" />
-                <CheckBox
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:indeterminate="false"
+                android:minHeight="50dp"
+                android:minWidth="200dp"
+                android:progress="1" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/rsv_demands"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Set as booked" />
+
+            <CheckBox
                 android:id="@+id/set_is_booked"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
-            </LinearLayout>
         </LinearLayout>
+    </LinearLayout>
 </ScrollView>

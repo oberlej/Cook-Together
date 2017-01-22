@@ -13,6 +13,7 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity
             android:name=".mainscreens.WelcomeActivity"
             android:screenOrientation="portrait">
@@ -28,8 +29,7 @@
             android:windowSoftInputMode="stateHidden" />
         <activity
             android:name=".mainscreens.HomeActivity"
-            android:screenOrientation="portrait"
-            android:windowSoftInputMode="stateHidden" />
+            android:screenOrientation="portrait" />
 
         <activity
             android:name="com.facebook.CustomTabActivity"

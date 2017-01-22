@@ -23,8 +23,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.cooktogether.fragments.ChatFragment;
 import com.cooktogether.fragments.MealNotEditableFragment;
-import com.cooktogether.fragments.ConversationFragment;
 
 import com.cooktogether.fragments.MyMealFragment;
 import com.cooktogether.fragments.MyMealsFragment;
@@ -337,7 +337,7 @@ public class HomeActivity extends AbstractBaseActivity {
 
     public void goToConversation(String conversationKey) {
         setConversationKey(conversationKey);
-        Fragment f = ConversationFragment.newInstance();
+        Fragment f = ChatFragment.newInstance();
         showFragment(f);
         //itemChecked.setChecked(false);
         //itemChecked = null;
