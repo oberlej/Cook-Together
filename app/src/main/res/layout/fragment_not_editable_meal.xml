@@ -19,30 +19,53 @@
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:orientation="horizontal">
+                android:layout_height="70dp"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
                 <!-- user pic -->
                 <include
                     layout="@layout/profile_pic"
                     android:layout_width="80dp"
-                    android:layout_height="70dp" />
-
+                    android:layout_height="70dp"
+                    android:layout_gravity="start"
+                    android:layout_weight="0" />
+                <!--Meal Title -->
                 <TextView
                     android:id="@+id/meal_title"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical"
                     android:hint="@string/meal_title"
-                    android:maxLines="1"
-                    android:layout_gravity="center_vertical"/>
+                    android:maxLines="1" />
             </LinearLayout>
 
-            <TextView
-                android:id="@+id/meal_description"
+            <View style="@style/Divider"
+                android:layout_width="wrap_content" />
+            <!--Meal description -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="top|start"
-                android:hint="@string/no_description"
-                android:maxLines="5" />
+                android:orientation="vertical"
+                android:layout_marginBottom="10dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0"
+                    android:text="@string/description_not_editable" />
+
+                <TextView
+                    android:id="@+id/meal_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="top|start"
+                    android:hint="@string/no_description"
+                    android:maxLines="5" />
+            </LinearLayout>
+
+            <View style="@style/Divider"/>
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -64,28 +87,46 @@
                 </LinearLayout>
             </LinearLayout>
 
+            <View style="@style/Divider"/>
 
             <TextView
                 android:id="@+id/meal_location"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:maxLines="1" />
+                android:maxLines="1"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"/>
 
+            <View style="@style/Divider"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="10dp">
             <TextView
                 android:id="@+id/nbr_persons"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:layout_gravity="start|center_vertical"
+                android:layout_weight="0"
+                android:layout_marginRight="15dp" />
 
             <include
                 layout="@layout/reservations_progress_bar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal" />
+                android:layout_gravity="end"
+                android:layout_weight="1"/>
+            </LinearLayout>
+                <View style="@style/Divider"/>
 
             <LinearLayout
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:orientation="horizontal"
+                android:layout_marginTop="10dp">
 
                 <Button
                     android:id="@+id/contact_button"
@@ -97,7 +138,7 @@
                     android:id="@+id/reserve_btn"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Reserve"
+                    android:text="@string/reserve"
                     android:visibility="invisible" />
             </LinearLayout>
         </LinearLayout>

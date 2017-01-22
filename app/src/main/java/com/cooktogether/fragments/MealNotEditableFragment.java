@@ -61,6 +61,7 @@ public class MealNotEditableFragment extends Fragment {
     private ProgressBar progressBar;
     private TextView progressBarTxt;
     private boolean picUserClicked;
+    private TextView mNbrPersonsView;
 
     public MealNotEditableFragment() {
 
@@ -110,7 +111,7 @@ public class MealNotEditableFragment extends Fragment {
 
         progressBar = (ProgressBar) view.findViewById(R.id.reservations_progress_bar);
         progressBarTxt = (TextView) view.findViewById(R.id.progress_bar_txt);
-
+        mNbrPersonsView = (TextView)view.findViewById(R.id.nbr_persons);
         reserve_btn = (Button) view.findViewById(R.id.reserve_btn);
         reserve_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -156,6 +157,7 @@ public class MealNotEditableFragment extends Fragment {
                 progressBar.setProgress(mNbrReservations);
 
                 mNbrPersons = meal.getNbrPersons();
+                mNbrPersonsView.setText("Number of persons : "+ String.valueOf(mNbrPersons));
                 progressBar.setMax(mNbrPersons);
                 progressBarTxt.setText(mNbrReservations + "/" + mNbrPersons + " places reserved");
                 if (meal.getBooked()) {
