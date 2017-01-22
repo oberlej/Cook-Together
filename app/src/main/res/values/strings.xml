@@ -61,6 +61,8 @@
     <string name="search_meal">Search Meal</string>
     <string name="my_messages">My Messages</string>
     <string name="my_reservations">My reservations</string>
+    <string name="reservations_accepted">Reservation accepted :</string>
+    <string name="reservation_demands">Reservation demands :</string>
 </resources>
 
 
