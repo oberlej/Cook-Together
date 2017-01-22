@@ -83,17 +83,19 @@ public class MealNotEditableFragment extends Fragment {
     private void initFields(View view) {
         mParent = (HomeActivity) getActivity();
         mealKey = mParent.getMealKey();
-
-        CircleImageView userPic = (CircleImageView) view.findViewById(R.id.profile_pic);
-        new UploadPicture(getContext(), mParent.getToVisit() , userPic, null, mParent.getRootRef(), mParent.getDB()).loadPicture();
-        userPic.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                picUserClicked = true;
-                mParent.setToVisit(mParent.getToVisit());
-                mParent.showProfile();
-            }
-        });
+        mParent.getSupportActionBar().setTitle("Proposed Meal");
+        if(mParent.getToVisit()!=null) { //should not happen
+            CircleImageView userPic = (CircleImageView) view.findViewById(R.id.profile_pic);
+            new UploadPicture(getContext(), mParent.getToVisit(), userPic, null, mParent.getRootRef(), mParent.getDB()).loadPicture();
+            userPic.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    picUserClicked = true;
+                    mParent.setToVisit(mParent.getToVisit());
+                    mParent.showProfile();
+                }
+            });
+        }
 
         title = (TextView) view.findViewById(R.id.meal_title);
         description = (TextView) view.findViewById(R.id.meal_description);

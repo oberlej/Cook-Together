@@ -91,7 +91,6 @@ public class ListSearchFragment extends AbstractMealListFragment {
                         // Launch Meal Details Fragment
                         //to get the user pic
                         ((HomeActivity)mParent).setToVisit(users.get(selectedMeal.getMealKey()));
-                        ((HomeActivity) mParent).setMealKey(selectedMeal.getMealKey());
                         ((HomeActivity) mParent).goToMeal(selectedMeal.getMealKey());
                     }
                 })

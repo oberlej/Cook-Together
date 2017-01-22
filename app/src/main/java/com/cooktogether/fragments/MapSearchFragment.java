@@ -157,7 +157,10 @@ public class MapSearchFragment extends AbstractLocationFragment implements OnMap
         mClusterManager.setOnClusterItemInfoWindowClickListener(new ClusterManager.OnClusterItemInfoWindowClickListener<MealMarker>() {
             @Override
             public void onClusterItemInfoWindowClick(MealMarker mealMarker) {
-                ((HomeActivity) mParent).goToMeal((String) mealMarker.getmKey());
+                // Launch Meal Details Fragment
+                //to get the user pic
+                ((HomeActivity)mParent).setToVisit(usersList.get(mealMarker.getmKey()));
+                ((HomeActivity) mParent).goToMeal(mealMarker.getmKey());
             }
         });
 
