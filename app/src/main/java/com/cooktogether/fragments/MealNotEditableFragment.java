@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cooktogether.R;
+import com.cooktogether.helpers.UploadPicture;
 import com.cooktogether.mainscreens.HomeActivity;
 import com.cooktogether.model.Conversation;
 import com.cooktogether.model.Day;
@@ -32,6 +33,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 /**
  * Created by hela on 07/01/17.
@@ -57,6 +60,7 @@ public class MealNotEditableFragment extends Fragment {
     private int mNbrPersons;
     private ProgressBar progressBar;
     private TextView progressBarTxt;
+    private boolean picUserClicked;
 
     public MealNotEditableFragment() {
 
@@ -79,6 +83,18 @@ public class MealNotEditableFragment extends Fragment {
     private void initFields(View view) {
         mParent = (HomeActivity) getActivity();
         mealKey = mParent.getMealKey();
+
+        CircleImageView userPic = (CircleImageView) view.findViewById(R.id.profile_pic);
+        new UploadPicture(getContext(), mParent.getToVisit() , userPic, null, mParent.getRootRef(), mParent.getDB()).loadPicture();
+        userPic.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                picUserClicked = true;
+                mParent.setToVisit(mParent.getToVisit());
+                mParent.showProfile();
+            }
+        });
+
         title = (TextView) view.findViewById(R.id.meal_title);
         description = (TextView) view.findViewById(R.id.meal_description);
         mListOfDays = (LinearLayout) view.findViewById(R.id.list_of_days);
@@ -257,6 +273,8 @@ public class MealNotEditableFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         ((HomeActivity) mParent).mMealKey = null;
+        if(!picUserClicked) //exit without visiting profile
+            ((HomeActivity)mParent).setToVisit(null);
     }
 }
 

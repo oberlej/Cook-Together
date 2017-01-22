@@ -17,12 +17,24 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/meal_title"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/meal_title"
-                android:maxLines="1" />
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+                <!-- user pic -->
+                <include
+                    layout="@layout/profile_pic"
+                    android:layout_width="80dp"
+                    android:layout_height="70dp" />
+
+                <TextView
+                    android:id="@+id/meal_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/meal_title"
+                    android:maxLines="1"
+                    android:layout_gravity="center_vertical"/>
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/meal_description"
@@ -42,6 +54,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="@string/free_days" />
+
                 <LinearLayout
                     android:id="@+id/list_of_days"
                     android:layout_width="match_parent"
@@ -58,29 +71,34 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:maxLines="1" />
+
             <TextView
                 android:id="@+id/nbr_persons"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content" />
+
             <include
                 layout="@layout/reservations_progress_bar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"/>
+                android:layout_gravity="center_horizontal" />
+
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content">
-            <Button
-                android:id="@+id/contact_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/contact" />
-            <Button
-                android:id="@+id/reserve_btn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Reserve"
-                android:visibility="invisible"/>
+
+                <Button
+                    android:id="@+id/contact_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/contact" />
+
+                <Button
+                    android:id="@+id/reserve_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Reserve"
+                    android:visibility="invisible" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

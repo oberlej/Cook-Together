@@ -96,7 +96,7 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
         loadUser();
         if(!mUser.getUserKey().equals(getCurrentUser().getUid())) {
             disableEdit();
-            mParent.getSupportActionBar().setTitle(mUser.getUserName() +"Profile");
+            mParent.getSupportActionBar().setTitle(mUser.getUserName() +" Profile");
             setHasOptionsMenu(false);
         }
         else {
