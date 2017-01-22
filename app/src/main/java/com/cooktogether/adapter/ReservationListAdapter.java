@@ -1,13 +1,16 @@
 package com.cooktogether.adapter;
 
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.cooktogether.R;
 import com.cooktogether.model.Meal;
 import com.cooktogether.model.Reservation;
+import com.cooktogether.model.StatusEnum;
 import com.cooktogether.viewholder.ReservationViewHolder;
 
 import java.util.ArrayList;
@@ -42,7 +45,15 @@ public class ReservationListAdapter  extends RecyclerView.Adapter<ReservationVie
 
     @Override
     public void onBindViewHolder(ReservationViewHolder holder, int position) {
-        holder.bindToPost(reservations.get(position), meals.get(position));
+        Reservation rsv = reservations.get(position);
+        TextView status = (TextView)holder.itemView.findViewById(R.id.rsv_status);
+        if(StatusEnum.valueOf(rsv.getStatus().toUpperCase()).equals(StatusEnum.WAITING))
+            status.setTextColor(Color.rgb(255,165,0));
+        else if(StatusEnum.valueOf(rsv.getStatus().toUpperCase()).equals(StatusEnum.ACCEPTED))
+            status.setTextColor(Color.GREEN);
+        else
+            status.setTextColor(Color.RED);
+        holder.bindToPost(rsv, meals.get(position));
     }
 
     @Override

@@ -10,6 +10,7 @@
     android:elevation="1dp"
     android:background="@color/common_google_signin_btn_text_dark_disabled"
     android:weightSum="1">
+
     <!-- user pic -->
     <include
         layout="@layout/profile_pic"
@@ -51,6 +52,7 @@
         android:visibility="gone"
         android:layout_alignRight="@id/meal_details_layout"
         android:layout_gravity="end|center_vertical"/>
+
     <!-- meal reservations progress bar -->
     <include
         layout="@layout/reservations_progress_bar"
