@@ -15,6 +15,8 @@ import com.cooktogether.viewholder.ReservationViewHolder;
 
 import java.util.ArrayList;
 
+import static java.security.AccessController.getContext;
+
 /**
  * Created by hela on 18/01/17.
  */
@@ -48,9 +50,9 @@ public class ReservationListAdapter  extends RecyclerView.Adapter<ReservationVie
         Reservation rsv = reservations.get(position);
         TextView status = (TextView)holder.itemView.findViewById(R.id.rsv_status);
         if(StatusEnum.valueOf(rsv.getStatus().toUpperCase()).equals(StatusEnum.WAITING))
-            status.setTextColor(Color.rgb(255,165,0));
+            status.setTextColor(Color.rgb(255,165,0)); //color.rsv_orange
         else if(StatusEnum.valueOf(rsv.getStatus().toUpperCase()).equals(StatusEnum.ACCEPTED))
-            status.setTextColor(Color.GREEN);
+            status.setTextColor(Color.rgb(50,205,50)); //color.rsv_green
         else
             status.setTextColor(Color.RED);
         holder.bindToPost(rsv, meals.get(position));
