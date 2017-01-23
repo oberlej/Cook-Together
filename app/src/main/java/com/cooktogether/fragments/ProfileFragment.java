@@ -21,6 +21,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -336,12 +337,12 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
     private boolean checkInputIsValid() {
         boolean valid = true;
         if (mUserName.getText() == null || mUserName.getText().toString().isEmpty()) {
-            mUserName.setError("Please add your name before saving!");
+            mUserName.setError("Please add your username before saving!");
             mUserName.requestFocus();
             valid = false;
         }
         if (mBirthDate.getText() == null || mBirthDate.getText().toString().isEmpty()) {
-            mBirthDate.setError("Please specify your birthday before saving!");
+            mBirthDate.setError("Please specify your birth date before saving!");
             mBirthDate.requestFocus();
             valid = false;
         }
@@ -559,4 +560,6 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
         super.onDestroy();
         ((HomeActivity)mParent).setToVisit(null);
     }
+
+
 }
