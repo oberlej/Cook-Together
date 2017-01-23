@@ -17,6 +17,7 @@ import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
@@ -41,6 +42,7 @@ public class UploadPicture {
     private StorageReference rootRef;
     private DatabaseReference db;
     private boolean picSet = true;
+
     //Todo remove the currentUser: it should not be needed!
     public UploadPicture(Context context, User mUser, ImageView mPicture, FirebaseUser currentUser,
                          StorageReference rootRef, DatabaseReference db) {
@@ -56,24 +58,51 @@ public class UploadPicture {
         return picSet;
     }
 
+    private void downloadPicture(final File f) {
+        rootRef.child("profile_pictures").child(mUser.getUserKey()).getFile(f).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+            @Override
+            public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                setImage(f);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+            }
+        });
+    }
+
+    private void setImage(File f) {
+        Bitmap b = BitmapFactory.decodeFile(f.getPath(), null);
+        if (b == null) {
+            resetPicture();
+        } else {
+            mPicture.setImageBitmap(b);
+        }
+    }
+
+
     public void loadPicture() {
         File picture = new File(context.getDir("profile_pictures", Context.MODE_PRIVATE) + "/" + mUser.getUserKey() + ".jpg");
-
         if (!picture.exists()) {
-            if (mUser.isFacebookConnected() && mUser.isFacebookPicture()) {
-                setFacebookPicture();
-            } else {
-                resetPicture();
-            }
-        } else {
-            Bitmap b = BitmapFactory.decodeFile(picture.getPath(), null);
-            if (b == null) {
-                Toast.makeText(context, "Failed to load your picture. Please try again.", Toast.LENGTH_LONG).show();
-                resetPicture();
-            } else {
-                mPicture.setImageBitmap(b);
-            }
+            downloadPicture(picture);
+        }else{
+            setImage(picture);
         }
+//        if (!picture.exists()) {
+//            if (mUser.isFacebookConnected() && mUser.isFacebookPicture()) {
+//                setFacebookPicture();
+//            } else {
+//                resetPicture();
+//            }
+//        } else {
+//            Bitmap b = BitmapFactory.decodeFile(picture.getPath(), null);
+//            if (b == null) {
+//                Toast.makeText(context, "Failed to load your picture. Please try again.", Toast.LENGTH_LONG).show();
+//                resetPicture();
+//            } else {
+//                mPicture.setImageBitmap(b);
+//            }
+//        }
     }
 
     public void setFacebookPicture() {
@@ -107,7 +136,7 @@ public class UploadPicture {
             }
         }*/
         //if (!facebookUserId.isEmpty()) {
-            return "https://graph.facebook.com/" + mUser.getUserKey() + "/picture?type=large";
+        return "https://graph.facebook.com/" + mUser.getUserKey() + "/picture?type=large";
         //}
         //return "";
     }
