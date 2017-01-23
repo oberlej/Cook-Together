@@ -509,7 +509,7 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
     }
 
     private void removeRsvDemand(View v) {
-        View parent = (View) (v.getParent()).getParent();
+        View parent = (View) (v.getParent()).getParent().getParent();
         Reservation rsv = (Reservation) parent.getTag(R.id.TAG_RSV_DEMAND);
         rsv_demands.removeView(parent);
         User user = mRsv_demands.get(rsv);

@@ -82,6 +82,7 @@ public class UploadPicture {
 
 
     public void loadPicture() {
+        if(context==null) return;
         File picture = new File(context.getDir("profile_pictures", Context.MODE_PRIVATE) + "/" + mUser.getUserKey() + ".jpg");
         if (!picture.exists()) {
             downloadPicture(picture);

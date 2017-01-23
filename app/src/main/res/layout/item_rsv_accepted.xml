@@ -4,32 +4,44 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
         <!-- user pic -->
-        <include
-            layout="@layout/profile_pic"
-            android:layout_width="80dp"
-            android:layout_height="80dp"/>
+        <LinearLayout
+            android:id="@+id/profile_pic_wrapper"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true">
+
+            <include
+                layout="@layout/profile_pic"
+                android:layout_width="@dimen/img_size"
+                android:layout_height="@dimen/img_size" />
+        </LinearLayout>
         <!-- user name -->
         <TextView
             android:id="@+id/user_name"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
             android:layout_gravity="center"
-            android:layout_weight="1"
             android:layout_marginLeft="5dp"
+            android:layout_toRightOf="@id/profile_pic_wrapper"
+            android:hint="username"
             android:textColor="@android:color/primary_text_light" />
         <!-- contact button -->
         <Button
             android:id="@+id/contact_user_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/contact"/>
+            android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_gravity="right"
+            android:text="@string/contact" />
 
-    </LinearLayout>
+    </RelativeLayout>
 
     <View style="@style/Divider" />
 </LinearLayout>
