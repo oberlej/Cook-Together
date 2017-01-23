@@ -10,10 +10,12 @@
 
 
         <android.support.design.widget.TabLayout
+            style="@style/MyTabLayout"
             android:id="@+id/search_tabs"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:tabGravity="fill"
+            android:textAlignment="center"
             app:tabMode="fixed" />
     </android.support.design.widget.AppBarLayout>
 
