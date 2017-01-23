@@ -2,16 +2,21 @@ package com.cooktogether.mainscreens;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -38,6 +43,7 @@ import com.cooktogether.helpers.UploadPicture;
 import com.cooktogether.model.User;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -66,6 +72,10 @@ public class HomeActivity extends AbstractBaseActivity {
 
     private MyMealsListFragment fragMeals;
     private SearchFragment fragSearch = null;
+    private int mId = 141414;
+
+    private DatabaseReference mNewMessageRef;
+    private ValueEventListener mNewMessageListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,6 +90,10 @@ public class HomeActivity extends AbstractBaseActivity {
             boolean firstCon = false;
             if (intent.getBooleanExtra("first connexion", firstCon) || mUser.getUserName().isEmpty() || mUser.getBirthDate().isEmpty())
                 showProfile();
+        } else if (intent.hasExtra(getString(R.string.newMessageIntent))) {
+            mNewMessageRef.setValue(0);
+            Fragment f = ChatListFragment.newInstance();
+            showFragment(f);
         } else {
             //set default item
             loadDefaultScreen();
@@ -129,6 +143,7 @@ public class HomeActivity extends AbstractBaseActivity {
         }
     }
 
+
     @Override
     protected void init() {
         // Set a Toolbar to replace the ActionBar.
@@ -157,11 +172,8 @@ public class HomeActivity extends AbstractBaseActivity {
         TextView mUserName = (TextView) headerLayout.findViewById(R.id.user_name_view);
 
         loadUser(ivHeaderPhoto, mUserName);
-        setMenuCounterListener();
-    }
-
-    private void setMenuCounterListener() {
-        getDB().child(getString(R.string.db_users)).child(getUid()).child(getString(R.string.db_unread)).addValueEventListener(new ValueEventListener() {
+        mNewMessageRef = getDB().child(getString(R.string.db_users)).child(getUid()).child(getString(R.string.db_unread));
+        mNewMessageListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot == null || !dataSnapshot.exists()) {
@@ -170,13 +182,57 @@ public class HomeActivity extends AbstractBaseActivity {
 
                 int unread = ((Long) dataSnapshot.getValue()).intValue();
                 setMessageCounter(unread);
+                if (unread > 0) {
+                    Intent intent = getIntent();
+                    if (intent.hasExtra(getString(R.string.newMessageIntent))) {
+                        intent.removeExtra(getString(R.string.newMessageIntent));
+                        return;
+                    }
+                    //create notification
+                    NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplicationContext())
+                            .setSmallIcon(R.drawable.ic_message_white_48dp)
+                            .setLargeIcon(BitmapFactory.decodeResource(getResources(),R.drawable.ic_launcher))
+                            .setContentTitle("New Message")
+                            .setContentText("Check your inbox!")
+                            .setAutoCancel(true);
+                    // Creates an explicit intent for an Activity in your app
+                    Intent resultIntent = new Intent(getApplicationContext(), HomeActivity.class);
+                    resultIntent.putExtra(getString(R.string.newMessageIntent), true);
+
+                    // The stack builder object will contain an artificial back stack for the
+                    // started Activity.
+                    // This ensures that navigating backward from the Activity leads out of
+                    // your application to the Home screen.
+                    TaskStackBuilder stackBuilder = TaskStackBuilder.create(getApplicationContext());
+                    // Adds the back stack for the Intent (but not the Intent itself)
+                    stackBuilder.addParentStack(HomeActivity.class);
+                    // Adds the Intent that starts the Activity to the top of the stack
+                    stackBuilder.addNextIntent(resultIntent);
+                    PendingIntent resultPendingIntent = stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
+                    mBuilder.setContentIntent(resultPendingIntent);
+                    NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    // mId allows you to update the notification later on.
+                    mNotificationManager.notify(mId, mBuilder.build());
+                }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Toast.makeText(HomeActivity.this, R.string.fail_load_profile, Toast.LENGTH_LONG).show();
             }
-        });
+        };
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mNewMessageRef.removeEventListener(mNewMessageListener);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mNewMessageRef.addValueEventListener(mNewMessageListener);
     }
 
     //Todo use the same function as in the profile fragment
