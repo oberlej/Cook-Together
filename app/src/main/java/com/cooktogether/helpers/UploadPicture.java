@@ -85,7 +85,7 @@ public class UploadPicture {
         File picture = new File(context.getDir("profile_pictures", Context.MODE_PRIVATE) + "/" + mUser.getUserKey() + ".jpg");
         if (!picture.exists()) {
             downloadPicture(picture);
-        }else{
+        } else {
             setImage(picture);
         }
 //        if (!picture.exists()) {
@@ -110,6 +110,7 @@ public class UploadPicture {
         if (!uri.isEmpty()) {
             new DownloadImage().execute(uri);
         } else {
+            Toast.makeText(context, "Failed to download your facebook profile picture. Please try again.", Toast.LENGTH_LONG).show();
             resetPicture();
         }
     }
@@ -119,6 +120,17 @@ public class UploadPicture {
         if (tmp.exists()) {
             tmp.delete();
         }
+        rootRef.child("profile_pictures").child(mUser.getUserKey()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+
+            }
+        });
+
         mUser.setFacebookPicture(false);
         mPicture.setImageBitmap(null);
         mPicture.setBackgroundResource(R.drawable.ic_photo_camera_black_48dp);
@@ -127,18 +139,19 @@ public class UploadPicture {
     }
 
     private String getFacebookPictureUri() {
-        /*String facebookUserId = "";
-        // find the Facebook profile and get the user's id
+        String facebookUserId = "";
+//        // find the Facebook profile and get the user's id
         for (UserInfo profile : currentUser.getProviderData()) {
             // check if the provider id matches "facebook.com"
             if (profile.getProviderId().equals(context.getString(R.string.facebook_provider_id))) {
                 facebookUserId = profile.getUid();
             }
-        }*/
-        //if (!facebookUserId.isEmpty()) {
-        return "https://graph.facebook.com/" + mUser.getUserKey() + "/picture?type=large";
-        //}
-        //return "";
+        }
+        if (!facebookUserId.isEmpty()) {
+            return "https://graph.facebook.com/" + facebookUserId + "/picture?type=large";
+        } else {
+            return "";
+        }
     }
 
     public String getPath() {
