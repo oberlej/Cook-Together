@@ -389,10 +389,12 @@ public class HomeActivity extends AbstractBaseActivity {
     private void showFragment(Fragment f) {
         // Insert the fragment by replacing any existing fragment
         FragmentManager fragmentManager = getSupportFragmentManager();
-        if (!(f instanceof MyMealsListFragment) && !(f instanceof SearchFragment))
-            fragmentManager.beginTransaction().replace(R.id.drawer_screen_content, f).addToBackStack("Fragment").commit();
-        else
-            fragmentManager.beginTransaction().replace(R.id.drawer_screen_content, f).commit();
+//        if (!(f instanceof MyMealsListFragment) && !(f instanceof SearchFragment))
+//            fragmentManager.beginTransaction().replace(R.id.drawer_screen_content, f).addToBackStack("Fragment").commit();
+//        else
+//            fragmentManager.beginTransaction().replace(R.id.drawer_screen_content, f).commit();
+        fragmentManager.beginTransaction().replace(R.id.drawer_screen_content, f).commit();
+
     }
 
     public void showProfile() {
