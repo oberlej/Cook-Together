@@ -550,6 +550,7 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
         mUseFBPicture.setVisibility(View.GONE);
         mDeletePicture.setVisibility(View.GONE);
         mBirthDate.setEnabled(false);
+        mBirthDate.setTextColor(Color.BLACK);
         mDescription.setEnabled(false);
         mDescription.setTextColor(Color.BLACK);
     }
