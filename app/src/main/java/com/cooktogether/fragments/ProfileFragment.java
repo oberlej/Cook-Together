@@ -94,7 +94,7 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         init(view);
         loadUser();
-        if(!mUser.getUserKey().equals(getCurrentUser().getUid())) {
+        if(mUser!= null && !mUser.getUserKey().equals(getCurrentUser().getUid())) {
             disableEdit();
             mParent.getSupportActionBar().setTitle(mUser.getUserName() +" Profile");
             setHasOptionsMenu(false);
@@ -126,7 +126,6 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
 
     private void loadUser() {
         mUser = ((HomeActivity)mParent).getToVisit()!= null ? ((HomeActivity)mParent).getToVisit() :((HomeActivity) mParent).getUser();
-        picLoader = new UploadPicture(getContext(), mUser, mPicture, getCurrentUser(), getRootRef(), getDB());
         if (mUser == null) {
             getDB().child("users").child(getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -142,6 +141,7 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
                     mBirthDate.setText(mUser.getBirthDate());
                     mDescription.setText(mUser.getDescription());
                     //profile pic
+                    picLoader = new UploadPicture(getContext(), mUser, mPicture, getCurrentUser(), getRootRef(), getDB());
                     loadPicture();
                 }
 
@@ -155,6 +155,7 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
             mBirthDate.setText(mUser.getBirthDate());
             mDescription.setText(mUser.getDescription());
             //profile pic
+            picLoader = new UploadPicture(getContext(), mUser, mPicture, getCurrentUser(), getRootRef(), getDB());
             loadPicture();
         }
     }
@@ -290,18 +291,23 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
         // Handle presses on the action bar items
         switch (item.getItemId()) {
             case R.id.action_save:
-                saveProfile();
-                Toast.makeText(getContext(), "Profile updated.", Toast.LENGTH_LONG).show();
-                ((HomeActivity) mParent).loadDefaultScreen();
-                return true;
+                if(checkInputIsValid()) {
+                    saveProfile();
+                    Toast.makeText(getContext(), "Profile updated.", Toast.LENGTH_LONG).show();
+                    ((HomeActivity) mParent).loadDefaultScreen();
+                    return true;
+                }
+                else return false;
             case R.id.action_cancel:
                 DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int choice) {
                         switch (choice) {
                             case DialogInterface.BUTTON_POSITIVE:
-                                Toast.makeText(getContext(), "Changes discarded.", Toast.LENGTH_LONG).show();
-                                ((HomeActivity) mParent).loadDefaultScreen();
+                                if(validUser()) {
+                                    Toast.makeText(getContext(), "Changes discarded.", Toast.LENGTH_LONG).show();
+                                    ((HomeActivity) mParent).loadDefaultScreen();
+                                }
                                 break;
                         }
                     }
@@ -315,6 +321,29 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private boolean validUser() {
+        mUserName.setText(mUser.getUserName());
+        mBirthDate.setText(mUser.getBirthDate());
+        mDescription.setText(mUser.getDescription());
+
+        return checkInputIsValid();
+    }
+
+    private boolean checkInputIsValid() {
+        boolean valid = true;
+        if (mUserName.getText() == null || mUserName.getText().toString().isEmpty()) {
+            mUserName.setError("Please add your name before saving!");
+            mUserName.requestFocus();
+            valid = false;
+        }
+        if (mBirthDate.getText() == null || mBirthDate.getText().toString().isEmpty()) {
+            mBirthDate.setError("Please specify your birthday before saving!");
+            mBirthDate.requestFocus();
+            valid = false;
+        }
+        return valid;
     }
 
     private void saveProfile() {

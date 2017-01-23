@@ -89,12 +89,21 @@ public class SignUpFragment extends AbstractBaseFragment {
                                     if (task.isSuccessful()) {
                                         //create user in db
                                         FirebaseUser cu = getCurrentUser();
-                                        User newUser = new User(cu.getUid(), cu.getDisplayName(), cu.getEmail(), "", "", false, false, new ArrayList<Review>(), new ArrayList<String>());
+                                        User newUser;
+                                        if(cu.getDisplayName() == null || cu.getDisplayName().isEmpty()) {
+                                            String name = cu.getEmail();
+                                            int index = name.indexOf("@");
+                                            name = name.substring(0,index);
+                                            newUser = new User(cu.getUid(), name, cu.getEmail(), "", "", false, false, new ArrayList<Review>(), new ArrayList<String>());
+                                        }else
+                                            newUser = new User(cu.getUid(), cu.getDisplayName(), cu.getEmail(), "", "", false, false, new ArrayList<Review>(), new ArrayList<String>());
+
                                         getDB().child("users").child(cu.getUid()).setValue(newUser);
 
                                         Intent intent = new Intent(getContext(), HomeActivity.class);
                                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                        intent.putExtra("first connexion",true);
                                         startActivity(intent);
                                     } else {
                                         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());

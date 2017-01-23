@@ -69,10 +69,18 @@ public class HomeActivity extends AbstractBaseActivity {
 
         setContentView(R.layout.drawer_main);
         init();
-
-        //set default item
-        loadDefaultScreen();
-        checkPermissions();
+        //check if it is the first connexion
+        Intent intent = getIntent();
+        if (intent.hasExtra("first connexion")|| (mUser != null && (mUser.getUserName().isEmpty() | mUser.getBirthDate().isEmpty()))) {
+            boolean firstCon = false;
+            if (intent.getBooleanExtra("first connexion", firstCon) || mUser.getUserName().isEmpty() || mUser.getBirthDate().isEmpty())
+                showProfile();
+        }
+        else {
+            //set default item
+            loadDefaultScreen();
+            checkPermissions();
+        }
     }
 
     private void checkPermissions() {
