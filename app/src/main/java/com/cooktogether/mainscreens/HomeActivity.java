@@ -167,7 +167,7 @@ public class HomeActivity extends AbstractBaseActivity {
             @Override
             public void onClick(View v) {
                 toVisit = null;
-                clearBackStack();
+//                clearBackStack();
                 showProfile();
             }
         });
@@ -193,7 +193,7 @@ public class HomeActivity extends AbstractBaseActivity {
                     //create notification
                     NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplicationContext())
                             .setSmallIcon(R.drawable.ic_message_white_48dp)
-                            .setLargeIcon(BitmapFactory.decodeResource(getResources(),R.drawable.ic_launcher))
+                            .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_launcher))
                             .setContentTitle("New Message")
                             .setContentText("Check your inbox!")
                             .setAutoCancel(true);
@@ -330,7 +330,7 @@ public class HomeActivity extends AbstractBaseActivity {
     }
 
     public void selectDrawerItem(MenuItem menuItem, String title) {
-        clearBackStack();
+//        clearBackStack();
         // Create a new fragment and specify the fragment to show based on nav item clicked
         Fragment fragment = null;
         Class fragmentClass;
@@ -369,9 +369,9 @@ public class HomeActivity extends AbstractBaseActivity {
             if (fragSearch == null)
                 fragSearch = (SearchFragment) fragment;
             showFragment(fragSearch);
+        } else {
+            showFragment(fragment);
         }
-
-        showFragment(fragment);
         // Highlight the selected item has been done by NavigationView
         menuItem.setChecked(true);
         // Set action bar title
@@ -432,7 +432,7 @@ public class HomeActivity extends AbstractBaseActivity {
                 return true;
             case R.id.action_profile:
                 toVisit = null;
-                clearBackStack();
+//                clearBackStack();
                 showProfile();
                 return true;
             case R.id.action_message:
@@ -566,12 +566,13 @@ public class HomeActivity extends AbstractBaseActivity {
 
     @Override
     public void onBackPressed() {
-        if (fragMeals.onBackPressed())
-            return;
-
-        if (fragSearch != null && fragSearch.onBackPressed())
-            return;
-        super.onBackPressed();
+//        if (fragMeals.onBackPressed())
+//            return;
+//
+//        if (fragSearch != null && fragSearch.onBackPressed())
+//            return;
+//        super.onBackPressed();
+        loadDefaultScreen();
     }
 
 }

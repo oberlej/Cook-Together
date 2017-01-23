@@ -276,6 +276,7 @@ public class MapSearchFragment extends AbstractLocationFragment implements OnMap
         //removes all the marker in the map
         nearByMealsList.clear();
         usersList.clear();
+        if(myGoogleMap!=null)
         myGoogleMap.clear();
         mMarkers.clear();
         if (mClusterManager != null)
