@@ -161,12 +161,15 @@ public abstract class AbstractLocationFragment extends AbstractBaseFragment {
         String provider = locationManager.getBestProvider(criteria, true);
 
         Location location;
-        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(getContext()," Cannot access to your current location",Toast.LENGTH_SHORT).show();
+            /*AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
             String message ="Cannot access to your current location, please verify your location permission before using the application";
             builder.setMessage(message)
                     .setPositiveButton("Continue", dialogClickListener)
-                    .setNegativeButton("Close app", dialogClickListener).show();
+                    .setNegativeButton("Close app", dialogClickListener).show();*/
             return;
         }
         location = locationManager.getLastKnownLocation(provider);
@@ -175,7 +178,7 @@ public abstract class AbstractLocationFragment extends AbstractBaseFragment {
             double lon = location.getLongitude();
             setSelectedLocation(new UserLocation(lat, lon, getAddress(lat, lon)));
         } else {
-            setSelectedLocation(new UserLocation(46.5198,  6.5657)); //todo see if we leave it this way
+            setSelectedLocation(null); //todo see if we leave it this way
         }
         locationManager.requestLocationUpdates(provider, 2000, 10, locationListener);
     }
