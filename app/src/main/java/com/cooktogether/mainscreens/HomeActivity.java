@@ -48,15 +48,17 @@ public class HomeActivity extends AbstractBaseActivity {
     private static final int MY_PERMISSIONS_REQUEST_READ_MEDIA = 1293;
     private DrawerLayout mDrawer;
     private Toolbar mToolbar;
-
     private NavigationView nvDrawer;
-
     private ActionBarDrawerToggle drawerToggle;
+    private Menu mMenu;
 
     public String mMealKey = "";
     private String conversationKey;
 
     private MenuItem itemChecked = null;
+
+    //used to update the message counter in the action bar. this is needed because the message action bar item can be null while a new count is coming in.
+    private int messageCounterUpdate = -1;
 
     private User mUser = null;
     private UploadPicture picLoader;
@@ -111,7 +113,7 @@ public class HomeActivity extends AbstractBaseActivity {
                 }
                 return;
             }
-            case MY_PERMISSIONS_REQUEST_READ_MEDIA:{
+            case MY_PERMISSIONS_REQUEST_READ_MEDIA: {
                 return;
             }
         }
@@ -155,8 +157,9 @@ public class HomeActivity extends AbstractBaseActivity {
                 if (dataSnapshot == null || !dataSnapshot.exists()) {
                     return;
                 }
+
                 int unread = ((Long) dataSnapshot.getValue()).intValue();
-                setMenuCounter(R.id.nav_my_messages, unread);
+                setMessageCounter(unread);
             }
 
             @Override
@@ -309,6 +312,16 @@ public class HomeActivity extends AbstractBaseActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_home, menu);
+        mMenu = menu;
+        mMenu.findItem(R.id.action_message).getActionView().findViewById(R.id.action_message_img).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToConversations();
+            }
+        });
+        if (messageCounterUpdate != -1) {
+            setMessageCounter(messageCounterUpdate);
+        }
         return true;
     }
 
@@ -410,9 +423,32 @@ public class HomeActivity extends AbstractBaseActivity {
         inputManager.hideSoftInputFromWindow(v.getWindowToken(), 0);
     }
 
-    public void setMenuCounter(@IdRes int itemId, int count) {
-        TextView view = (TextView) nvDrawer.getMenu().findItem(itemId).getActionView();
-        view.setText(count > 0 ? String.valueOf(count) : null);
+    public void setMessageCounter(int count) {
+        if (nvDrawer != null && mMenu != null) {
+            TextView navView = (TextView) nvDrawer.getMenu().findItem(R.id.nav_my_messages).getActionView().findViewById(R.id.nav_messages_counter);
+            MenuItem item = mMenu.findItem(R.id.action_message);
+            if (item == null) {
+                messageCounterUpdate = count;
+                return;
+            }
+            View view = item.getActionView();
+            if (view == null) {
+                messageCounterUpdate = count;
+                return;
+            }
+            TextView menuView = (TextView) view.findViewById(R.id.action_message_counter);
+            navView.setText(count > 0 ? String.valueOf(count) : null);
+            if (count < 1) {
+                menuView.setVisibility(View.INVISIBLE);
+                navView.setVisibility(View.INVISIBLE);
+            } else {
+                navView.setVisibility(View.VISIBLE);
+                navView.setText(String.valueOf(count));
+                menuView.setVisibility(View.VISIBLE);
+                menuView.setText(String.valueOf(count));
+            }
+            messageCounterUpdate = -1;
+        }
     }
 
     public User getUser() {

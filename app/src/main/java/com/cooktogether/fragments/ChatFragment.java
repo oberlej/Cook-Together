@@ -22,6 +22,7 @@ import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.Calendar;
@@ -43,6 +44,9 @@ public class ChatFragment extends AbstractBaseFragment {
     private String mConversationKey = null;
 
     private List<String> mUsersKeys;
+
+    private DatabaseReference mConversationRef;
+    private ValueEventListener mConversationListener;
 
     public static ChatFragment newInstance() {
         return new ChatFragment();
@@ -81,14 +85,52 @@ public class ChatFragment extends AbstractBaseFragment {
 
         mConversationKey = ((HomeActivity) mParent).getConversationKey();
         mMessage = (EditText) view.findViewById(R.id.chat_text_input);
-    }
 
-    private void loadConversation() {
+        mConversationRef = getDB().child(getString(R.string.db_user_conversations)).child(mParent.getUid()).child(mConversationKey);
 
-        getDB().child(getString(R.string.db_user_conversations)).child(mParent.getUid())
-                .child(mConversationKey).addListenerForSingleValueEvent(new ValueEventListener() {
+        mAdapter = new FirebaseListAdapter<Message>(getActivity(), Message.class, R.layout.item_chat, mConversationRef.child(getString(R.string.db_messages))) {
+            @Override
+            protected void populateView(View v, Message model, int position) {
+                // Get references to the views of message.xml
+                TextView messageText = (TextView) v.findViewById(R.id.message_text);
+                TextView messageTime = (TextView) v.findViewById(R.id.message_time);
+
+                // Set their text
+                messageText.setText(model.getContent());
+
+                // Format the date before showing it
+                messageTime.setText(model.getDate().toString());
+
+                if (!model.getSenderId().equals(mParent.getUid())) {
+                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) messageText.getLayoutParams();
+                    params.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
+                    params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, 0);
+                    messageText.setLayoutParams(params);
+                    messageText.setBackgroundResource(R.drawable.bg_bubble_white);
+
+                    params = (RelativeLayout.LayoutParams) messageTime.getLayoutParams();
+                    params.addRule(RelativeLayout.ALIGN_LEFT, R.id.message_text);
+                    messageTime.setLayoutParams(params);
+                } else {
+                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) messageText.getLayoutParams();
+                    params.addRule(RelativeLayout.ALIGN_PARENT_LEFT, 0);
+                    params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
+                    messageText.setLayoutParams(params);
+                    messageText.setBackgroundResource(R.drawable.bg_bubble_gray);
+
+                    params = (RelativeLayout.LayoutParams) messageTime.getLayoutParams();
+                    params.addRule(RelativeLayout.ALIGN_RIGHT, R.id.message_text);
+                    messageTime.setLayoutParams(params);
+                }
+            }
+
+        };
+        mList.setAdapter(mAdapter);
+
+        mConversationListener = new ValueEventListener() {
             @Override
             public void onDataChange(final DataSnapshot dataSnapshot) {
+                Boolean firstTime = mConversation == null;
                 Conversation conversation = Conversation.parseSnapshot(dataSnapshot);
                 mConversation = conversation;
                 //set unread to 0
@@ -115,62 +157,44 @@ public class ChatFragment extends AbstractBaseFragment {
                         }
                     });
                 }
+                //set up only done first time listener is fired
+                if (firstTime) {
+                    mParent.getSupportActionBar().setTitle(conversation.getTitle());
+                    mUsersKeys = conversation.getUsersKeys();
 
-                mParent.getSupportActionBar().setTitle(conversation.getTitle());
-                mUsersKeys = conversation.getUsersKeys();
-
-                //to make sure the current user Id is always the first in the list
-                mUsersKeys.remove(mParent.getUid());
-                mUsersKeys.add(0, mParent.getUid());
-
-
-                mAdapter = new FirebaseListAdapter<Message>(getActivity(), Message.class, R.layout.item_chat, dataSnapshot.child(getString(R.string.db_messages)).getRef()) {
-                    @Override
-                    protected void populateView(View v, Message model, int position) {
-                        // Get references to the views of message.xml
-                        TextView messageText = (TextView) v.findViewById(R.id.message_text);
-                        TextView messageTime = (TextView) v.findViewById(R.id.message_time);
-
-                        // Set their text
-                        messageText.setText(model.getContent());
-
-                        // Format the date before showing it
-                        messageTime.setText(model.getDate().toString());
-
-                        if (!model.getSenderId().equals(mParent.getUid())) {
-                            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) messageText.getLayoutParams();
-                            params.addRule(RelativeLayout.ALIGN_PARENT_LEFT, RelativeLayout.TRUE);
-                            params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, 0);
-                            messageText.setLayoutParams(params);
-                            messageText.setBackgroundResource(R.drawable.bg_bubble_white);
-
-                            params = (RelativeLayout.LayoutParams) messageTime.getLayoutParams();
-                            params.addRule(RelativeLayout.ALIGN_LEFT, R.id.message_text);
-                            messageTime.setLayoutParams(params);
-                        } else {
-                            RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) messageText.getLayoutParams();
-                            params.addRule(RelativeLayout.ALIGN_PARENT_LEFT, 0);
-                            params.addRule(RelativeLayout.ALIGN_PARENT_RIGHT, RelativeLayout.TRUE);
-                            messageText.setLayoutParams(params);
-                            messageText.setBackgroundResource(R.drawable.bg_bubble_gray);
-
-                            params = (RelativeLayout.LayoutParams) messageTime.getLayoutParams();
-                            params.addRule(RelativeLayout.ALIGN_RIGHT, R.id.message_text);
-                            messageTime.setLayoutParams(params);
-                        }
-                    }
-
-                };
-
-                mList.setAdapter(mAdapter);
+                    //to make sure the current user Id is always the first in the list
+                    mUsersKeys.remove(mParent.getUid());
+                    mUsersKeys.add(0, mParent.getUid());
+                }
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 Toast.makeText(getContext(), R.string.fail_load_conv, Toast.LENGTH_SHORT).show();
             }
+        };
+    }
 
-        });
+    @Override
+    public void onStart() {
+        super.onStart();
+        //add listeners
+        mConversationRef.addValueEventListener(mConversationListener);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        // Remove post value event listener
+        if (mConversationListener != null) {
+            mConversationRef.removeEventListener(mConversationListener);
+        }
+
+        // Clean up comments listener
+        mAdapter.cleanup();
+    }
+
+    private void loadConversation() {
     }
 
     private void requestFocus(View view) {
