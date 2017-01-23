@@ -64,6 +64,9 @@ public class HomeActivity extends AbstractBaseActivity {
     private UploadPicture picLoader;
     private User toVisit = null;
 
+    private MyMealsListFragment fragMeals;
+    private SearchFragment fragSearch = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,10 +74,17 @@ public class HomeActivity extends AbstractBaseActivity {
 
         setContentView(R.layout.drawer_main);
         init();
-
-        //set default item
-        loadDefaultScreen();
-        checkPermissions();
+        //check if it is the first connexion
+        Intent intent = getIntent();
+        if (intent.hasExtra("first connexion") || (mUser != null && (mUser.getUserName().isEmpty() | mUser.getBirthDate().isEmpty()))) {
+            boolean firstCon = false;
+            if (intent.getBooleanExtra("first connexion", firstCon) || mUser.getUserName().isEmpty() || mUser.getBirthDate().isEmpty())
+                showProfile();
+        } else {
+            //set default item
+            loadDefaultScreen();
+            checkPermissions();
+        }
     }
 
     private void checkPermissions() {
@@ -211,6 +221,14 @@ public class HomeActivity extends AbstractBaseActivity {
     }
 
     public void loadDefaultScreen() {
+        Class fragmentClass = MyMealsListFragment.class;
+        try {
+            fragMeals = (MyMealsListFragment) fragmentClass.newInstance();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
         MenuItem defaultItem = nvDrawer.getMenu().findItem(R.id.nav_my_meals);
         selectDrawerItem(defaultItem, defaultItem.getTitle().toString());
     }
@@ -254,6 +272,7 @@ public class HomeActivity extends AbstractBaseActivity {
     }
 
     public void selectDrawerItem(MenuItem menuItem, String title) {
+        clearBackStack();
         // Create a new fragment and specify the fragment to show based on nav item clicked
         Fragment fragment = null;
         Class fragmentClass;
@@ -286,9 +305,15 @@ public class HomeActivity extends AbstractBaseActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        if (fragment instanceof MyMealsListFragment)
+            showFragment(fragMeals);
+        else if (fragment instanceof SearchFragment) {
+            if (fragSearch == null)
+                fragSearch = (SearchFragment) fragment;
+            showFragment(fragSearch);
+        }
 
         showFragment(fragment);
-
         // Highlight the selected item has been done by NavigationView
         menuItem.setChecked(true);
         // Set action bar title
@@ -297,15 +322,27 @@ public class HomeActivity extends AbstractBaseActivity {
         mDrawer.closeDrawers();
     }
 
+    private void clearBackStack() {
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        // this will clear the back stack and displays no animation on the screen
+        fragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+    }
+
     private void showFragment(Fragment f) {
         // Insert the fragment by replacing any existing fragment
         FragmentManager fragmentManager = getSupportFragmentManager();
-        fragmentManager.beginTransaction().replace(R.id.drawer_screen_content, f).commit();
+        if (!(f instanceof MyMealsListFragment) && !(f instanceof SearchFragment))
+            fragmentManager.beginTransaction().replace(R.id.drawer_screen_content, f).addToBackStack("Fragment").commit();
+        else
+            fragmentManager.beginTransaction().replace(R.id.drawer_screen_content, f).commit();
     }
 
     public void showProfile() {
         Fragment f = ProfileFragment.newInstance();
         showFragment(f);
+        if (itemChecked != null)
+            itemChecked.setChecked(false);
+        itemChecked = null;
         mDrawer.closeDrawers();
     }
 
@@ -385,12 +422,12 @@ public class HomeActivity extends AbstractBaseActivity {
         selectDrawerItem(getNvDrawer().getMenu().findItem(R.id.nav_my_messages), getString(R.string.CONVERSATION_TITLE));
     }
 
-    public void setConversationKey(String conversationKey) {
-        this.conversationKey = conversationKey;
-    }
-
     public String getConversationKey() {
         return conversationKey;
+    }
+
+    public void setConversationKey(String conversationKey) {
+        this.conversationKey = conversationKey;
     }
 
     public void goToConversation(String conversationKey) {
@@ -459,13 +496,24 @@ public class HomeActivity extends AbstractBaseActivity {
         this.mUser = mUser;
     }
 
+    public User getToVisit() {
+        return toVisit;
+    }
+
     public void setToVisit(User toVisit) {
         this.toVisit = toVisit;
     }
 
-    public User getToVisit() {
-        return toVisit;
+    @Override
+    public void onBackPressed() {
+        if (fragMeals.onBackPressed())
+            return;
+
+        if (fragSearch != null && fragSearch.onBackPressed())
+            return;
+        super.onBackPressed();
     }
+
 }
 
 

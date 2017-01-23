@@ -21,13 +21,16 @@ public abstract class AbstractMealListFragment extends AbstractBaseFragment {
     protected RecyclerView mRecycler;
     protected LinearLayoutManager mManager;
     protected TextView mEmptyList;
+    private View v = null;
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_meal_list, container, false);
-        init(view);
-        return view;
+        if (v == null) {
+            v = inflater.inflate(R.layout.fragment_meal_list, container, false);
+            init(v);
+        }
+        return v;
     }
 
     @Override

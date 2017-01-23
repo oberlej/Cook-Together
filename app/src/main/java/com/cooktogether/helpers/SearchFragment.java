@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import com.cooktogether.R;
 import com.cooktogether.fragments.ListSearchFragment;
 import com.cooktogether.fragments.MapSearchFragment;
+import com.cooktogether.listener.OnBackPressListener;
 import com.cooktogether.mainscreens.HomeActivity;
 
 /**
@@ -54,7 +55,7 @@ public class SearchFragment extends AbstractBaseFragment {
     }
 
     private void setupViewPager(final ViewPager viewPager) {
-        adapter = new ViewPagerAdapter(mParent.getSupportFragmentManager());
+        adapter = new ViewPagerAdapter(getChildFragmentManager());
         viewPager.setOffscreenPageLimit(1);
         adapter.addFragment(mList, "List");
         adapter.addFragment(mMap, "Map");
@@ -76,5 +77,18 @@ public class SearchFragment extends AbstractBaseFragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
+    }
+
+    public boolean onBackPressed() {
+        // currently visible tab Fragment
+        OnBackPressListener currentFragment = (OnBackPressListener) adapter.getItem(viewPager.getCurrentItem());
+
+        if (currentFragment != null) {
+            // lets see if the currentFragment or any of its childFragment can handle onBackPressed
+            return currentFragment.onBackPressed();
+        }
+
+        // this Fragment couldn't handle the onBackPressed call
+        return false;
     }
 }

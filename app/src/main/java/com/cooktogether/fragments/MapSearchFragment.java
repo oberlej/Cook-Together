@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import com.cooktogether.R;
 import com.cooktogether.helpers.AbstractLocationFragment;
 import com.cooktogether.helpers.MealMarker;
 import com.cooktogether.helpers.UploadPicture;
+import com.cooktogether.listener.OnBackPressListener;
 import com.cooktogether.mainscreens.HomeActivity;
 import com.cooktogether.model.Meal;
 import com.cooktogether.model.User;
@@ -43,7 +45,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
  * Created by hela on 08/01/17.
  */
 
-public class MapSearchFragment extends AbstractLocationFragment implements OnMapReadyCallback {
+public class MapSearchFragment extends AbstractLocationFragment implements OnMapReadyCallback, OnBackPressListener {
     private GoogleMap myGoogleMap;
     private ArrayList<Meal> nearByMealsList;
     private HashMap<String, User> usersList; //key is mealKey , value is the user
@@ -337,6 +339,37 @@ public class MapSearchFragment extends AbstractLocationFragment implements OnMap
         @Override
         public View getInfoContents(Marker marker) {
             return null;
+        }
+    }
+
+
+    @Override
+    public boolean onBackPressed() {
+        if (getParentFragment() == null) return false;
+
+        int childCount = getParentFragment().getChildFragmentManager().getBackStackEntryCount();
+        if (childCount == 0) {
+            // it has no child Fragment
+            // can not handle the onBackPressed task by itself
+            return false;
+
+        } else {
+            // get the child Fragment
+            FragmentManager childFragmentManager = getParentFragment().getChildFragmentManager();
+            OnBackPressListener childFragment = (OnBackPressListener) childFragmentManager.getFragments().get(1);
+
+            // propagate onBackPressed method call to the child Fragment
+            if (!childFragment.onBackPressed()) {
+                // child Fragment was unable to handle the task
+                // It could happen when the child Fragment is last last leaf of a chain
+                // removing the child Fragment from stack
+                childFragmentManager.popBackStackImmediate();
+
+            }
+
+            // either this Fragment or its child handled the task
+            // either way we are successful and done here
+            return true;
         }
     }
 }

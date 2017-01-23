@@ -90,7 +90,8 @@
                     style="@style/Date"
                     android:layout_height="wrap_content"
                     android:layout_gravity="left"
-                    android:hint="@string/bday" />
+                    android:hint="@string/bday"
+                    android:layout_width="match_parent" />
             </android.support.design.widget.TextInputLayout>
 
             <TextView
