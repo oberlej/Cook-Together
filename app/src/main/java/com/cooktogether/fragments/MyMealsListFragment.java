@@ -11,33 +11,39 @@ import android.view.ViewGroup;
 import com.cooktogether.R;
 import com.cooktogether.helpers.AbstractBaseFragment;
 import com.cooktogether.helpers.ViewPagerAdapter;
+import com.cooktogether.listener.OnBackPressListener;
 import com.cooktogether.mainscreens.HomeActivity;
 
 /**
  * Created by hela on 21/01/17.
  */
 
-public class MyMealsListFragment extends AbstractBaseFragment{
+public class MyMealsListFragment extends AbstractBaseFragment {
     private Fragment mCurrent;
     private Fragment mBooked;
     private ViewPager viewPager;
     private ViewPagerAdapter adapter;
     private TabLayout mTabLayout;
 
+    private View v = null;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_my_meals, container, false);
-        init(view);
-        return view;
+        if (v == null) {
+            v = inflater.inflate(R.layout.fragment_my_meals, container, false);
+
+            init(v);
+        }
+        return v;
     }
 
     @Override
     protected void init(View view) {
         mParent = (HomeActivity) getActivity();
         mParent.getSupportActionBar().setTitle("My Meals");
-        ((HomeActivity)mParent).hideKeyboard(getContext());
-        //init fragments
+        ((HomeActivity) mParent).hideKeyboard(getContext());
 
+        //init fragments
         mCurrent = MyMealsFragment.newInstance();
         mBooked = MyMealsFragment.newInstance();
 
@@ -61,10 +67,11 @@ public class MyMealsListFragment extends AbstractBaseFragment{
     }
 
     private void setupViewPager(final ViewPager viewPager) {
-        adapter = new ViewPagerAdapter(mParent.getSupportFragmentManager());
+        adapter = new ViewPagerAdapter(getChildFragmentManager());
         viewPager.setOffscreenPageLimit(1);
         adapter.addFragment(mCurrent, "Current");
         adapter.addFragment(mBooked, "Booked");
+
         viewPager.setAdapter(adapter);
     }
 
@@ -83,5 +90,18 @@ public class MyMealsListFragment extends AbstractBaseFragment{
     @Override
     public void onDestroy() {
         super.onDestroy();
+    }
+
+    public boolean onBackPressed() {
+        // currently visible tab Fragment
+        OnBackPressListener currentFragment = (OnBackPressListener) adapter.getItem(viewPager.getCurrentItem());
+
+        if (currentFragment != null) {
+            //see if the currentFragment or any of its childFragment can handle onBackPressed
+            return currentFragment.onBackPressed();
+        }
+
+        // this Fragment couldn't handle the onBackPressed call
+        return false;
     }
 }

@@ -1,15 +1,16 @@
 package com.cooktogether.fragments;
 
+import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.widget.Toast;
 
 import com.cooktogether.R;
 import com.cooktogether.adapter.MealsListAdapter;
 import com.cooktogether.helpers.AbstractMealListFragment;
+import com.cooktogether.listener.OnBackPressListener;
 import com.cooktogether.listener.RecyclerItemClickListener;
 import com.cooktogether.mainscreens.HomeActivity;
 import com.cooktogether.model.Meal;
-import com.cooktogether.model.User;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -17,11 +18,8 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
-import de.hdodenhof.circleimageview.CircleImageView;
-
-public class MyMealsFragment extends AbstractMealListFragment {
+public class MyMealsFragment extends AbstractMealListFragment implements OnBackPressListener {
     private boolean current;
     private ArrayList<Meal> myMeals;
 
@@ -94,4 +92,33 @@ public class MyMealsFragment extends AbstractMealListFragment {
         }
     }
 
+    @Override
+    public boolean onBackPressed() {
+        if (getParentFragment() == null) return false;
+
+        int childCount = getParentFragment().getChildFragmentManager().getBackStackEntryCount();
+        if (childCount == 0) {
+            // it has no child Fragment
+            // can not handle the onBackPressed task by itself
+            return false;
+
+        } else {
+            // get the child Fragment
+            FragmentManager childFragmentManager = getParentFragment().getChildFragmentManager();
+            OnBackPressListener childFragment = (OnBackPressListener) childFragmentManager.getFragments().get(0);
+
+            // propagate onBackPressed method call to the child Fragment
+            if (!childFragment.onBackPressed()) {
+                // child Fragment was unable to handle the task
+                // It could happen when the child Fragment is last last leaf of a chain
+                // removing the child Fragment from stack
+                childFragmentManager.popBackStackImmediate();
+
+            }
+
+            // either this Fragment or its child handled the task
+            // either way we are successful and done here
+            return true;
+        }
+    }
 }
