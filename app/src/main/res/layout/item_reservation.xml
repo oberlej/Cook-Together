@@ -1,41 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/common_google_signin_btn_text_dark_disabled"
-    android:orientation="horizontal"
-    android:padding="10dp"
     android:layout_margin="5dp"
+    android:background="@color/common_google_signin_btn_text_dark_disabled"
+    android:backgroundTint="@color/common_google_signin_btn_text_dark_disabled"
+    android:elevation="1dp"
+    android:orientation="horizontal"
     android:weightSum="1">
+
     <LinearLayout
         android:id="@+id/rsv_details_layout"
         android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:layout_weight="0.01">
-    <TextView
-        android:id="@+id/rsv_meal_title"
-        android:layout_width="305dp"
-        android:layout_height="wrap_content" />
-
-    <TextView
-        android:id="@+id/rsv_meal_description"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:maxLines="1" />
-
-    <TextView
-        android:id="@+id/rsv_meal_location"
-        android:layout_width="122dp"
         android:layout_height="wrap_content"
-        android:backgroundTint="@color/common_google_signin_btn_text_dark_default"
-        android:maxLines="1" />
+        android:layout_gravity="start"
+        android:layout_weight="0.71"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/rsv_meal_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+
+        <TextView
+            android:id="@+id/rsv_meal_description"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:maxLines="1" />
+
+        <TextView
+            android:id="@+id/rsv_meal_location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:backgroundTint="@color/common_google_signin_btn_text_dark_default"
+            android:maxLines="1" />
     </LinearLayout>
+    <!-- meal status -->
     <TextView
         android:id="@+id/rsv_status"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignRight="@id/rsv_details_layout"
-        android:layout_gravity="end|center_vertical"/>
+        android:layout_alignRight="@id/meal_details_layout"
+        android:layout_gravity="end|center_vertical"
+        android:layout_weight="0.2"
+        android:textStyle="bold" />
 </LinearLayout>
