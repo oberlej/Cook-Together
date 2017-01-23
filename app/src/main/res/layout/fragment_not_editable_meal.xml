@@ -1,146 +1,163 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/padding"
+    android:paddingTop="40dp"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <ScrollView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingBottom="@dimen/activity_vertical_margin"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingTop="@dimen/activity_vertical_margin">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <LinearLayout
+            style="section_padding"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_marginBottom="8dp"
+            android:orientation="horizontal">
+            <!-- user pic -->
+            <include
+                layout="@layout/profile_pic"
+                style="@style/meal_pic_view"
+                android:layout_width="80dp"
+                android:layout_height="70dp"
+                android:layout_gravity="start"
+                android:layout_weight="0" />
+            <!--Meal Title -->
+            <TextView
+                android:id="@+id/meal_title"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:layout_marginLeft="-80dp"
+                style="@style/meal_title"
+                android:hint="@string/meal_title"
+                android:maxLines="1" />
+        </LinearLayout>
+
+        <View
+            style="@style/Divider"
+            android:layout_width="wrap_content" />
+        <!--Meal description -->
+        <LinearLayout
+            style="section_padding"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/Header"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="0"
+                android:text="@string/description_not_editable" />
+
+            <TextView
+                android:id="@+id/meal_description"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="top|start"
+                android:hint="@string/no_description"
+                android:maxLines="5" />
+        </LinearLayout>
+
+        <View style="@style/Divider" />
+
+        <LinearLayout
+            style="section_padding"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="70dp"
-                android:orientation="horizontal"
-                android:layout_marginBottom="8dp">
-                <!-- user pic -->
-                <include
-                    layout="@layout/profile_pic"
-                    android:layout_width="80dp"
-                    android:layout_height="70dp"
-                    android:layout_gravity="start"
-                    android:layout_weight="0" />
-                <!--Meal Title -->
-                <TextView
-                    android:id="@+id/meal_title"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="center_vertical"
-                    android:hint="@string/meal_title"
-                    android:maxLines="1" />
-            </LinearLayout>
-
-            <View style="@style/Divider"
-                android:layout_width="wrap_content" />
-            <!--Meal description -->
-            <LinearLayout
+            <TextView
+                style="@style/Header"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginBottom="10dp">
-
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0"
-                    android:text="@string/description_not_editable" />
-
-                <TextView
-                    android:id="@+id/meal_description"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:gravity="top|start"
-                    android:hint="@string/no_description"
-                    android:maxLines="5" />
-            </LinearLayout>
-
-            <View style="@style/Divider"/>
+                android:text="@string/free_days" />
 
             <LinearLayout
+                android:id="@+id/list_of_days"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
 
-                <TextView
-                    style="@style/Header"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:text="@string/free_days" />
-
-                <LinearLayout
-                    android:id="@+id/list_of_days"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                </LinearLayout>
             </LinearLayout>
+        </LinearLayout>
 
-            <View style="@style/Divider"/>
+        <View style="@style/Divider" />
+
+        <LinearLayout
+            style="section_padding"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="match_parent"
+                android:src="@drawable/ic_location_on_black_48dp" />
 
             <TextView
                 android:id="@+id/meal_location"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:ems="10"
-                android:maxLines="1"
+                android:layout_marginBottom="8dp"
                 android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"/>
+                android:ems="10"
+                android:maxLines="1" />
+        </LinearLayout>
 
-            <View style="@style/Divider"/>
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:layout_marginBottom="10dp">
+        <View style="@style/Divider" />
+
+        <LinearLayout
+            style="section_padding"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
+            android:orientation="horizontal">
+
             <TextView
                 android:id="@+id/nbr_persons"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="start|center_vertical"
-                android:layout_weight="0"
-                android:layout_marginRight="15dp" />
+                android:layout_marginRight="15dp"
+                android:layout_weight="0" />
 
             <include
                 layout="@layout/reservations_progress_bar"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
-                android:layout_weight="1"/>
-            </LinearLayout>
-                <View style="@style/Divider"/>
+                android:layout_weight="1" />
+        </LinearLayout>
 
-            <LinearLayout
+        <View style="@style/Divider" />
+
+        <LinearLayout
+            style="section_padding"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp"
+            android:orientation="horizontal">
+
+            <Button
+
+                android:id="@+id/contact_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:orientation="horizontal"
-                android:layout_marginTop="10dp">
+                android:text="@string/contact" />
 
-                <Button
-                    android:id="@+id/contact_button"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/contact" />
-
-                <Button
-                    android:id="@+id/reserve_btn"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/reserve"
-                    android:visibility="invisible" />
-            </LinearLayout>
+            <Button
+                android:id="@+id/reserve_btn"
+                style="@style/btn"
+                android:text="@string/reserve"
+                android:visibility="invisible" />
         </LinearLayout>
-    </ScrollView>
-</LinearLayout>
+    </LinearLayout>
+</ScrollView>

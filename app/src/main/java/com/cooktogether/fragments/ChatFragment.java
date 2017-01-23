@@ -131,12 +131,13 @@ public class ChatFragment extends AbstractBaseFragment {
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         final User user = User.parseSnapshot(dataSnapshot);
                         //CLICKABLE ACTION BAR
-                        View actionBar = mParent.findViewById(R.id.toolbar_main);
+                        final View actionBar = mParent.findViewById(R.id.toolbar_main);
                         actionBar.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 // Launch Meal Details Fragment
                                 //to get the user pic
+                                actionBar.setClickable(false);
                                 ((HomeActivity)mParent).setToVisit(user);
                                 ((HomeActivity) mParent).goToMeal(mConversationKey);
                             }

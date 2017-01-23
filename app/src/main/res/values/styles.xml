@@ -9,7 +9,16 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
-
+    <style name="padding">
+        <item name="android:paddingBottom">@dimen/activity_vertical_margin</item>
+        <item name="android:paddingLeft">@dimen/activity_horizontal_margin</item>
+        <item name="android:paddingRight">@dimen/activity_horizontal_margin</item>
+        <item name="android:paddingTop">@dimen/activity_vertical_margin</item>
+    </style>
+    <style name="meal_pic_viem">
+        <item name="android:layout_width">50dp</item>
+        <item name="android:layout_height">50dp</item>
+    </style>
     <style name="ToolbarTheme" parent="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="android:textColorPrimary">@color/actionBarText</item>
         <item name="actionMenuTextColor">@color/actionBarText</item>
@@ -52,6 +61,12 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:drawableRight">@drawable/date</item>
         <item name="android:focusable">true</item>
+    </style>
+    <!-- style for btn -->
+    <style name="btn">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:radius">14dp</item>
     </style>
 
     <style name="ScrollbarStyle">

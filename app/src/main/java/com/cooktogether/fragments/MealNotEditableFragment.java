@@ -182,15 +182,18 @@ public class MealNotEditableFragment extends Fragment {
 
                             if (r.getStatus().equals(StatusEnum.WAITING.getStatus())) {
                                 reserve_btn.setText("WAITING FOR A RESPONSE");
-                                reserve_btn.setBackgroundColor(getResources().getColor(R.color.rsv_orange));
+                                reserve_btn.setBackgroundColor(Color.WHITE);
+                                reserve_btn.setTextColor(getResources().getColor(R.color.rsv_orange));
                             }
                             else if (r.getStatus().equals(StatusEnum.ACCEPTED.getStatus())) {
                                 reserve_btn.setText("Reservation Accepted!");
-                                reserve_btn.setBackgroundColor(getResources().getColor(R.color.rsv_green));
+                                reserve_btn.setBackgroundColor(Color.WHITE);
+                                reserve_btn.setTextColor(getResources().getColor(R.color.rsv_green));
                             }
                             else {
                                 reserve_btn.setText("Reservation Refused");
-                                reserve_btn.setBackgroundColor(getResources().getColor(R.color.rsv_red));
+                                reserve_btn.setBackgroundColor(Color.WHITE);
+                                reserve_btn.setTextColor(getResources().getColor(R.color.rsv_red));
                             }
                             reserve_btn.setEnabled(false);
                         }
