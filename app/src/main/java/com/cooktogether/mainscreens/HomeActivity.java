@@ -166,6 +166,8 @@ public class HomeActivity extends AbstractBaseActivity {
         ivHeaderPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                toVisit = null;
+                clearBackStack();
                 showProfile();
             }
         });
@@ -429,6 +431,8 @@ public class HomeActivity extends AbstractBaseActivity {
                 mDrawer.openDrawer(GravityCompat.START);
                 return true;
             case R.id.action_profile:
+                toVisit = null;
+                clearBackStack();
                 showProfile();
                 return true;
             case R.id.action_message:
