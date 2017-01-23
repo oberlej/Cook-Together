@@ -6,31 +6,33 @@
     android:background="@color/common_google_signin_btn_text_dark_disabled"
     android:backgroundTint="@color/common_google_signin_btn_text_dark_disabled"
     android:elevation="1dp"
-    android:orientation="horizontal"
-    android:weightSum="1">
+    android:orientation="horizontal">
 
     <!-- user pic -->
-    <include
-        style="@style/item_meal_pic_view"
-        layout="@layout/profile_pic"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:layout_weight="0.2"
-        android:gravity="center_vertical" />
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:padding="16dp">
+
+        <include
+            style="@style/item_meal_pic_view"
+            layout="@layout/profile_pic" />
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/meal_details_layout"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="start"
-        android:layout_weight="0.6"
         android:orientation="vertical"
         android:padding="10dp">
 
         <TextView
             android:id="@+id/meal_title"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:textStyle="bold" />
 
 
         <TextView
@@ -45,24 +47,17 @@
             android:layout_height="wrap_content"
             android:backgroundTint="@color/common_google_signin_btn_text_dark_default"
             android:maxLines="1" />
-    </LinearLayout>
-    <!-- meal status -->
-    <TextView
-        android:id="@+id/meal_status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignRight="@id/meal_details_layout"
-        android:layout_gravity="end|center_vertical"
-        android:layout_weight="0.2"
-        android:visibility="gone" />
 
-    <!-- meal reservations progress bar -->
-    <include
-        layout="@layout/reservations_progress_bar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignRight="@id/meal_details_layout"
-        android:layout_gravity="end|center_vertical"
-        android:layout_weight="0.2"
-        android:visibility="gone" />
+        <!-- meal status -->
+        <TextView
+            android:id="@+id/meal_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+        <!-- meal reservations progress bar -->
+        <include
+            layout="@layout/reservations_progress_bar"
+            android:visibility="gone" />
+    </LinearLayout>
 </LinearLayout>

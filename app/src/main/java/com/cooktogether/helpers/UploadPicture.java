@@ -133,7 +133,7 @@ public class UploadPicture {
 
         mUser.setFacebookPicture(false);
         mPicture.setImageBitmap(null);
-        mPicture.setBackgroundResource(R.drawable.ic_photo_camera_black_48dp);
+        mPicture.setBackgroundResource(R.drawable.ic_face_black_48dp);
         picSet = false;
         db.child("users").child(mUser.getUserKey()).child("facebookPicture").setValue(false);
     }

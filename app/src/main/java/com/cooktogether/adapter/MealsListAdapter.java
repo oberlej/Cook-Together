@@ -6,6 +6,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -72,8 +74,8 @@ public class MealsListAdapter extends RecyclerView.Adapter<MealViewHolder> {
             mealRsvProgress.setProgress(m.getNbrReservations());
             progressTxt.setText(m.getNbrReservations() + "/" + m.getNbrPersons() + " places reserved");
             progressTxt.setTextColor(Color.rgb(50, 205, 50)); //color.rsv_green;
-            mealStatus.setVisibility(GONE);
             holder.itemView.findViewById(R.id.progress_bar_layout).setVisibility(View.VISIBLE);
+            mealStatus.setVisibility(View.GONE);
         }
 
         //setting user pic
