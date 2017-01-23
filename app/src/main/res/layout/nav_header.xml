@@ -4,6 +4,7 @@
     android:layout_height="192dp"
     android:background="@color/colorPrimary"
     android:padding="16dp"
+    style="@style/padding"
     android:theme="@style/ThemeOverlay.AppCompat.Dark"
     android:orientation="vertical"
     android:gravity="bottom">

@@ -136,7 +136,8 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
                         return;
                     }
                     mUser = User.parseSnapshot(dataSnapshot);
-                    ((HomeActivity) mParent).setUser(mUser);
+                    if(((HomeActivity) mParent).getToVisit() == null) //loading the current user profile
+                        ((HomeActivity) mParent).setUser(mUser);
                     mUserName.setText(mUser.getUserName());
                     mBirthDate.setText(mUser.getBirthDate());
                     mDescription.setText(mUser.getDescription());
