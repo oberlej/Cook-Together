@@ -94,16 +94,15 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         init(view);
         loadUser();
-        if(mUser!= null && !mUser.getUserKey().equals(getCurrentUser().getUid())) {
+        if (mUser != null && !mUser.getUserKey().equals(getCurrentUser().getUid())) {
             disableEdit();
-            mParent.getSupportActionBar().setTitle(mUser.getUserName() +" Profile");
+            mParent.getSupportActionBar().setTitle(mUser.getUserName() + " Profile");
             setHasOptionsMenu(false);
-        }
-        else {
+        } else {
             mParent.getSupportActionBar().setTitle("My Profile");
             setHasOptionsMenu(true);
         }
-        ((HomeActivity)mParent).hideKeyboard(getContext());
+        ((HomeActivity) mParent).hideKeyboard(getContext());
         return view;
     }
 
@@ -125,7 +124,7 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
     }
 
     private void loadUser() {
-        mUser = ((HomeActivity)mParent).getToVisit()!= null ? ((HomeActivity)mParent).getToVisit() :((HomeActivity) mParent).getUser();
+        mUser = ((HomeActivity) mParent).getToVisit() != null ? ((HomeActivity) mParent).getToVisit() : ((HomeActivity) mParent).getUser();
         if (mUser == null) {
             getDB().child("users").child(getUid()).addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
@@ -136,7 +135,7 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
                         return;
                     }
                     mUser = User.parseSnapshot(dataSnapshot);
-                    if(((HomeActivity) mParent).getToVisit() == null) //loading the current user profile
+                    if (((HomeActivity) mParent).getToVisit() == null) //loading the current user profile
                         ((HomeActivity) mParent).setUser(mUser);
                     mUserName.setText(mUser.getUserName());
                     mBirthDate.setText(mUser.getBirthDate());
@@ -179,7 +178,7 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
             mUseFBPicture.setVisibility(View.VISIBLE);
         }
 
-        if(picLoader.isPicSet())
+        if (picLoader.isPicSet())
             mDeletePicture.setVisibility(View.VISIBLE);
         else
             mDeletePicture.setVisibility(View.GONE);
@@ -292,20 +291,19 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
         // Handle presses on the action bar items
         switch (item.getItemId()) {
             case R.id.action_save:
-                if(checkInputIsValid()) {
+                if (checkInputIsValid()) {
                     saveProfile();
                     Toast.makeText(getContext(), "Profile updated.", Toast.LENGTH_LONG).show();
                     ((HomeActivity) mParent).loadDefaultScreen();
                     return true;
-                }
-                else return false;
+                } else return false;
             case R.id.action_cancel:
                 DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int choice) {
                         switch (choice) {
                             case DialogInterface.BUTTON_POSITIVE:
-                                if(validUser()) {
+                                if (validUser()) {
                                     Toast.makeText(getContext(), "Changes discarded.", Toast.LENGTH_LONG).show();
                                     ((HomeActivity) mParent).loadDefaultScreen();
                                 }
@@ -391,10 +389,10 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
                 picLoader.uploadPicture();
                 picLoader.writePicture();
                 saveUser();
-                ((HomeActivity)mParent).loadPicture();
+                ((HomeActivity) mParent).loadPicture();
             } else {
                 resetPicture();
-                ((HomeActivity)mParent).resetPicture();
+                ((HomeActivity) mParent).resetPicture();
             }
         }
     }
@@ -458,6 +456,8 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
     }
 
     private void setFacebookPicture() {
+        mUseFBPicture.setVisibility(View.GONE);
+        mDeletePicture.setVisibility(View.VISIBLE);
         picLoader.setFacebookPicture();
         if (mUser.isFacebookPicture()) {
             mUseFBPicture.setVisibility(View.GONE);
@@ -483,37 +483,37 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
         mDeletePicture.setVisibility(View.GONE);
     }
 
-  /*  private class DownloadImage extends AsyncTask<String, Void, Bitmap> {
+    /*  private class DownloadImage extends AsyncTask<String, Void, Bitmap> {
 
-        public DownloadImage() {
-        }
+          public DownloadImage() {
+          }
 
-        protected Bitmap doInBackground(String... urls) {
-            Bitmap mIcon11 = null;
-            try {
-                InputStream in = new java.net.URL(urls[0]).openStream();
-                mIcon11 = BitmapFactory.decodeStream(in);
-            } catch (Exception e) {
-            }
-            return mIcon11;
-        }
+          protected Bitmap doInBackground(String... urls) {
+              Bitmap mIcon11 = null;
+              try {
+                  InputStream in = new java.net.URL(urls[0]).openStream();
+                  mIcon11 = BitmapFactory.decodeStream(in);
+              } catch (Exception e) {
+              }
+              return mIcon11;
+          }
 
-        protected void onPostExecute(Bitmap result) {
-            if (result != null) {
-                mPicture.setImageBitmap(result);
-                mUseFBPicture.setVisibility(View.GONE);
-                mDeletePicture.setVisibility(View.VISIBLE);
-                mUser.setFacebookPicture(true);
-                saveUser();
-                uploadPicture();
-                writePicture();
-            } else {
-                Toast.makeText(getContext(), "Failed to download your facebook profile picture. Please try again.", Toast.LENGTH_LONG).show();
-                resetPicture();
-            }
-        }
-    }
-*/
+          protected void onPostExecute(Bitmap result) {
+              if (result != null) {
+                  mPicture.setImageBitmap(result);
+                  mUseFBPicture.setVisibility(View.GONE);
+                  mDeletePicture.setVisibility(View.VISIBLE);
+                  mUser.setFacebookPicture(true);
+                  saveUser();
+                  uploadPicture();
+                  writePicture();
+              } else {
+                  Toast.makeText(getContext(), "Failed to download your facebook profile picture. Please try again.", Toast.LENGTH_LONG).show();
+                  resetPicture();
+              }
+          }
+      }
+  */
     public void updateDateButtonText() {
         String dateForButton = dateFormat.format(mCalendar.getTime());
         mBirthDate.setText(dateForButton);
@@ -543,7 +543,8 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
             mBirthDate.setText(dateForButton);
         }
     }
-    private void disableEdit(){
+
+    private void disableEdit() {
         mPicture.setClickable(false);
         mUserName.setEnabled(false);
         mUseFBPicture.setVisibility(View.GONE);
@@ -551,9 +552,10 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
         mBirthDate.setEnabled(false);
         mDescription.setEnabled(false);
     }
+
     @Override
-    public void onDestroy(){
+    public void onDestroy() {
         super.onDestroy();
-        ((HomeActivity)mParent).setToVisit(null);
+        ((HomeActivity) mParent).setToVisit(null);
     }
 }
