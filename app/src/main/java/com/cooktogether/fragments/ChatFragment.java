@@ -14,10 +14,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cooktogether.R;
+import com.cooktogether.adapter.MealsListAdapter;
 import com.cooktogether.helpers.AbstractBaseFragment;
 import com.cooktogether.mainscreens.HomeActivity;
 import com.cooktogether.model.Conversation;
+import com.cooktogether.model.Meal;
 import com.cooktogether.model.Message;
+import com.cooktogether.model.User;
 import com.firebase.ui.database.FirebaseListAdapter;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.firebase.database.DataSnapshot;
@@ -122,6 +125,29 @@ public class ChatFragment extends AbstractBaseFragment {
                 //to make sure the current user Id is always the first in the list
                 mUsersKeys.remove(mParent.getUid());
                 mUsersKeys.add(0, mParent.getUid());
+
+                getDB().child("users").child(mUsersKeys.get(1)).addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        final User user = User.parseSnapshot(dataSnapshot);
+                        //CLICKABLE ACTION BAR
+                        View actionBar = mParent.findViewById(R.id.toolbar_main);
+                        actionBar.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                // Launch Meal Details Fragment
+                                //to get the user pic
+                                ((HomeActivity)mParent).setToVisit(user);
+                                ((HomeActivity) mParent).goToMeal(mConversationKey);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
 
 
                 mAdapter = new FirebaseListAdapter<Message>(getActivity(), Message.class, R.layout.item_chat, dataSnapshot.child(getString(R.string.db_messages)).getRef()) {
