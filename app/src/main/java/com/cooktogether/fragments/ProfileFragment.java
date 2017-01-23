@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -550,6 +551,7 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
         mDeletePicture.setVisibility(View.GONE);
         mBirthDate.setEnabled(false);
         mDescription.setEnabled(false);
+        mDescription.setTextColor(Color.BLACK);
     }
     @Override
     public void onDestroy(){
