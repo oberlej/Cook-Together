@@ -156,18 +156,21 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
     private boolean checkInputIsValid() {
         boolean valid = true;
         if (mTitle.getText() == null || mTitle.getText().toString().isEmpty()) {
+            mTitle.requestFocus();
             mTitle.setError("Please add a title to your meal!");
             valid = false;
         }
 
         if (getSelectedLocation() == null) {
             Toast.makeText(getContext(), "Unvalid location or no service available", Toast.LENGTH_LONG).show();
+            mLocationName.requestFocus();
             valid = false;
         }
 
         if (mNbrPersonsView.getText() == null || mNbrPersonsView.getText().toString().isEmpty()
                 || Integer.valueOf(mNbrPersonsView.getText().toString()) < 1) {
             mNbrPersonsView.setError("Please put a valid number of persons");
+            mNbrPersonsView.requestFocus();
             valid = false;
         }
 
