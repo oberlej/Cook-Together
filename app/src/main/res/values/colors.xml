@@ -9,6 +9,8 @@
     <color name="rsv_green">#32CD32</color>
     <color name="rsv_red">#FF0000</color>
     <color name="rsv_orange">#FFA500</color>
+    <color name="white">#FFFFFF</color>
+
 
     <!-- Screens background color-->
     <color name="bg_screen1">#20d2bb</color>
@@ -24,7 +26,6 @@
     <color name="dot_light_screen1">#8cf9eb</color>
     <color name="dot_light_screen2">#93c6fd</color>
     <color name="dot_light_screen3">#e4b5fc</color>
-
 
 
     <array name="array_dot_active">

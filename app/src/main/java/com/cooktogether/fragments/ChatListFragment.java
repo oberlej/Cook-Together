@@ -41,7 +41,9 @@ public class ChatListFragment extends AbstractBaseFragment {
     protected RecyclerView mRecycler;
     protected LinearLayoutManager mManager;
 
-//    private TextView mEmptyList;
+    public static ChatListFragment newInstance() {
+        return new ChatListFragment();
+    }
 
     public ChatListFragment() {
     }

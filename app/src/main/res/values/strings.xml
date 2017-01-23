@@ -76,6 +76,7 @@
     <!--error msg-->
     <string name="fail_load_conv">Failed to load Conversation.</string>
     <string name="fail_load_profile">"Failed to load profile. Please try logging out and back in."</string>
+    <string name="newMessageIntent">newMessageNotification</string>
 </resources>
 
 
