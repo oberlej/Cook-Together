@@ -82,6 +82,7 @@ public class MealNotEditableFragment extends Fragment {
 
 
     private void initFields(View view) {
+        picUserClicked = false;
         mParent = (HomeActivity) getActivity();
         mealKey = mParent.getMealKey();
         mParent.getSupportActionBar().setTitle("Proposed Meal");
@@ -277,8 +278,9 @@ public class MealNotEditableFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         ((HomeActivity) mParent).mMealKey = null;
-        if(!picUserClicked) //exit without visiting profile
-            ((HomeActivity)mParent).setToVisit(null);
+        if(!picUserClicked) { //exit without visiting profile
+            mParent.setToVisit(null);
+        }
     }
 }
 

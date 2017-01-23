@@ -96,23 +96,25 @@ public class MyReservationsFragment  extends AbstractBaseFragment {
                     getDB().child("meals").child(rsv.getMealKey()).addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                            Meal m = Meal.parseSnapshot(dataSnapshot);
+                            final Meal m = Meal.parseSnapshot(dataSnapshot);
                             meals.add(m);
+
+                            getDB().child("users").child(m.getUserKey()).addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    User user = User.parseSnapshot(dataSnapshot);
+                                    users.put(m.getMealKey(), user);
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+
                             mAdapter = new ReservationListAdapter(meals, reservations);
                             mRecycler.setAdapter(mAdapter);
                             mEmptyList.setVisibility(View.GONE);
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
-                    getDB().child("users").child(rsv.getUserKey()).addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            User user = User.parseSnapshot(dataSnapshot);
-                            users.put(rsv.getMealKey(), user);
                         }
 
                         @Override
