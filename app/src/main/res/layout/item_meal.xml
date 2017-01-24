@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="5dp"
+    android:layout_margin="@dimen/activity_horizontal_margin"
     android:background="@color/common_google_signin_btn_text_dark_disabled"
     android:backgroundTint="@color/common_google_signin_btn_text_dark_disabled"
     android:elevation="1dp"
