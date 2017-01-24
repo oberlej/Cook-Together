@@ -178,7 +178,6 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
             ((Button) mListOfDays.getRootView().findViewById(R.id.create_new_day_btn)).setError("Please add at least one free day");
             valid = false;
         }
-        Toast.makeText(getContext(), "Please check the information you entered", Toast.LENGTH_LONG).show();
         return valid;
     }
 
@@ -475,10 +474,10 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
     }
 
     private void showProfile(View v) {
-        View parent = (View) (v.getParent()).getParent();
+        View parent = (View) (v.getParent()).getParent().getParent();
         Reservation rsv;
         User user;
-        if( parent.getTag(R.id.TAG_RSV_DEMAND) != null) {
+        if( ((View)parent.getParent()).getTag(R.id.TAG_RSV_DEMAND) != null) {
             rsv = (Reservation) parent.getTag(R.id.TAG_RSV_DEMAND);
             user = mRsv_demands.get(rsv);
         }

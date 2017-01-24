@@ -85,8 +85,8 @@ public class MealNotEditableFragment extends Fragment {
         picUserClicked = false;
         mParent = (HomeActivity) getActivity();
         mealKey = mParent.getMealKey();
-        mParent.getSupportActionBar().setTitle("Proposed Meal");
-        if (mParent.getToVisit() != null) { //should not happen
+
+        if(mParent.getToVisit()!=null) { //should not happen
             CircleImageView userPic = (CircleImageView) view.findViewById(R.id.profile_pic);
             new UploadPicture(getContext(), mParent.getToVisit(), userPic, null, mParent.getRootRef(), mParent.getDB()).loadPicture();
             userPic.setOnClickListener(new View.OnClickListener() {
@@ -140,7 +140,7 @@ public class MealNotEditableFragment extends Fragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Meal meal = Meal.parseSnapshot(dataSnapshot);
-
+                mParent.getSupportActionBar().setTitle(meal.getTitle());
                 mealUserKey = meal.getUserKey();
                 locationName.setText(meal.getLocation().toString());
                 title.setText(meal.getTitle());

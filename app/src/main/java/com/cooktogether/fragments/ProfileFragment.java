@@ -567,7 +567,7 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
     @Override
     public void onDestroy() {
         super.onDestroy();
-        ((HomeActivity) mParent).setToVisit(null);
+        //((HomeActivity) mParent).setToVisit(null);
     }
 
 
