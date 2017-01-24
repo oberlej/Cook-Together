@@ -2,48 +2,66 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="5dp"
+    android:layout_margin="@dimen/activity_horizontal_margin"
     android:background="@color/common_google_signin_btn_text_dark_disabled"
     android:backgroundTint="@color/common_google_signin_btn_text_dark_disabled"
     android:elevation="1dp"
-    android:orientation="horizontal"
-    android:weightSum="1">
+    android:orientation="horizontal">
 
     <LinearLayout
-        android:id="@+id/rsv_details_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="start"
-        android:layout_weight="0.71"
-        android:orientation="vertical"
-        android:padding="10dp">
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:weightSum="10">
 
-        <TextView
-            android:id="@+id/rsv_meal_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-
-
-        <TextView
-            android:id="@+id/rsv_meal_description"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:maxLines="1" />
-
-        <TextView
-            android:id="@+id/rsv_meal_location"
-            android:layout_width="match_parent"
+        <LinearLayout
+            android:id="@+id/rsv_details_layout"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:backgroundTint="@color/common_google_signin_btn_text_dark_default"
-            android:maxLines="1" />
+            android:layout_weight="7"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/rsv_meal_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:lines="1"
+                android:maxLines="1"
+                android:textStyle="bold" />
+
+
+            <TextView
+                android:id="@+id/rsv_meal_description"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:ellipsize="end"
+                android:lines="1"
+                android:maxLines="1" />
+
+            <TextView
+                android:id="@+id/rsv_meal_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="@color/common_google_signin_btn_text_dark_default"
+                android:ellipsize="end"
+                android:lines="1"
+                android:maxLines="1" />
+        </LinearLayout>
+        <!-- meal status -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_weight="3">
+
+            <TextView
+                android:text="asdasdasda"
+                android:id="@+id/rsv_status"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textAlignment="center"
+                android:textStyle="bold" />
+        </LinearLayout>
     </LinearLayout>
-    <!-- meal status -->
-    <TextView
-        android:id="@+id/rsv_status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignRight="@id/meal_details_layout"
-        android:layout_gravity="end|center_vertical"
-        android:layout_weight="0.2"
-        android:textStyle="bold" />
 </LinearLayout>

@@ -85,6 +85,7 @@ public class MealNotEditableFragment extends Fragment {
         picUserClicked = false;
         mParent = (HomeActivity) getActivity();
         mealKey = mParent.getMealKey();
+
         if(mParent.getToVisit()!=null) { //should not happen
             CircleImageView userPic = (CircleImageView) view.findViewById(R.id.profile_pic);
             new UploadPicture(getContext(), mParent.getToVisit(), userPic, null, mParent.getRootRef(), mParent.getDB()).loadPicture();
@@ -111,7 +112,7 @@ public class MealNotEditableFragment extends Fragment {
 
         progressBar = (ProgressBar) view.findViewById(R.id.reservations_progress_bar);
         progressBarTxt = (TextView) view.findViewById(R.id.progress_bar_txt);
-        mNbrPersonsView = (TextView)view.findViewById(R.id.nbr_persons);
+        mNbrPersonsView = (TextView) view.findViewById(R.id.nbr_persons);
         reserve_btn = (Button) view.findViewById(R.id.reserve_btn);
         reserve_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -135,7 +136,7 @@ public class MealNotEditableFragment extends Fragment {
     }
 
     private void loadMeal() {
-        mParent.getDB().child("meals").child(mealKey).addValueEventListener(new ValueEventListener() {
+        mParent.getDB().child("meals").child(mealKey).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Meal meal = Meal.parseSnapshot(dataSnapshot);
@@ -157,7 +158,7 @@ public class MealNotEditableFragment extends Fragment {
                 progressBar.setProgress(mNbrReservations);
 
                 mNbrPersons = meal.getNbrPersons();
-                mNbrPersonsView.setText("Number of persons : "+ String.valueOf(mNbrPersons));
+                mNbrPersonsView.setText("Number of persons : " + String.valueOf(mNbrPersons));
                 progressBar.setMax(mNbrPersons);
                 progressBarTxt.setText(mNbrReservations + "/" + mNbrPersons + " places reserved");
                 if (meal.getBooked()) {
@@ -174,7 +175,7 @@ public class MealNotEditableFragment extends Fragment {
                 if (rsv.containsKey(mParent.getUid())) {
                     contact_btn.setEnabled(true);
                     Query q = mParent.getDB().child("reservations").child(rsv.get(mParent.getUid()));
-                    q.addValueEventListener(new ValueEventListener() {
+                    q.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             Reservation r = Reservation.parseSnapshot(dataSnapshot);
@@ -183,13 +184,11 @@ public class MealNotEditableFragment extends Fragment {
                                 reserve_btn.setText("WAITING FOR A RESPONSE");
                                 reserve_btn.setBackgroundColor(Color.WHITE);
                                 reserve_btn.setTextColor(getResources().getColor(R.color.rsv_orange));
-                            }
-                            else if (r.getStatus().equals(StatusEnum.ACCEPTED.getStatus())) {
+                            } else if (r.getStatus().equals(StatusEnum.ACCEPTED.getStatus())) {
                                 reserve_btn.setText("Reservation Accepted!");
                                 reserve_btn.setBackgroundColor(Color.WHITE);
                                 reserve_btn.setTextColor(getResources().getColor(R.color.rsv_green));
-                            }
-                            else {
+                            } else {
                                 reserve_btn.setText("Reservation Refused");
                                 reserve_btn.setBackgroundColor(Color.WHITE);
                                 reserve_btn.setTextColor(getResources().getColor(R.color.rsv_red));
@@ -257,19 +256,43 @@ public class MealNotEditableFragment extends Fragment {
     }
 
     public void reserve(View v) {
-        String reservationKey = mParent.getDB().child("reservations").push().getKey();
-        Reservation newReserv = new Reservation(reservationKey, mParent.getUid(), mealKey, StatusEnum.WAITING);
-        //set the new reservation
-        mParent.getDB().child("reservations").child(reservationKey).setValue(newReserv);
-        //update user reservations
-        mParent.getDB().child("users").child(mParent.getUid()).child("reservations").child(reservationKey).setValue(true);
-        //meals user reservations
-        mParent.getDB().child("meals").child(mealKey).child("reservations").child(reservationKey).setValue(mParent.getUid());
-        mParent.getDB().child("meals").child(mealKey).child("nbrReservations").setValue(mNbrReservations + 1);
-        if (mNbrReservations + 1 == mNbrPersons) {
-            mParent.getDB().child("meals").child(mealKey).child("booked").setValue(true);
-        }
-        Toast.makeText(getContext(), "A reservation demand has been!", Toast.LENGTH_LONG).show();
+        //check if not full
+        mParent.getDB().child("meals").child(mealKey).child("booked").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot != null && dataSnapshot.exists()) {
+                    if (!(boolean) dataSnapshot.getValue()) {
+                        String reservationKey = mParent.getDB().child("reservations").push().getKey();
+                        Reservation newReserv = new Reservation(reservationKey, mParent.getUid(), mealKey, StatusEnum.WAITING);
+                        //set the new reservation
+                        mParent.getDB().child("reservations").child(reservationKey).setValue(newReserv);
+                        //update user reservations
+                        mParent.getDB().child("users").child(mParent.getUid()).child("reservations").child(reservationKey).setValue(true);
+                        //meals user reservations
+                        mParent.getDB().child("meals").child(mealKey).child("reservations").child(reservationKey).setValue(mParent.getUid());
+                        mParent.getDB().child("meals").child(mealKey).child("nbrReservations").setValue(mNbrReservations + 1);
+                        if (mNbrReservations + 1 == mNbrPersons) {
+                            mParent.getDB().child("meals").child(mealKey).child("booked").setValue(true);
+                        }
+                        reserve_btn.setText("WAITING FOR A RESPONSE");
+                        reserve_btn.setBackgroundColor(Color.WHITE);
+                        reserve_btn.setTextColor(getResources().getColor(R.color.rsv_orange));
+                        reserve_btn.setEnabled(false);
+                        Toast.makeText(getContext(), "A reservation demand has been!", Toast.LENGTH_LONG).show();
+                    } else {
+                        reserve_btn.setText("BOOKED");
+                        reserve_btn.setEnabled(false);
+                        contact_btn.setEnabled(false);
+                        Toast.makeText(getContext(), "Sorry, the meal is already booked. Please look for a different meal.", Toast.LENGTH_LONG).show();
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
     public static Fragment newInstance() {
@@ -280,7 +303,7 @@ public class MealNotEditableFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
         ((HomeActivity) mParent).mMealKey = null;
-        if(!picUserClicked) { //exit without visiting profile
+        if (!picUserClicked) { //exit without visiting profile
             mParent.setToVisit(null);
         }
     }

@@ -93,11 +93,11 @@
                     android:hint="@string/bday" />
             </android.support.design.widget.TextInputLayout>
 
-            <TextView
-                style="@style/Header"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Reviews" />
+            <!--<TextView-->
+                <!--style="@style/Header"-->
+                <!--android:layout_width="match_parent"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="Reviews" />-->
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

@@ -174,16 +174,23 @@ public class ProfileFragment extends AbstractBaseFragment implements View.OnClic
     private void loadPicture() {
         picLoader.loadPicture();
 
-        if (mUser.isFacebookPicture()) {
-            mUseFBPicture.setVisibility(View.GONE);
-        } else {
+        if (mUser.isFacebookConnected()) {
             mUseFBPicture.setVisibility(View.VISIBLE);
+            if (mUser.isFacebookPicture()) {
+                mUseFBPicture.setVisibility(View.GONE);
+            } else {
+                mUseFBPicture.setVisibility(View.VISIBLE);
+            }
+        } else {
+            mUseFBPicture.setVisibility(View.GONE);
         }
 
-        if (picLoader.isPicSet())
-            mDeletePicture.setVisibility(View.VISIBLE);
-        else
-            mDeletePicture.setVisibility(View.GONE);
+
+//
+//        if (picLoader.isPicSet())
+//            mDeletePicture.setVisibility(View.VISIBLE);
+//        else
+//            mDeletePicture.setVisibility(View.GONE);
 
         /* File picture = new File(getContext().getDir("profile_pictures", Context.MODE_PRIVATE) + "/" + getUid() + ".jpg");
 
