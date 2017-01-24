@@ -41,6 +41,7 @@ public class MyReservationsFragment  extends AbstractBaseFragment {
     private ArrayList<Reservation> reservations;
     private ArrayList<Meal> meals;
     private HashMap<String, User> users;
+    private View v = null;
 
     public static MyReservationsFragment newInstance() {
         return new MyReservationsFragment();
@@ -54,9 +55,11 @@ public class MyReservationsFragment  extends AbstractBaseFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_reservation_list, container, false);
-        init(view);
-        return view;
+        if(v == null) {
+            v = inflater.inflate(R.layout.fragment_reservation_list, container, false);
+            init(v);
+        }
+        return v;
     }
 
     @Override

@@ -29,11 +29,9 @@ public class MyMealsListFragment extends AbstractBaseFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        if (v == null) {
             v = inflater.inflate(R.layout.fragment_my_meals, container, false);
 
             init(v);
-        }
         return v;
     }
 

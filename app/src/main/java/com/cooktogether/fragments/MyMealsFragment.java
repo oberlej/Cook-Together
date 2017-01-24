@@ -46,6 +46,7 @@ public class MyMealsFragment extends AbstractMealListFragment implements OnBackP
         mealsQuery.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot mealsSnapshot) {
+                myMeals.clear();
                 for (DataSnapshot mealSnap : mealsSnapshot.getChildren()) {
                     Meal meal = Meal.parseSnapshot(mealSnap);
                     if (current && !meal.getBooked())

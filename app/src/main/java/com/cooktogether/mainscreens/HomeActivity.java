@@ -167,7 +167,7 @@ public class HomeActivity extends AbstractBaseActivity {
             @Override
             public void onClick(View v) {
                 toVisit = null;
-//                clearBackStack();
+                clearBackStack();
                 showProfile();
             }
         });
@@ -330,7 +330,7 @@ public class HomeActivity extends AbstractBaseActivity {
     }
 
     public void selectDrawerItem(MenuItem menuItem, String title) {
-//        clearBackStack();
+        clearBackStack();
         // Create a new fragment and specify the fragment to show based on nav item clicked
         Fragment fragment = null;
         Class fragmentClass;
@@ -363,11 +363,12 @@ public class HomeActivity extends AbstractBaseActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        if (fragment instanceof MyMealsListFragment)
+        if (fragment instanceof MyMealsListFragment) {
+            fragMeals = (MyMealsListFragment) fragment;
             showFragment(fragMeals);
+        }
         else if (fragment instanceof SearchFragment) {
-            if (fragSearch == null)
-                fragSearch = (SearchFragment) fragment;
+            fragSearch = (SearchFragment) fragment;
             showFragment(fragSearch);
         } else {
             showFragment(fragment);
@@ -389,9 +390,9 @@ public class HomeActivity extends AbstractBaseActivity {
     private void showFragment(Fragment f) {
         // Insert the fragment by replacing any existing fragment
         FragmentManager fragmentManager = getSupportFragmentManager();
-//        if (!(f instanceof MyMealsListFragment) && !(f instanceof SearchFragment))
-//            fragmentManager.beginTransaction().replace(R.id.drawer_screen_content, f).addToBackStack("Fragment").commit();
-//        else
+        if (!(f instanceof MyMealsListFragment) && !(f instanceof SearchFragment))
+            fragmentManager.beginTransaction().replace(R.id.drawer_screen_content, f).addToBackStack("Fragment").commit();
+        else
 //            fragmentManager.beginTransaction().replace(R.id.drawer_screen_content, f).commit();
         fragmentManager.beginTransaction().replace(R.id.drawer_screen_content, f).commit();
 
@@ -434,7 +435,7 @@ public class HomeActivity extends AbstractBaseActivity {
                 return true;
             case R.id.action_profile:
                 toVisit = null;
-//                clearBackStack();
+                clearBackStack();
                 showProfile();
                 return true;
             case R.id.action_message:
@@ -496,8 +497,9 @@ public class HomeActivity extends AbstractBaseActivity {
         setConversationKey(conversationKey);
         Fragment f = ChatFragment.newInstance();
         showFragment(f);
-        //itemChecked.setChecked(false);
-        //itemChecked = null;
+        if(itemChecked != null)
+            itemChecked.setChecked(false);
+        itemChecked = null;
         mDrawer.closeDrawers();
 
     }
@@ -506,8 +508,9 @@ public class HomeActivity extends AbstractBaseActivity {
         setMealKey(mealKey);
         Fragment f = MealNotEditableFragment.newInstance();
         showFragment(f);
-        //itemChecked.setChecked(false);
-        //itemChecked = null;
+        if(itemChecked != null)
+            itemChecked.setChecked(false);
+        itemChecked = null;
         mDrawer.closeDrawers();
     }
 
@@ -568,13 +571,12 @@ public class HomeActivity extends AbstractBaseActivity {
 
     @Override
     public void onBackPressed() {
-//        if (fragMeals.onBackPressed())
-//            return;
-//
-//        if (fragSearch != null && fragSearch.onBackPressed())
-//            return;
-//        super.onBackPressed();
-        loadDefaultScreen();
+        if (fragMeals.onBackPressed())
+            return;
+        if (fragSearch != null && fragSearch.onBackPressed())
+            return;
+        super.onBackPressed();
+//        loadDefaultScreen();
     }
 
 }

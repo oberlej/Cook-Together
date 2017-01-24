@@ -46,8 +46,8 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
         mFragmentTitleList.clear();
     }
 
-    @Override
+    /*@Override
     public void restoreState(Parcelable state, ClassLoader loader) {
 
-    }
+    }*/
 }
