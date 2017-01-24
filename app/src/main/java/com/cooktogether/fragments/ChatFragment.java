@@ -178,6 +178,7 @@ public class ChatFragment extends AbstractBaseFragment {
                                     @Override
                                     public void onClick(View v) {
                                         // Launch Meal Details Fragment
+                                        actionBar.setClickable(false);
                                         ((HomeActivity) mParent).setMealKey(mConversationKey);
                                         ((HomeActivity) mParent).selectDrawerItem(((HomeActivity) mParent).getNvDrawer().getMenu().findItem(R.id.nav_meal_detail), getString(R.string.update_meal));
                                     }
@@ -188,7 +189,6 @@ public class ChatFragment extends AbstractBaseFragment {
                                     public void onDataChange(DataSnapshot dataSnapshot) {
                                         final User user = User.parseSnapshot(dataSnapshot);
                                         //CLICKABLE ACTION BAR
-                                        final View actionBar = mParent.findViewById(R.id.toolbar_main);
                                         actionBar.setOnClickListener(new View.OnClickListener() {
                                             @Override
                                             public void onClick(View v) {

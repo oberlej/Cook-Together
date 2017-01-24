@@ -48,6 +48,8 @@ public class ListSearchFragment extends AbstractMealListFragment  implements OnB
         mealsQuery.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot mealsSnapshot) {
+                users.clear();
+                othersMeals.clear();
                 for (DataSnapshot mealSnap : mealsSnapshot.getChildren()) {
                     final Meal meal = Meal.parseSnapshot(mealSnap);
                     if (!meal.getUserKey().equals(getUid())) {

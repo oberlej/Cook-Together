@@ -478,8 +478,8 @@ public class MyMealFragment extends AbstractLocationFragment implements View.OnC
         View parent = (View) (v.getParent()).getParent();
         Reservation rsv;
         User user;
-        if( parent.getTag(R.id.TAG_RSV_DEMAND) != null) {
-            rsv = (Reservation) parent.getTag(R.id.TAG_RSV_DEMAND);
+        if( ((View)parent.getParent()).getTag(R.id.TAG_RSV_DEMAND) != null) {
+            rsv = (Reservation) ((View)parent.getParent()).getTag(R.id.TAG_RSV_DEMAND);
             user = mRsv_demands.get(rsv);
         }
         else{
