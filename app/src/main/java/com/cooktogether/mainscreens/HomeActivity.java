@@ -571,12 +571,12 @@ public class HomeActivity extends AbstractBaseActivity {
 
     @Override
     public void onBackPressed() {
-        if (fragMeals.onBackPressed())
+        if (fragMeals != null && fragMeals.onBackPressed())
             return;
         if (fragSearch != null && fragSearch.onBackPressed())
             return;
-        super.onBackPressed();
-//        loadDefaultScreen();
+        //super.onBackPressed();
+        loadDefaultScreen();
     }
 
 }
